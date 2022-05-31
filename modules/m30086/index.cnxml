@@ -1,0 +1,146 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Ôtômát tuyến tính giới nội và văn phạm cảm ngữ cảnh</title>
+  <metadata>
+  <md:content-id>m30086</md:content-id><md:title>Ôtômát tuyến tính giới nội và văn phạm cảm ngữ cảnh</md:title>
+  <md:abstract>Nội dung chính : Trong chương này, chúng ta xét thêm một loại ôtômát, không mạnh bằng máy Turing, được gọi là ôtômát tuyến tính giới nội (Linear Bounded Automata – LBA). Đồng thời cũng xét thêm lớp văn phạm tương ứng với nó, là lớp văn phạm L1 hay còn gọi là văn phạm cảm ngữ cảnh, lớp văn phạm nằm giữa lớp văn phạm L0 và văn phạm phi ngữ cảnh L2. Từ đó ta hoàn thành sự phân cấp các ngôn ngữ thành 4 cấp, gọi là sự phân cấp Chomsky. 
+Mục tiêu cần đạt: Cuối chương, sinh viên cần phải nắm vững:
+ Khái niệm LBA, định nghĩa và các thành phần.
+ Sự tương đương giữa LBA và văn phạm cảm ngữ cảnh.
+ Mối tương quan giữa các lớp ngôn ngữ. 
+Kiến thức cơ bản: Để tiếp thu tốt nội dung của chương này, sinh viên cần hiểu rõ các dạng ôtômát đã được giới thiệu trong các chương trước, đặc biệt là mô hình máy Turing; nắm vững cơ cấu các lớp văn phạm…
+Tài liệu tham khảo : 
+[1] Nguyễn Văn Ba – Giáo trình ngôn ngữ hình thức – Trường Đại học Bách khoa Hà nội – 1994.
+[2] A. C. Fleck  -  Context Sensitive Languages:                                                                 
+http://www.cs.uiowa.edu/~fleck/PartIIIxpar
+[3] Linear Bounder Automata:                                                                 
+http://cs.engr.uky.edu/~lewis/texts/theory/automata/lb-auto.pdf</md:abstract>
+  <md:uuid>17cc0f19-5fd9-4ab1-8b50-ef0093bbeae3</md:uuid>
+</metadata>
+
+<content>
+    <section id="id-0623557069575">
+      <title>ÔTÔMÁT TUYẾN TÍNH GIỚI NỘI (LBA)</title>
+      <para id="id20255123">Ta gọi Ôtômát tuyến tính giới nội (Linear Bounded Automata - LBA) là một máy Turing không đơn định và không có khả năng nới rộng vùng làm việc ra khỏi mút trái và mút phải của chuỗi nhập. Nó phải thỏa hai điều kiện sau :</para>
+      <para id="id20255140">1) Bộ chữ cái nhập của nó có chứa thêm hai ký hiệu đặc biệt  và $ dùng làm ký hiệu đánh dấu mút trái và mút phải.</para>
+      <para id="id20255161">2) LBA không thực hiện phép chuyển sang trái (L) từ  và không thực hiện phép chuyển sang phải (R) từ $, và cũng không viết các ký hiệu khác lên  và $.</para>
+      <para id="id20255192">LBA đơn giản là một máy Turing nhưng thay vì sử dụng một băng không giới hạn cho việc tính toán, nó bị hạn chế chỉ trong phạm vi băng chứa chuỗi nhập x với hai ô chứa các ký hiệu đánh dấu cận đầu mút. Sự giới hạn này làm cho việc tính toán phải thông qua một số các hàm tuyến tính trên độ dài chuỗi, do đó ta gọi mô hình này là ôtômát tuyến tính giới nội. LBA không dùng các ô trống ở trên băng về phía trái và phía phải của chuỗi nhập, vì vậy ký hiệu khoảng trắng B (Blank) như đã dùng ở máy Turing là không cần dùng ở đây. Trái lại, để LBA nhận biết được giới hạn bên trái và giới hạn bên phải của chuỗi nhập, ta phải đưa thêm vào bộ chữ cái nhập  hai ký hiệu đặc biệt , $ để đánh dấu mút trái và mút phải của chuỗi. Vậy, tại thời điểm bắt đầu, chuỗi nhập đưa vào ở trên băng sẽ có dạng  w $, trong đó w  (- {, $})* là chuỗi cần đoán nhận. Trong quá trình làm việc, khi đầu đọc đọc tới ô có chứa  hay $, thì phép chuyển tiếp theo sau đó chỉ có thể là đổi trạng thái, chuyển đầu đọc trở lại phía trong phạm vi băng (tức chuyển sang phải khi gặp  và chuyển sang trái khi gặp $), và không được phép viết ký hiệu gì khác trên băng tại ô đang đọc khi gặp  và $.</para>
+      <para id="id20255347">Định nghĩa LBA </para>
+      <para id="id20255351">Một cách hình thức, LBA là một hệ thống M(Q, , ,,qo,, $, F), trong đó các thành phần Q, , , qo, F vẫn như đã định nghĩa ở máy Turing, còn , $   và hàm chuyển :</para>
+      <para id="id20255464">: Q    (Q    { L, R})</para>
+      <para id="id20389277">phải thỏa mãn điều kiện:</para>
+      <list id="id20389285" list-type="bulleted">
+        <item>Nếu (p, Y, E)  (q, ) thì Y =  và E = R</item>
+        <item>Nếu (p, Y, E)  (q, $) thì Y = $ và E = L</item>
+      </list>
+      <para id="id20389360">Ngôn ngữ được chấp nhận bởi LBA </para>
+      <para id="id20389366">Ta định nghĩa ngôn ngữ L(M) được đoán nhận bởi LBA M là tập hợp :</para>
+      <para id="id20389376">L(M) = { w  w  ( - {, $})* và qow$ ⊢M* q với q  F và   * }</para>
+      <para id="id20389513">Chú ý rằng các ký hiệu đánh dấu hai đầu mút ngay từ hình thái bắt đầu chúng đã có mặt trên băng nhập, nhưng chúng không được xem như thuộc một phần của chuỗi được chấp nhận hay không được chấp nhận bởi LBA. Vì đầu đọc của LBA không thể dịch chuyển ra ngoài phần chuỗi nhập nên chúng ta không cần định nghĩa các khoảng trống (ký hiệu Blank) phía bên phải của $.</para>
+    </section>
+    <section id="id-89407132017">
+      <title>VĂN PHẠM CẢM NGỮ CẢNH (CSG)</title>
+      <para id="id20389537">Ta gọi văn phạm cảm ngữ cảnh (Context Sensitive Grammar - CSG) là một hệ thống G (V, T, P, S), trong đó:</para>
+      <list id="id20389582" list-type="enumerated">
+        <item>V là một tập hữu hạn các biến hay ký hiệu không kết thúc.</item>
+        <item>T là một tập hữu hạn các ký hiệu cuối, V  T = </item>
+        <item>P là tập hữu hạn các luật sinh dạng    trong đó ,   (V  T)*, chuỗi  phải có chứa biến và ràng buộc    </item>
+        <item>S  V là ký hiệu bắt đầu.</item>
+      </list>
+      <para id="id20389762">Ta định nghĩa ngôn ngữ do văn phạm cảm ngữ cảnh G sinh ra là</para>
+      <para id="id20389772">L(G) = { w  w  * và S * w}</para>
+      <para id="id20389822">L(G) được gọi là ngôn ngữ cảm ngữ cảnh (Context Sensitive Language - CSL). Thuật ngữ “cảm ngữ cảnh” có xuất xứ từ một dạng chuẩn của văn phạm dạng này, trong đó mỗi luật sinh có dạng 1A2  12 với   , cho thấy một biến A chỉ có thể được thay thế bởi một chuỗi  (khác rỗng) trong “ngữ cảnh” 1 - 2. Điều đó không giống như trong văn phạm phi ngữ cảnh, với các luật sinh có dạng A   ( 0), sự thay thế này không đòi hỏi ngữ cảnh.</para>
+      <para id="id20390020">Thí dụ 8.1 : Xét CSG G (V, T, P, S) với V ={ S, B, C},  ={a, b, c} và P gồm các luật sinh như sau :</para>
+      <para id="id20390053">1) S  aSBC</para>
+      <para id="id20390079">2) S  aBC</para>
+      <para id="id20390101">3) CB  BC</para>
+      <para id="id20390125">4) aB  ab</para>
+      <para id="id20390146">5) bB  bb</para>
+      <para id="id20390162">6) bC  bc</para>
+      <para id="id20390178">7) cC  cc</para>
+      <para id="id20390194">Một cách phi hình thức, bằng cách áp dụng một số luật sinh cho các chuỗi dẫn xuất sinh ra ngôn ngữ, ta dễ thấy rằng văn phạm G sinh ra ngôn ngữ có dạng :</para>
+      <para id="id20390208">L = {anbncn n  1}</para>
+      <para id="id20390255">Thật vậy, với luật sinh (1) và (2) ta có chuỗi dẫn xuất S * an(BC)n. Sau đó, bằng cách áp dụng luật sinh (3), mọi biến B sẽ được thay thế lên trước các biến C trong chuỗi dẫn xuất : an(BC) * anBnCn. Bởi luật sinh (4) và (5), mọi biến B sẽ được thay thế thành các ký hiệu kết thúc b, và cuối cùng với (6) và (7), mọi biến C cũng sẽ được thay thế thành c. Tóm lại, ta có chuỗi dẫn xuất như sau :</para>
+      <para id="id20390354">S* an(BC)n * anBnCn * anbncn</para>
+      <para id="id20390454">Bài toán thành viên với CSG (Membership)</para>
+      <para id="id20390460">ĐỊNH LÝ 8.1 : Tồn tại giải thuật để xác định với mọi ngôn ngữ cảm ngữ cảnh CSG G(V, T, P, S) bất kỳ và một chuỗi nhập w  T*, liệu chuỗi w có thuộc ngôn ngữ L(G) hay không.</para>
+      <para id="id20390495">Chứng minh</para>
+      <para id="id20390500">Giả sử  w  = n. Ta lập đồ thị mà mỗi đỉnh là một chuỗi thuộc (V  T)* có độ dài nhỏ hơn hoặc bằng n, có một cung từ đỉnh  đến đỉnh  nếu  G . Như vậy một đường trong đồ thị đó tương ứng với một suy dẫn trong G. Vậy w  L(G) khi và chỉ khi có một đường đi từ đỉnh bắt đầu S tới đỉnh w trong đồ thị. Dùng bất cứ giải thuật nào cho phép tìm đường nối hai đỉnh trong đồ thị (đã có nhiều thuật toán như thế), ta sẽ xác định được phải chăng đã có đường đi từ đỉnh S tới đỉnh w.</para>
+      <para id="id20390617">Thí dụ 8.2 : Xét CSG G (V, T, P, S) với các luật sinh được cho như trong Thí dụ 8.1 trên và xét chuỗi nhập w = abbc. Ta cần xác định xem liệu chuỗi w  L(G)?</para>
+      <para id="id20390663">Để tìm đường đi từ đỉnh S tới đỉnh abbc trong đồ thị nói trên ta có thể dùng phương pháp “vết dầu loang” như sau:</para>
+      <para id="id20390692">Lập các R(i), i = 0, 1, 2, … theo quy tắc sau:</para>
+      <para id="id20390702">R(0) = { S }</para>
+      <para id="id20390709">R(i) = R(i -1)  {      với   R(i -1) và      w  }</para>
+      <para id="id20390849">Do R(0)  R(1)  …  R(i)  R(i +1)  …  tập các đỉnh, vậy tồn tại số k nào đó sao cho:</para>
+      <para id="id20390917">R(k) = R(k +1) = R(k +2) = … </para>
+      <para id="id20390926">Do đó quá trình thành lập các R(i) sẽ có thể ngừng sau k bước.</para>
+      <para id="id20390936">Và w  L(G) khi và chỉ khi có i  k để cho w  R(i).</para>
+      <para id="id20390974">Trong thí dụ trên, giả sử khi ta xét  w = 4, ta có:</para>
+      <para id="id20391001">R(0) = { S }</para>
+      <para id="id20391008">R(1) = {S, aSBC, aBC}</para>
+      <para id="id20391014">R(2) = {S, aSBC, aBC, abC}</para>
+      <para id="id20391021">R(3) = {S, aSBC, aBC, abC, abc}</para>
+      <para id="id20391027">R(4) = R(3)</para>
+      <para id="id20391034">Vậy chuỗi abbc không thuộc L(G).</para>
+    </section>
+    <section id="id-499272213177">
+      <title>SỰ TƯƠNG ĐƯƠNG GIỮA LBA VÀ CSG</title>
+      <para id="id20391061">Chúng ta chú ý rằng LBA có thể chấp nhận các chuỗi rỗng , còn CSG không thể sinh ra chuỗi rỗng. Ngoài trường hợp đó ra thì LBA sẽ chấp nhận chính xác tất cả các chuỗi được sinh ra từ CSG.</para>
+      <para id="id20391089">ĐỊNH LÝ 8.2 : Nếu L là một CSG thì L sẽ được chấp nhận bởi một LBA nào đó.</para>
+      <para id="id20391104">Chứng minh</para>
+      <para id="id20391109">Cách chứng minh định lý này cũng tương tự như cách chứng minh của định lý 7.9 ở chương trước về sự tương đương giữa lớp ngôn ngữ sinh từ văn phạm loại 0 với lớp ngôn ngữ mà máy Turing chấp nhận, chỉ khác là ở đây không cần dùng một băng nhập thứ hai để phát sinh các dạng câu theo chuỗi dẫn xuất lần lượt theo các suy dẫn của văn phạm, mà chỉ cần dùng rãnh thứ hai trên băng nhập của LBA vào việc đó.</para>
+      <para id="id20391127">Cho G = (V, T, P, S) là một CSG, ta xây dựng ôtômát LBA M như sau: Băng nhập của LBA gồm hai rãnh : rãnh 1 chứa chuỗi nhập w với các ký hiệu đánh dấu , $ ở hai đầu, rãnh 2 dùng để phát sinh các dạng câu . Trạng thái bắt đầu, nếu w =  thì M ngừng và không chấp nhận input, nếu không thì đầu đọc viết ký hiệu S ở rãnh 2, ngay dưới ký hiệu bên trái nhất của chuỗi w, tiếp đó M thực hiện quá trình sau:</para>
+      <para id="id20391179">1) Chọn trong số không đơn định một chuỗi con  của chuỗi  trên rãnh 2 sao cho    là một luật sinh trong P.</para>
+      <para id="id20391233">2) Thay  bởi , nếu cần thiết ta phải dịch chuyển phần cuối chuỗi sang phải cho đủ chỗ, tuy nhiên nếu dịch chuyển ra ngoài $ thì LBA ngừng và không chấp nhận.</para>
+      <para id="id20391263">3) (Hình thái hiện tại ở rãnh 1 là  w $, còn ở rãnh 2 là chuỗi , mà S G  và      w ). So sánh rãnh 1 và rãnh 2, nếu  = w thì LBA ngừng và chấp nhận w. Nếu không thì trở về bước (1).</para>
+      <para id="id20391384">Như vậy khi M chấp nhận chuỗi w, thì S G* w. Ngược lại nếu S G* w thì mọi dạng câu  xuất hiện trong chuỗi dẫn xuất đó đều thoả mãn      w , bởi vì mọi luật sinh    trong văn phạm G đều thỏa       . Như vậy M có thể thực hiện chuỗi dẫn xuất đó trên rãnh 2, giữa hai ký hiệu đánh dấu đầu mút  và $. Vậy M chấp nhận chuỗi nhập w. </para>
+      <para id="id20391596">Tóm lại M sẽ chấp nhận mọi chuỗi sinh ra bởi văn phạm G.</para>
+      <para id="id20391606">ĐỊNH LÝ 8.3 : Nếu L = L(M) với một LBA M (Q, , ,,qo,, $, F) thì L – {} là một ngôn ngữ cảm ngữ cảnh.</para>
+      <para id="id20391694">Chứng minh</para>
+      <para id="id20391699">Cách chứng minh định lý này cũng tương tự như cách chứng minh của định lý 7.10 ở chương trước, bằng cách ta xây dựng một CSG G thực hiện 3 giai đoạn:</para>
+      <para id="id20391714">- Giai đoạn 1: Văn phạm cho phép sinh ra một chuỗi w (chuỗi nhập của M), cũng được chứa trong , $ và q0.</para>
+      <para id="id20391744">- Giai đoạn 2: Văn phạm lặp lại công việc của M.</para>
+      <para id="id20391754">- Giai đoạn 3: Khi xuất hiện trạng thái q  F, ta thu về chuỗi w với lưu ý rằng các luật sinh    đều có    =   . </para>
+      <para id="id20391853">Quá trình mô phỏng lại các luật sinh đó bởi các luật sinh của CSG sẽ không có gì vướng mắc. Chỉ ở giai đoạn 3, việc xoá đi các ký hiệu đánh dấu hai đầu mút  và $, q không được phép làm rút ngắn chuỗi nhập lại. Để giải quyết vướng mắc này, ta gắn các ký hiệu , $, q kề bên với các ký hiệu của chuỗi nhập mà không để đứng rời ra như trước.</para>
+      <para id="id20391894">Cụ thể, giai đoạn 1 thực hiện bởi các luật sinh trong G sau:</para>
+      <para id="id20391905">S1  [a, q0  a]S2S1  [a, q0a$]</para>
+      <para id="id20391981">S2  [a, a]S2,S2  [a,a$]</para>
+      <para id="id20392036">a   - {, $}</para>
+      <para id="id20392078">Các luật sinh trong G cho phép thực hiện giai đoạn 2, giống như LBA M thực hiện (sinh viên tự xây dựng xem như bài tập).</para>
+      <para id="id20392091">Cuối cùng, ở giai đoạn 3, các luật sinh sau đây sẽ được sử dụng, với q  F :</para>
+      <para id="id20392112"> [a, q]  a</para>
+      <para id="id20392155">a   - {, $} và ,  có thể có. </para>
+      <para id="id20392214">Chú ý rằng số luật sinh là hữu hạn, vì  và / hoặc  chỉ gồm , $ và một ký hiệu nhập vào. Chúng ta cũng có thể xoá thành phần thứ hai của một biến nếu nó liền kề với ký hiệu kết thúc bằng cách dùng các luật sinh dạng:</para>
+      <para id="id20392258">[a, ]b  ab</para>
+      <para id="id20392288">b[a, ]  ba</para>
+      <para id="id20392318">a, b   - {, $} và  có thể có. </para>
+      <para id="id20392370">Như vậy các luật sinh vừa được xây dựng mô tả văn phạm là CSG và có thể chứng minh L(M) - {} = L(G).</para>
+    </section>
+    <section id="id-930210667669">
+      <title>TƯƠNG QUAN GIỮA CÁC LỚP NGÔN NGỮ </title>
+      <para id="id20392400">Ngôn ngữ đoán nhận bởi các văn phạm cũng được phân loại theo tên của từng lớp văn phạm, ta gọi đó là sự phân cấp Chomsky về ngôn ngữ. </para>
+      <para id="id20392414">Có 4 lớp ngôn ngữ đã được giới thiệu – tập đệ quy liệt kê (r.e), ngôn ngữ cảm ngữ cảnh (CSL), ngôn ngữ phi ngữ cảnh (CFL) và tập chính quy (r) tương đương với 4 lớp ngôn ngữ loại 0, 1, 2 và 3.</para>
+      <para id="id20392426">Theo lý thuyết được xây dựng xuyên suốt trong giáo trình này, ta có thể tóm tắt lại như sau: </para>
+      <para id="id20392435">a) L là ngôn ngữ loại 0 khi và chỉ khi L được đoán nhận bởi một máy Turing.</para>
+      <para id="id20392445">b) L là ngôn ngữ loại 1 khi và chỉ khi L được đoán nhận bởi một ôtômát tuyến tính giới nội (sai khác chuỗi rỗng )</para>
+      <para id="id20392466">c) L là ngôn ngữ loại 2 khi và chỉ khi L được đoán nhận bởi một ôtômát đẩy xuống (không đơn định).</para>
+      <para id="id20392479">d) L là ngôn ngữ loại 3 khi và chỉ khi L được đoán nhận bởi một ôtômát hữu hạn (sai khác chuỗi rỗng ).</para>
+      <para id="id20392501">Ta cũng cần lưu ý rằng sự phân cấp ngôn ngữ như trên là một bao hàm thức nghiêm ngặt, thể hiện quy luật sau: </para>
+      <para id="id20392510">a) Lớp các ngôn ngữ loại 3 là tập con thực sự của lớp ngôn ngữ loại 2. Thật vậy mọi văn phạm chính quy đều là văn phạm phi ngữ cảnh. Hơn nữa người ta có thể chứng minh rằng ngôn ngữ {0n1n  n  1} là một ngôn ngữ phi ngữ cảnh, nhưng không phải là ngôn ngữ chính quy.</para>
+      <para id="id20392559">b) Lớp các ngôn ngữ loại 2 không chứa các chuỗi rỗng là tập con thực sự của lớp ngôn ngữ loại 1. Thật vậy mọi văn phạm phi ngữ cảnh có dạng chuẩn Chomsky đều là văn phạm cảm ngữ cảnh. Hơn nữa người ta có thể chứng minh rằng ngôn ngữ {a 2i  i  1} là ngôn ngữ cảm ngữ cảnh nhưng không là ngôn ngữ phi ngữ cảnh.</para>
+      <para id="id20392602">c) Lớp các ngôn ngữ loại 1 là tập con thực sự của lớp các ngôn ngữ loại 0. Thật vậy, mọi văn phạm cảm ngữ cảnh đều là văn phạm cấu trúc không hạn chế. Mặt khác người ta cũng đề xuất được những ngôn ngữ là đệ quy liệt kê (loại 0), mà không cần làm ngữ cảnh (loại 1). Các thí dụ đó được xây dựng dựa trên các khái niệm “đệ quy” và “sự giải được”, mà khuôn khổ giáo trình này không cho phép đề cập đến.</para>
+      <para id="id20392620">Tổng kết chương VIII: Với sự giới thiệu mô hình ôtômát tuyến tính giới nội LBA và lớp ngôn ngữ cảm ngữ cảnh mà nó đoán nhận, mô hình phân cấp ngôn ngữ theo Noam Chomsky đã được hoàn chỉnh. </para>
+      <para id="id20392640">BÀI TẬP CHƯƠNG VIII</para>
+      <para id="id20259571">8.1. Xây dựng văn phạm cảm ngữ cảnh sinh ra các ngôn ngữ sau:</para>
+      <para id="id20259585">a) { ww | w Î (0+1)+}</para>
+      <para id="id20259618">b) { 0k | k = i2 và i ³ 1} </para>
+      <para id="id20259659">c) { 0i | i không là số nguyên tố} </para>
+      <para id="id20259684">d) { ai b2i c3i  i ³ 1}</para>
+      <para id="id20259734">e) { ai bi ck  i ³ 1, k  1}</para>
+      <para id="id20259792">8.2. Thiết kế ôtômát tuyến tính giới nội LBA đoán nhận các ngôn ngữ sau:</para>
+      <list id="id20259806" list-type="enumerated">
+        <item>{ an bn cn  n ³ 1}</item>
+      </list>
+      <para id="id20259860">b) { ww | w Î (a + b + c)*}</para>
+    </section>
+  </content>
+</document>

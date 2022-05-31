@@ -1,0 +1,406 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Ôtômát đẩy xuống</title>
+  <metadata>
+  <md:content-id>m30082</md:content-id><md:title>Ôtômát đẩy xuống</md:title>
+  <md:abstract>Nội dung chính: Trong chương này, chúng ta khảo sát một dạng mô hình ôtômát khác, có khả năng nhận diện được lớp ngôn ngữ mà văn phạm phi ngữ cảnh sinh ra - ôtômát đẩy xuống (PDA) - với sự bổ sung thêm của Stack đóng vai trò như một bộ giữ nhớ trong quá trình ôtômát thực hiện các phép chuyển để nhận dạng ngôn ngữ. Tiếp theo đó, mối quan hệ tương đương giữa hai cơ chế - ôtômát đẩy xuống và CFG- dùng biểu diễn cho lớp văn phạm phi ngữ cảnh cũng sẽ được nêu ra và chứng minh chặt chẽ.
+Mục tiêu cần đạt : Cuối chương này, sinh viên có thể:
+ Thiết kế PDA chấp nhận một ngôn ngữ phi ngữ cảnh cho trước bằng Stack rỗng hay trạng thái kết thúc. 
+ Chuyển một PDA chấp nhận ngôn ngữ bằng trạng thái kết thúc sang PDA chấp nhận ngôn ngữ bằng Stack rỗng và ngược lại. 
+ Xây dựng NPDA chấp nhận ngôn ngữ sinh ra từ một CFG. 
+ Viết văn phạm phi ngữ cảnh sinh ra lớp ngôn ngữ được chấp nhận bởi một NPDA cho trước. 
+Kiến thức cơ bản: Để tiếp thu tốt nội dung của chương này, sinh viên cần nắm vững các tính chất của lớp ngôn ngữ phi ngữ cảnh; cơ chế đoán nhận ngôn ngữ của dạng máy trừu tượng ôtômát và các thành phần bắt buộc của chúng; …
+Tài liệu tham khảo : 
+[1] V.J. Rayward-Smith – A First course in Formal Language Theory (Second Editor) –  McGraw-Hill Book Company Europe – 1995 (Chapter 6 : Pushdown Automata )
+[2] John E. Hopcroft, Jeffrey D.Ullman – Introduction to Automata Theory, Languages and Computation – Addison – Wesley Publishing Company, Inc – 1979 (Chapter 5 : Pushdown Automata )
+[3] Hồ Văn Quân – Giáo trình lý thuyết ôtômát và ngôn ngữ hình thức – Nhà xuất bản Đại học quốc gia Tp. Hồ Chí Minh – 2002.
+[4] Copy right by David Matuszek - NPDAs and CFGs:                                                                 
+http://www.netaxs.com/people/nerp/automata/npda-cfg0.html</md:abstract>
+  <md:uuid>7cab59c1-665d-4775-8464-a3b18010d0da</md:uuid>
+</metadata>
+
+<content>
+    <section id="id-77420877592">
+      <title>ÔTÔMÁT ĐẨY XUỐNG ( PDA : PUSHDOWN AUTOMATA)</title>
+      <para id="id19604867">Như ta đã biết, lớp các ngôn ngữ chính quy được sinh từ văn phạm chính quy, đồng thời cũng được đoán nhận bởi các ôtômát hữu hạn (đơn định hoặc không đơn định). Trong phần này, chúng ta lại thấy một điều tương tự là lớp ngôn ngữ phi ngữ cảnh, được sinh ra từ văn phạm phi ngữ cảnh, cũng được đoán nhận bởi một loại ôtômát khác - gọi là ôtômát đẩy xuống (PDA). </para>
+      <para id="id19604891">Có một điều khác biệt là ở đây, chỉ có dạng ôtômát đẩy xuống không đơn định (NPDA) mới có thể đủ mạnh để đoán nhận lớp ngôn ngữ phi ngữ cảnh, còn dạng đơn định (DPDA) chỉ cho phép đoán nhận một tập con thực sự của lớp ngôn ngữ này. Tuy nhiên, tập con đó cũng bao gồm phần lớn các ngôn ngữ lập trình. </para>
+      <section id="id-81737984496">
+        <title>Mô tả PDA </title>
+        <para id="id19604915">Ôtômát đẩy xuống thực chất là một ôtômát với sự điều khiển cả hai: băng nhập và Stack (bộ đẩy xuống). Về cơ bản, nó vẫn giữ tất cả các thành phần của một ôtômát hữu hạn, với sự bổ sung thêm một ngăn xếp làm việc (Stack) đóng vai trò như một bộ giữ nhớ, nhờ đó mà khả năng ghi nhớ của ôtômát được tăng thêm. Stack xem như là một chồng đĩa, vì vậy cái đặt vào sau sẽ lấy ra trước (LIFO). </para>
+        <para id="id19604940">Với sự mở rộng này ôtômát đẩy xuống có thể chấp nhận cả các biểu thức không chính quy. Chẳng hạn tập hợp L = {wcwR | w  (0+1)*} (với wR là chuỗi đảo ngược của chuỗi w) là một ngôn ngữ phi ngữ cảnh sinh bởi văn phạm S  0S0 | 1S1 | c và nó không thể được chấp nhận bởi bất kỳ một ôtômát hữu hạn nào.</para>
+        <figure id="id19605007">
+          <media id="id1163770265965" alt=""><image src="../../media/graphics1-6edb.png" mime-type="image/png" height="128" width="359"/></media>
+        </figure>
+        <para id="id19504298">Hình 6.1 - Mô tả một PDA </para>
+        <para id="id19504319">Để chấp nhận ngôn ngữ L như trên ta dùng bộ điều khiển có hai trạng thái q1, q2 và một Stack trên đó ta đặt các đĩa xanh (B), vàng (Y), đỏ (R). Thiết bị sẽ thao tác theo các quy tắc sau đây:</para>
+        <para id="id19504349">1) Máy sẽ bắt đầu với một đĩa đỏ ở trên Stack và bộ điều khiển ở trạng thái q1.</para>
+        <para id="id19504369">2) Nếu 0 được đưa vào thiết bị thì ta đặt một đĩa xanh vào Stack. Nếu đưa 1 vào thiết bị ở trạng thái q1 thì ta đặt một đĩa vàng vào Stack. Cả hai trường hợp thiết bị không thay đổi trạng thái.</para>
+        <para id="id19504393">3) Nếu c được đưa vào thiết bị ở trạng thái q1 thì thiết bị đổi trạng thái sang q2 và không thay đổi Stack.</para>
+        <para id="id19504426">4) Nếu 0 được đưa vào thiết bị ở trạng thái q2 và đỉnh Stack là đĩa màu xanh thì đĩa được lấy ra. Nếu 1 đưa vào thiết bị ở trạng thái q2 và đĩa vàng tại đỉnh Stack thì ta loại bỏ đĩa này. Trạng thái q2 không thay đổi.</para>
+        <para id="id19504469">5) Nếu thiết bị ở trạng thái q2 và đĩa đỏ tại đỉnh Stack ta loại bỏ đĩa này không cần ký hiệu nhập.</para>
+        <para id="id19504489">6) Ngoài các trường hợp trên thì thiết bị không thay đổi.</para>
+        <para id="id19504499">Các quy tắc trên được tóm tắt như trong bảng sau:</para>
+        <table id="id19504506" summary="">
+          <tgroup cols="5">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <colspec colnum="4" colname="c4"/>
+            <colspec colnum="5" colname="c5"/>
+            <tbody>
+              <row>
+                <entry namest="c1" nameend="c5">INPUT</entry>
+              </row>
+              <row>
+                <entry>Đỉnh Stack</entry>
+                <entry>Trạng thái</entry>
+                <entry>0</entry>
+                <entry>1</entry>
+                <entry>c</entry>
+              </row>
+              <row>
+                <entry>Xanh</entry>
+                <entry>q1</entry>
+                <entry>Thêm đĩa xanh, giữ nguyên q1</entry>
+                <entry>Thêm đĩa vàng, giữ nguyên q1</entry>
+                <entry>Chuyển sang q2</entry>
+              </row>
+              <row>
+                <entry/>
+                <entry>q2</entry>
+                <entry>Xoá đỉnh Stack, giữ nguyên q2</entry>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry>Vàng</entry>
+                <entry>q1</entry>
+                <entry>Thêm đĩa xanh, giữ nguyên q1</entry>
+                <entry>Thêm đĩa vàng, giữ nguyên q1</entry>
+                <entry>Chuyển sang q2</entry>
+              </row>
+              <row>
+                <entry/>
+                <entry>q2</entry>
+                <entry/>
+                <entry>Xoá đỉnh Stack giữ nguyên q2</entry>
+                <entry/>
+              </row>
+              <row>
+                <entry>Đỏ</entry>
+                <entry>q1</entry>
+                <entry>Thêm đĩa xanh, giữ nguyên q1</entry>
+                <entry>Thêm đĩa vàng, giữ nguyên q1</entry>
+                <entry>Chuyển sang q2</entry>
+              </row>
+              <row>
+                <entry/>
+                <entry>q2</entry>
+                <entry namest="c3" nameend="c5">Xoá đỉnh Stack không cần đọc input</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id19505018">Hình 6.2 - Mô tả hoạt động của PDA chấp nhận ngôn ngữ {wcwR |w (0+1)*}</para>
+        <para id="id19505073">Một chuỗi được chấp nhận bởi thiết bị nếu nó đã đọc duyệt qua đến hết chuỗi đồng thời với Stack trở về trạng thái rỗng.</para>
+        <para id="id19505086">Nhận xét : Nhờ Stack có khả năng lưu giữ một số bất kỳ các ký hiệu mà PDA có thể nhớ nửa phần đầu của chuỗi (w) cho tới khi gặp ký hiệu phân cách c, cho dù chuỗi có độ dài lớn đến bao nhiêu. Và sau đó, các ký hiệu này được đem ra để so sánh dần với phần chuỗi ngược còn lại (wR). Một ôtômát hữu hạn không có được khả năng ghi nhớ đó. </para>
+      </section>
+      <section id="id-191972671901">
+        <title>Định nghĩa </title>
+        <para id="id19505142">Ôtômát đẩy xuống có một bộ điều khiển hữu hạn và một Stack. Stack chứa một chuỗi các ký hiệu thuộc một bộ chữ cái nào đó. Ký hiệu bên trái nhất của chuỗi xem như ký hiệu tại đỉnh Stack. PDA không đơn định nếu như có một số hữu hạn các lựa chọn phép chuyển trong mỗi lần chuyển. </para>
+        <para id="id19505162">Phép chuyển sẽ có hai kiểu:</para>
+        <para id="id19505167">- Kiểu thứ nhất phụ thuộc vào ký hiệu nhập, tức là với một trạng thái, một ký hiệu tại đỉnh Stack và một ký hiệu nhập; PDA sẽ lựa chọn trạng thái kế tiếp và một chuỗi các ký hiệu thay thế trên Stack, đầu đọc dịch đi sang phải một ký hiệu.</para>
+        <para id="id19505185">- Kiểu thứ hai không phụ thuộc vào ký hiệu nhập, gọi là  - dịch chuyển : tương tự như kiểu thứ nhất, chỉ ngoại trừ là ký hiệu nhập không được dùng và đầu đọc không dịch chuyển sau khi chuyển trạng thái. Thực chất, bước chuyển đặc biệt này là một sự tạm ngừng quan sát trên băng nhập để sắp xếp lại các ký hiệu trong ngăn xếp.</para>
+        <para id="id19505214">Có hai cách để định nghĩa ngôn ngữ chấp nhận bởi ôtômát đẩy xuống: </para>
+        <para id="id19505224">- Ngôn ngữ được chấp nhận bởi Stack rỗng: gồm tất cả các input mà sau một chuỗi các phép chuyển trạng thái làm cho ôtômát dẫn tới Stack rỗng.</para>
+        <para id="id19505238">- Ngôn ngữ được chấp nhận bởi trạng thái kết thúc: ta thiết kế một số trạng thái kết thúc, khi đó ngôn ngữ chấp nhận bởi ôtômát có thể định nghĩa gồm tất cả các input mà có một chuỗi các phép chuyển làm cho ôtômát dẫn tới một trong những trạng thái kết thúc.</para>
+        <para id="id19505256">Ta có thể thấy hai cách định nghĩa cho sự chấp nhận chuỗi này là tương đương nhau trong mọi trường hợp, có nghĩa là nếu một tập hợp được chấp nhận bởi Stack rỗng của một PDA nào đó thì cũng sẽ được chấp nhận bằng trạng thái kết thúc trên một PDA khác, và ngược lại. Thiết kế PDA chấp nhận chuỗi bằng trạng thái kết thúc thường phổ biến hơn, nhưng sẽ dễ dàng hơn để chứng minh nguyên lý cơ bản của PDA khi thiết kế PDA chấp nhận chuỗi bằng Stack rỗng. Nguyên lý này được phát biểu như sau: Một ngôn ngữ được chấp nhận bởi PDA khi và chỉ khi nó là một ngôn ngữ phi ngữ cảnh.</para>
+        <para id="id19505293">Một cách hình thức, ta định nghĩa:</para>
+        <para id="id19505302">Định nghĩa : Một ôtômát đẩy xuống M là một hệ thống M (Q, , , , q0, Z0, F), trong đó :</para>
+        <para id="id19505363">1) Q là tập hữu hạn các trạng thái</para>
+        <para id="id19505369">2)  là bộ chữ cái gọi là bộ chữ cái nhập</para>
+        <para id="id19505386">3)  là bộ chữ cái gọi là bộ chữ cái Stack</para>
+        <para id="id19505404">4) : hàm chuyển ánh xạ từ Q  ( {})    tập con hữu hạn của Q  *</para>
+        <para id="id19505499">5) q0 là trạng thái khởi đầu</para>
+        <para id="id19505516">5) Z0 là một chữ cái riêng của Stack gọi là ký hiệu bắt đầu trên Stack</para>
+        <para id="id19505534">6) F  Q là tập các trạng thái kết thúc</para>
+        <para id="id19505552">(Trong trường hợp PDA được thiết kế chấp nhận ngôn ngữ bằng Stack rỗng thì tập hợp F = )</para>
+        <para id="id19505572">Trừ khi ta dùng các ký hiệu khác, ta quy ước dùng chữ nhỏ gần đầu bảng chữ cái để chỉ các ký hiệu nhập, các chữ nhỏ cuối bảng chữ cái để chỉ các chuỗi nhập. Các chữ hoa và chữ Hy lạp chỉ ký hiệu và chuỗi ký hiệu Stack.</para>
+        <para id="id19505589">Câu hỏi :</para>
+        <para id="id19505601">?</para>
+        <para id="id19505714">So sánh các thành phần trong định nghĩa hình thức cho một ôtômát đẩy xuống </para>
+        <para id="id19505722">PDA với ôtômát hữu hạn đã khảo sát trong chương 3 ? Nêu những khả năng mở</para>
+        <para id="id19505729">rộng của PDA so với FA ?</para>
+        <para id="id19505734">Sự dịch chuyển </para>
+        <para id="id19505739">Hàm chuyển phụ thuộc ký hiệu nhập : </para>
+        <para id="id19505745">(q, a, Z) = {(p1, 1), (p2, 2), ..., (pm, m)} </para>
+        <para id="id19505820">trong đó q và pi, 1  i  m, là các trạng thái thuộc tập Q, a  , Z là một ký hiệu Stack và i  *, 1  i  m, là PDA ở trạng thái q với ký hiệu nhập a và ký hiệu Z tại đỉnh Stack, nó đi vào một trạng thái pi nào đó thay Z bằng i và dịch chuyển đầu đọc đi một ký hiệu. Ta quy ước rằng ký hiệu bên trái nhất của i sẽ là ký hiệu được thay cao nhất trên Stack (nghĩa là nó nằm tại đỉnh Stack mới) và ký hiệu bên phải nhất của i là ký hiệu được thay thấp nhất trong Stack. Chú ý rằng không được phép chọn pi và j với i  j tại một bước chuyển nào đó.</para>
+        <para id="id19506026">Hàm chuyển không phụ thuộc ký hiệu nhập :</para>
+        <para id="id19506032">(q, , Z) = {(p1, 1), (p2, 2), ..., (pm, m)} </para>
+        <para id="id19506116">trong đó q là trạng thái mà PDA đang giữ, độc lập với ký hiệu nhập, PDA đi vào trạng thái pi thay Z bởi i với 1  i  m. Trong trường hợp này đầu đọc không dịch chuyển.</para>
+        <para id="id19506173">Thí dụ 6.1 :Mô tả dưới đây cho PDA chấp nhận ngôn ngữ {wcwR w  (0+1)*} bằng Stack rỗng. </para>
+        <para id="id19506223">M ({q1, q2}, {0, 1, c}, {R, B, Y}, d, q1, R, Æ ) </para>
+        <para id="id19506277">1) d(q1, 0, R) = {(q1, BR)} </para>
+        <para id="id19506316">2)d(q1, 1, R) = {(q1, YR)}</para>
+        <para id="id19506351">3)d(q1, 0, B) = {(q1, BB)} </para>
+        <para id="id19506390">4)d(q1, 1, B) = {(q1, YB)}</para>
+        <para id="id19506426">5)d(q1, 0, Y) = {(q1, BY)} </para>
+        <para id="id19634604">6)d(q1, 1, Y) = {(q1, YY)}</para>
+        <para id="id19634639">7)d(q1, c, R) = {(q2, R)}</para>
+        <para id="id19634674">8)d(q1, c, B) = {(q2, B)}</para>
+        <para id="id19634709">9)d(q1, c, Y) = {(q2, Y)}</para>
+        <para id="id19634744">10)d(q2, 0, B) = {(q2, e)}</para>
+        <para id="id19634786">11)d(q2, 1, Y) = {(q2, e)}</para>
+        <para id="id19634832">12)d(q2, e, R) = {(q2, e)}</para>
+        <para id="id19634883">Hình 6.3 - Mô tả PDA chấp nhận wcwR bằng Stack rỗng</para>
+        <para id="id19634909">Chú ý rằng mỗi phép chuyển PDA sẽ viết lên đỉnh Stack một chuỗi  có độ dài 2. Chẳng hạn d(q1, 0, R) = {(q1, BR)}. Nếu  có độ dài bằng 1 thì PDA đơn giản là thay ký hiệu tại đỉnh Stack và không làm thay đổi độ dài Stack. Nếu  bằng  thì PDA loại bỏ (Pop) phần tử tại đỉnh Stack. Chẳng hạn d(q2, e, R) = {(q2, e)} nghĩa là PDA ở trạng thái q2 với R ở đỉnh Stack thì PDA xóa R độc lập với ký hiệu nhập, trong trường hợp này đầu đọc không dịch chuyển, điều này có nghĩa là PDA không yêu cầu còn một ký hiệu nào trên chuỗi nhập.</para>
+        <para id="id19635048">Hình thái (ID : Instantaneous Descriptions)</para>
+        <para id="id19635054">Để hình thức hóa cấu hình của một PDA với một PDA cụ thể, ta định nghĩa một hình thái (ID). ID phải ghi nhớ trạng thái và nội dung của Stack. ID là một bộ ba (q, w, ), trong đó q là trạng thái, w là chuỗi nhập và  là chuỗi các ký hiệu Stack.</para>
+        <para id="id19635085">Nếu M (Q, , , , q0, Z0, F) là một PDA, ta nói :</para>
+        <para id="id19635145">(q, aw, Z) ⊢M (p, w, ) nếu (q, a, Z) chứa (p, ) </para>
+        <para id="id19635211">Lưu ý a có thể là một ký hiệu trong input hoặc . Chẳng hạn với PDA mô tả như trên, ta có (q1, BY)  d(q1, 0, Y), suy ra rằng (q1, 011, YYR) ⊢ (q1, 11, BYYR). </para>
+        <para id="id19635292">Ta dùng ký hiệu ⊢*M cho bao đóng phản xạ và bắt cầu của ⊢M, tức là : I ⊢* I đối với mỗi ID I, và I ⊢M J và J ⊢*M K thì I ⊢*M K. Ta viết I ⊢i K nếu ID I trở thành K sau chính xác i bước chuyển. Chữ chỉ số dưới M trong các ky 1hiệu ⊢M, ⊢iM và ⊢*M có thể được bỏ qua khi M đã được xác định. </para>
+        <para id="id19635459">Ngôn ngữ chấp nhận bởi PDA</para>
+        <para id="id19635464">Với PDA M (Q, , , , q0, Z0, F), ta định nghĩa :</para>
+        <para id="id19635524">Ngôn ngữ được chấp nhận bởi trạng thái kết thúc là: </para>
+        <para id="id19635535">L (M) = {w  (q0, w, Z0) ⊢* (p, , ) với p  F và   *}</para>
+        <para id="id19635637">Ngôn ngữ được chấp nhận bởi Stack rỗng là :</para>
+        <para id="id19635646">N(M) = {w  (q0, w, Z0) ⊢* (p, , ) với p  Q}. </para>
+        <para id="id19635718">Khi có sự chấp nhận bằng Stack rỗng thì tập trạng thái kết thúc là không còn cần thiết vì vậy ta ký hiệu tập trạng thái kết thúc F là .</para>
+        <para id="id19635740">Thí dụ 6.2 :Các phép chuyển hình thái của PDA chấp nhận chuỗi 001c100 thuộc ngôn ngữ {wcwR w  (0+1)*} bằng Stack rỗng như sau :</para>
+        <para id="id19635792">(q1, 001c100, R) ⊢ (q1, 01c110, YR) ⊢ (q1, 1c110, YYR) ⊢ (q1, c100, BYYR) ⊢ </para>
+        <para id="id19635884">(q2, 100, BYYR) ⊢ (q2, 00, YYR) ⊢ (q2, 0, YR) ⊢ (q2, , R) ⊢ (q2, , ) : Chấp nhận</para>
+        <para id="id19636011">Nhận xét : Trong ví dụ thiết kế PDA chấp nhận ngôn ngữ {wcwR w  (0+1)*} bằng Stack rỗng như trên, ta thấy các giá trị hàm chuyển của nó luôn là là đơn trị. Tại mỗi thời điểm từ một trạng thái trong bộ điều khiển, có thể đọc vào hoặc không đọc một ký hiệu trên băng nhập, với một ký hiệu tại đỉnh Stack, chỉ có một giá trị xác định bước chuyển kế tiếp. Vì thế, ta gọi dạng PDA này là ôtômát đẩy xuống đơn định - DPDA. </para>
+        <para id="id19636088">PDA không đơn định (NPDA)</para>
+        <para id="id19636097">Thí dụ 6.3 : Thiết kế PDA chấp nhận ngôn ngữ {wwR | w  (0+1)*} bằng Stack rỗng.</para>
+        <para id="id19636137">Câu hỏi :</para>
+        <para id="id19636149">?</para>
+        <para id="id19636261">Hãy nêu vai trò của ký hiệu c trong ngôn ngữ được cho bởi thí dụ 6.1 và cho nhận </para>
+        <para id="id19636269">xét về sự khác biệt dạng chuỗi thuộc ngôn ngữ trong thí dụ 6.3 với thí dụ 6.1 đã nêu ở trên ?</para>
+        <para id="id19636278">Rõ ràng ta thấy khi không có sự hiện diện của ký hiệu c ở giữa chuỗi nhập để xác định thời điểm bộ điều khiển có thể chuyển từ trạng thái q1 sang trạng thái q2, thì vấn đề sẽ trở nên phức tạp hơn khi cần phải quyết định đâu là ký hiệu bắt đầu cho chuỗi ngược (wR) ? Ở mỗi thời điểm mà bộ điều khiển đọc thấy hai ký hiệu liên tiếp giống nhau trong chuỗi nhập thì bắt buộc nó phải đoán thử cả hai khả năng cho ký hiệu thứ hai: hoặc vẫn giữ trạng thái q1 và Push vào Stack nếu xem ký hiệu này vẫn thuộc chuỗi xuôi (w), hoặc chuyển sang trạng thái q2 và Pop khỏi Stack nếu xem nó là ký hiệu bắt đầu cho chuỗi ngược (wR). </para>
+        <para id="id19636378"/>
+        <para id="id19636391">Mô tả PDA không đơn định chấp nhận ngôn ngữ {wwR w  (0+1)*} bằng Stack rỗng</para>
+        <para id="id19636436">M ({q1, q2}, {0, 1}, {R, B, Y}, d, q1, R, Æ ) </para>
+        <para id="id19636490">1)d(q1, 0, R) = {(q1, BR)} </para>
+        <para id="id19636528">2)d(q1, 1, R) = {(q1,YR)} </para>
+        <para id="id19636566">3)d(q1, 0, B) = {(q1, BB), (q2, e)} </para>
+        <para id="id19636621">4)d(q1, 0, Y) = {(q1, BY)} </para>
+        <para id="id19636660">5)d(q1, 1, B) = {(q1, YB)} </para>
+        <para id="id19636698">6)d(q1, 1, Y) = {(q1, YY),(q2, e)}</para>
+        <para id="id19636749">7)d(q2, 0, B) = {(q2, e)}</para>
+        <para id="id19636792">8)d(q2, 1, Y) = {(q2, e)}</para>
+        <para id="id19636834">9)d(q1, e, R) = {(q2, e)}</para>
+        <para id="id19636885">10)d(q2, e, R) = {(q2, e)}</para>
+        <para id="id19636936">Hình 6.4 - Mô tả PDA không đơn định chấp nhận wwR bằng Stack rỗng</para>
+        <para id="id19636955">Quy tắc (1) đến (3) cho phép M lưu trữ input trên Stack, quy tắc (3) và (6) cho phép M lựa chọn một trong hai phép chuyển. M có thể quyết định (đoán) đã đi đến giữa chuỗi nó chuyển sang phép chuyển thứ 2: M chuyển sang q2 và thử sự thích hợp của phần chuỗi còn lại với các ký hiệu đang ở trên Stack. Nếu M đoán đúng và nếu chuỗi nhập có dạng wwR thì M sẽ làm rỗng Stack của nó và chấp nhận chuỗi nhập.</para>
+        <para id="id19636996">Cũng như NFA một PDA không đơn định (NPDA) M chấp nhận một input nếu có một chuỗi các lựa chọn mà M làm rỗng Stack của nó. Nghĩa là M luôn luôn "đoán đúng", đoán sai không phải là nguyên nhân để loại bỏ input. Một input bị loại bỏ nếu và chỉ nếu không có sự lựa chọn nào để làm rỗng Stack (hay là không thể "đoán đúng" vì không tồn tại cách đúng). </para>
+        <para id="id19637027">Thí dụ 6.4 :Các phép chuyển hình thái của PDA chấp nhận chuỗi 001100 thuộc ngôn ngữ {wwR w  (0+1)*} bằng Stack rỗng như sau :</para>
+        <para id="id19637087">Khởi đầu</para>
+        <para id="id19637098">¯</para>
+        <para id="id19637112">(q1, 001100, R) ® (q2, 001100, e) : Không chấp nhận</para>
+        <para id="id19637163">¯</para>
+        <para id="id19637177">(q1, 01100, BR) ® (q2, 1100, R) ® (q2, 1100, e) : Không chấp nhận</para>
+        <para id="id19637248">¯</para>
+        <para id="id19637261">(q1, 1100, BBR)</para>
+        <para id="id19637280">¯</para>
+        <para id="id19637294">(q1, 100, YBBR) ® (q2, 00, BBR)</para>
+        <para id="id19637332">¯ ¯</para>
+        <para id="id19637357">(q1, 00, YYBBR) (q2, 0, BR)  (q2, e, R)  (q2, e, e) : Chấp nhận</para>
+        <para id="id19637458">¯</para>
+        <para id="id19637471">(q1, 0, BYYBBR) ® (q2, e, YYBBR) : Không chấp nhận</para>
+        <para id="id19637522">¯</para>
+        <para id="id19637536">(q1, e, BBYYBBR) : Không chấp nhận</para>
+        <para id="id19637568">Hình 6.5 - Hình thái của PDA với input 001100</para>
+        <para id="id19637594">PDA đơn định (DPDA)</para>
+        <para id="id19637602">Một PDA M (Q, , , , q0, Z0, F) được gọi là đơn định nếu:</para>
+        <para id="id19637663">1) q  Q và Z  : nếu (q, , Z)   thì (q, a, Z) = , a  </para>
+        <para id="id19637779">2) Không có q Q, Z   và a  (  {}) mà (q, a, Z) chứa nhiều hơn một phần tử.</para>
+        <para id="id19637858">Điều kiện 1 không cho phép khả năng chọn lựa giữa phép chuyển không xác định ký hiệu nhập ( - dịch chuyển) và phép chuyển trên một ký hiệu input. Điều kiện 2 không cho phép chọn lựa một vài phép chuyển nào đó (q, a, Z) hay (q, , Z). Không như ôtômát hữu hạn FA, một PDA thì thông thường được xét là không đơn định trừ khi ta có ghi chú cụ thể.</para>
+        <para id="id19637895">Đối với ôtômát hữu hạn, dạng đơn định và không đơn định là tương đương nhau về phương diện chấp nhận ngôn ngữ. Tuy nhiên, điều này không đúng với ôtômát đẩy xuống, PDA không đơn định và PDA đơn định là không tương đương nhau. Thực tế ngôn ngữ wwR được chấp nhận bởi một PDA không đơn định nhưng không được chấp nhận bởi bất kỳ một PDA đơn định nào.</para>
+      </section>
+    </section>
+    <section id="id-742414055784">
+      <title>PDA VÀ VĂN PHẠM PHI NGỮ CẢNH </title>
+      <section id="id-494894682191">
+        <title>Tương đương của việc chấp nhận chuỗi bởi trạng thái kết thúc và bởi Stack rỗng </title>
+        <para id="id19637948">ĐỊNH LÝ 6.1: Nếu L là L(M2) với PDA M2 thì L là N(M1) với PDA M1 nào đó.</para>
+        <section id="id-800808637165">
+          <title>Chứng minh</title>
+          <para id="id19638003">Ta sẽ xây dựng M1 tương tự như M2 nhưng M1 sẽ xóa rỗng Stack của nó khi M2 đi vào trạng thái kết thúc. Ta dùng một trạng thái qe của M1 để xóa Stack của nó và dùng ký hiệu đánh dấu đáy Stack M1 bằng ký hiệu X0, vì vậy M1 không thể làm rỗng Stack của nó khi M2 chưa đi vào trạng thái kết thúc. </para>
+          <para id="id19638107">Đặt M2 (Q, , , , q0, Z0, F) là PDA sao cho L = L(M2).</para>
+          <para id="id19638183">Đặt M1 (Q  {qe, q0’}, , , ’, q0’, X0, ) trong đó ’ định nghĩa như sau:</para>
+          <para id="id19638307">1) ’(q0’, e, X0) = {(q0, Z0X0)}</para>
+          <para id="id19638397">2) ’(q, a, Z) chứa mọi phần tử của (q, a, Z), q  Q, a   hoặc a =  và Z  </para>
+          <para id="id19638487">3) q  F và Z    {X0}, ’(q, , Z) chứa (qe, )</para>
+          <para id="id19638588">4) Z    {X0}, ’(q0’, e, Z) chứa (qe, )</para>
+          <para id="id19638696">Quy tắc 1 làm cho PDA M1 đi vào trạng thái khởi đầu của M2 trừ việc thêm X0 vào đáy Stack. Quy tắc 2 cho phép M1 chuyển tương tự như M2. Quy tắc 3 và 4 cho phép M1 chọn việc đi vào trạng thái qe và xoá Stack hay là tiếp tục mô phỏng M2. Chú ý rằng M2 có thể xóa rỗng Stack của nó khi chưa tới trạng thái kết thúc vì vậy M1 phải được đánh dấu đáy Stack bằng X0. Vì nếu không làm như vậy thì khi M1 chuyển tương tự như M2, M1 sẽ xoá rỗng Stack và chấp nhận input trong khi M2 chưa đi vào trạng thái kết thúc nghĩa là input chưa được chấp nhận.</para>
+          <para id="id19638851">Đặt x  L(M2) thì (q0, x, Z0) ⊢*M2 (q, , ) với q  F. Ta xét M1 với input x.</para>
+          <para id="id19638946">Theo quy tắc 1 : (q0’, x, X0) ⊢*M1 (q0, x, Z0X0)</para>
+          <para id="id19639029">Theo quy tắc 2 mỗi phép chuyển của M2 là một phép chuyển trong M1, vậy:</para>
+          <para id="id19639056">(q0, x, Z0) ⊢*M1 (q, e, g)</para>
+          <para id="id19639118">Nếu một PDA có thể thực hiện một chuỗi các phép chuyển từ một ID đã cho thì nó có thể làm một chuỗi các phép chuyển đó từ một ID bất kỳ thu được từ ID đầu tiên bằng cách thêm các chuỗi ký hiệu Stack vào dưới chuỗi Stack ban đầu (vì các ký hiệu ở phía dưới của Stack không làm ảnh hưởng gì). </para>
+          <para id="id19639135">Vậy (q0’, x, X0) ⊢M1 (q0, x, Z0X0) ⊢*M1 (q, , X0). </para>
+          <para id="id19639257">Theo quy tắc 3 và 4 : (q, , X0) ⊢*M1 (qe, , ). </para>
+          <para id="id19639332">Vì vậy (q0’, x, X0) ⊢*M1 (qe, , ) và M1 chấp nhận chuỗi x bằng Stack rỗng. </para>
+          <para id="id19639422">Ngược lại, nếu M1 chấp nhận x bằng Stack rỗng thì dễ dàng chỉ ra rằng chuỗi các phép chuyển phải bắt đầu bằng một phép chuyển theo quy tắc 1, sau đó bằng một chuỗi phép chuyển theo quy tắc 2, trong khi thực hiện các phép chuyển này M1 chuyển tương tự như M2, sau đó xóa Stack của M1 bằng quy tắc chuyển 3 và 4. </para>
+          <para id="id19639476">Vậy x  L(M2).</para>
+          <para id="id19639501">ĐỊNH LÝ 6.2 : Nếu L là N(M1) với PDA M1 nào đó thì L là L(M2) với một PDA M2 nào đó.</para>
+        </section>
+        <section id="id-239124729357">
+          <title>Chứng minh</title>
+          <para id="id19639557">Ta sẽ xây dựng M2 tương tự M1 và M2 đi vào trạng thái kết thúc khi và chỉ khi M1 làm rỗng Stack của nó. </para>
+          <para id="id19639603">Đặt M1 (Q, , , , q0, Z0, F) là PDA sao cho L = N(M1). </para>
+          <para id="id19639679">Đặt M2 (Q  {q0’, qf}, ,   {X0}, ’, q0’, X0, {qf}) trong đó ’ được định nghĩa như sau:</para>
+          <list id="id19639814" list-type="enumerated">
+            <item>’(q0’, e, X0) = {(q0, Z0X0)}</item>
+            <item>q  Q, a    {}, và Z   : ’(q, a, Z) = (q, a, Z)</item>
+          </list>
+          <para id="id19639996">3) q  Q, ’(q, , X0) chứa (qf, )</para>
+          <para id="id19640072">Quy tắc 1 cho phép M2 đi vào hình thái khởi đầu ID của M1, trừ việc M2 sẽ có chứa ở dưới đáy Stack của nó ký hiệu X0, ký hiệu này sẽ nằm bên dưới tất cả các ký hiệu Stack của M1. Quy tắc 2 cho phép M2 chuyển tương tự như M1. Khi M1 làm rỗng Stack của nó, thì M2 khi chuyển tương tự như M1 sẽ xóa toàn bộ Stack của nó trừ ký hiệu X0 nằm dưới đáy Stack. Quy tắc 3 làm cho M2 sau đó khi gặp X0 xuất hiện thì đi vào trạng thái kết thúc và chấp nhận input x. </para>
+          <para id="id19640208">Chứng minh L(M2) = N(M1) cũng tương tự như định lý 6.1</para>
+        </section>
+      </section>
+      <section id="id-192499341847">
+        <title>Tương đương giữa PDA và CFL </title>
+        <para id="id19640245">ĐỊNH LÝ 6.3: Nếu L là ngôn ngữ phi ngữ cảnh thì tồn tại PDA M sao cho L = N(M).</para>
+        <para id="id19640260">Chứng minh</para>
+        <para id="id19640264">Giả sử  không thuộc L(G) (có thể sửa đổi lý luận cho trường hợp ngôn ngữ L(G) có chứa ). Đặt G (V, T, P, S) là văn phạm phi ngữ cảnh có dạng chuẩn Greibach sinh ra L. Đặt M ({q}, T, V, , q, S, ), trong đó (q, a, A) chứa (q, ) khi và chỉ khi A  a là một luật sinh trong P. </para>
+        <para id="id19640352">PDA M mô phỏng chuỗi dẫn xuất trái của G. Vì G là dạng chuẩn Greibach nên mỗi dạng câu trong dẫn xuất trái gồm một chuỗi các ký hiệu kết thúc x sau đó là một chuỗi các biến . M lưu trữ phần hậu tố  của dạng câu bên trái trên Stack của nó sau khi xử lý phần tiền tố x. </para>
+        <para id="id19640388">Một cách hình thức ta chỉ ra rằng : </para>
+        <para id="id19640394">S * x bằng dẫn xuất trái khi và chỉ khi (q, x, S) ⊢*M (q, , ) (1)</para>
+        <para id="id19640464">Trước tiên, chúng ta giả sử (q, x, S) ⊢i (q, , ) và sẽ chỉ ra bằng quy nạp theo số lần i rằng S * x.</para>
+        <para id="id19640526">Với i = 0, điều đó hiển nhiên đúng vì x =  và  = S.</para>
+        <para id="id19640553">Giả sử i  1 và đặt x = ya. </para>
+        <para id="id19640570">Xét bước chuyển hình thái trước bước cuối :</para>
+        <para id="id19640579">(q, ya, S) ⊢i -1 (q, a, ) ⊢ (q, , )(2)</para>
+        <para id="id19640639">Nếu loại bỏ ký hiệu a ở cuối chuỗi input trong hình thái đầu tiên của (2), ta có: (q, y, S) ⊢i -1 (q, , ) (vì a không ảnh hưởng đến các phép chuyển của M). </para>
+        <para id="id19640685">Theo giả thiết quy nạp S * y. Phép chuyển (q, a, ) ⊢ (q, , ) sẽ suy ra  = A, với A  V và A  a là một luật sinh trong G và  = .</para>
+        <para id="id19640813">Vậy S * y  ya = x</para>
+        <para id="id19640863">Ta đã chứng minh xong "nếu" của giả thiết (1)</para>
+        <para id="id19640872">Ngược lại, ta giả sử S i x bằng dẫn xuất trái. Ta sẽ chứng minh quy nạp theo số bước dẫn xuất i rằng: (q, x, S) ⊢* (q, , )</para>
+        <para id="id19640936">Với i = 0: phép chuyển hiển nhiên đúng</para>
+        <para id="id19640945">Xét i  1 và giả sử S i -1 yA  ya, trong đó x = ya và  = . Theo giả thiết quy nạp : (q, y, S) ⊢* (q, , A). Vậy (q, ya, S) ⊢* (q, a, A) </para>
+        <para id="id19641072">Vì A  a là một luật sinh nên (q, a, A) chứa (q, ). Vậy :</para>
+        <para id="id19641116">(q, x, S) ⊢* (q, a, A) ⊢* (q, , ) </para>
+        <para id="id19641175">Hay phần "chỉ nếu" của giả thiết (1) cũng đã được chứng minh xong.</para>
+        <para id="id19641182">Để kết thúc việc chứng minh, ta chú ý rằng giả thiết (1) với  =  thì S * x nếu và chỉ nếu (q, x, S) ⊢* (q, , ). Tức là x  L(G) khi và chỉ khi x  N(M).</para>
+        <para id="id19641272">Thí dụ 6.3 :Xây dựng NPDA chấp nhận ngôn ngữ sinh bởi CFG G có các luật sinh như sau :</para>
+        <para id="id19641288">S ® aAA </para>
+        <para id="id19641307">A ® aS | bS | a</para>
+        <para id="id19641325">Ta có : CFG G ( {S, A}, {a, b}, P, S )</para>
+        <para id="id19641333">NPDA tương đương M ({q}, {a, b}, {S, A}, , q, S, ) với  như sau :</para>
+        <para id="id19641371">1) d (q, a, S) = {(q, AA)}</para>
+        <para id="id19641391">2) d (q, a, A) = {(q, S), (q, e)}</para>
+        <para id="id19641420">3)d (q, b, A) = {(q, e)}</para>
+        <para id="id19641448"/>
+        <para id="id19641452">ĐỊNH LÝ 6.4 : Nếu L là N(M) với PDA M thì L và ngôn ngữ phi ngữ cảnh. </para>
+        <para id="id19641466">Chứng minh</para>
+        <para id="id19641471">Gọi PDA M (Q, , , , q0, Z0, ). Đặt G (V, , P, S) là CFG, trong đó :</para>
+        <para id="id19641551">. V là tập các đối tượng dạng [q, A, p] với p, q  Q; A  </para>
+        <para id="id19641582">. S là ký hiệu chưa kết thúc mới thêm vào. </para>
+        <para id="id19641591">. P là tập các luật sinh có dạng :</para>
+        <para id="id19641597"> 1) S ® [q0, Z0, q] ,q Î Q.</para>
+        <para id="id19641656">2) [q, A, q m+1] ® a[q1, B1, q2][q2, B2, q3] ... [qm, Bm, qm+1] </para>
+        <para id="id19641775">q, q1, q2, ..., qm+1  Q, a    {} và A, B1, B2, ..., Bm   </para>
+        <para id="id19641916">sao cho (q, a, A) có chứa (q1, B1B2 .. Bm). </para>
+        <para id="id19641969"> Nếu m = 0 thì luật sinh có dạng [q, A, q1]  a. </para>
+        <para id="id19642000">Để nắm được chứng minh, cần phải lưu ý rằng các biến và luật sinh trong G được xác định sao cho dẫn xuất trái trong G của x mô phỏng PDA khi cho x nhập vào. Cụ thể hơn, các biến xuất hiện tại một bước bất kỳ trong G tương đương với các ký hiệu trên Stack của M. Nói cách khác [q, A, p] dẫn ra x nếu và chỉ nếu x là nguyên nhân làm M xoá rỗng Stack của nó bằng chuỗi các phép chuyển từ trạng thái q đến trạng thái p. </para>
+        <para id="id19642027">Để chứng minh L(G) = N(M), ta quy nạp theo số bước dẫn xuất của G hoặc số bước chuyển trạng thái của M rằng [q, A, p] *G x nếu và chỉ nếu (q, x, A) ⊢*M (p, , )</para>
+        <para id="id19642093">Thí dụ 6.4 :Xây dựng CFG G tương đương sinh ra ngôn ngữ được chấp nhận bởi PDA sau :</para>
+        <para id="id19642111">M ( {q0, q1}, {0, 1}, {Z0, X}, d, q0­, Z0, Æ )</para>
+        <para id="id19642168">với d được cho như sau :</para>
+        <para id="id19642185">1) d (q0, 0, Z0) = {(q0, XZ0)}</para>
+        <para id="id19642255">2) d (q0, 0, X) = {(q0, XX)}</para>
+        <para id="id19642306">3) d (q0, 1, X) = {(q1, )}</para>
+        <para id="id19642362">4) d (q1, 1, X) = {(q1, )}</para>
+        <para id="id19642415">5) d (q1, , x) = {(q1, )}</para>
+        <para id="id19258533">6) d (q1, , Z0) = {(q1, )}</para>
+        <para id="id19258603">Ta xây dựng CFG G (V, {0, 1}, P, S) sinh ra N(M) với các thành phần như sau :</para>
+        <para id="id19258614">V = { S, [q0, X, q0], [q0, X, q1], [q1, X, q0], [q1, X, q1], </para>
+        <para id="id19258702">[q0, Z0, q0], [q0, Z0, q1], [q1, Z0, q0], [q1, Z0, q1] } </para>
+        <para id="id19258845">Tập luật sinh P chứa các luật sinh có dạng :</para>
+        <para id="id19258851">Các luật sinh cho ký hiệu bắt đầu S : S ® [q0, Z0, q0] | [q0, Z0, q1]</para>
+        <para id="id19258931">Các luật sinh cho các biến khác trong V được xây dựng từ các hàm chuyển của PDA như sau :</para>
+        <para id="id19258940">d1) [q0, Z0, q0] ® 0 [q0, X, q0][q0, Z0, q0]</para>
+        <para id="id19259047"> | 0 [q0, X, q1][q1, Z0, q0]</para>
+        <para id="id19259112">[q0, Z0, q1] ® 0 [q0, X, q0][q0, Z0, q1]</para>
+        <para id="id19259209"> | 0 [q0, X, q1][q1, Z0, q1]</para>
+        <para id="id19259274">d2) [q0, X, q0] ® 0 [q0, X, q0][q0, X, q0]</para>
+        <para id="id19259356"> | 0 [q0, X, q1][q1, X, q0]</para>
+        <para id="id19259409">[q0, X, q1] ® 0 [q0, X, q0][q0, X, q1]</para>
+        <para id="id19259481"> | 0 [q0, X, q1][q1, X, q1]</para>
+        <para id="id19259534">d3) [q0, X, q1] ® 1</para>
+        <para id="id19259575">d4) [q1, Z0, q1] ® </para>
+        <para id="id19259632">d5) [q1, X, q1] ® </para>
+        <para id="id19259676">d6) [q1, X, q1] ® 1</para>
+        <para id="id19259717">Nhận xét rằng không có luật sinh nào cho các biến [q1, X, q0] và [q1, Z0, q0]. Vì tất cả các luật sinh cho biến [q0, X, q0] và [q0, Z0, q0] đều có chứa [q1, X, q0] hoặc [q0, Z0, q0] ở vế phải, nên sẽ không thể có chuỗi ký hiệu kết thúc nào có thể được dẫn ra từ các biến [q0, X, q0] hoặc [q0, Z0, q0]. Loại bỏ 4 biến này ra khỏi tập biến V và xóa các luật sinh có liên quan đến chúng trong tập P, ta thu được văn phạm có dạng như sau:</para>
+        <para id="id19259955"> S ® [q0, Z0, q1]</para>
+        <para id="id19260008"> [q0, Z0, q1] ® 0 [q0, X, q1][q1, Z0, q1]</para>
+        <para id="id19260112">[q0, X, q1] ® 0 [q0, X, q1][q1, X, q1]</para>
+        <para id="id19260188"> [q0, X, q1] ® 1</para>
+        <para id="id19260225"> [q1, Z0, q1] ® </para>
+        <para id="id19260277"> [q1, X, q1] ® </para>
+        <para id="id19260318"> [q1, X, q1] ® 1</para>
+        <para id="id19260354">Câu hỏi :</para>
+        <para id="id19260366">?</para>
+        <para id="id19260478">Sinh viên hãy dùng các kiến thức đã học trong chương trước (ĐỊNH LÝ 5.2)</para>
+        <para id="id19260486">để viết một văn phạm tương đương với văn phạm trên không có chứa các ký</para>
+        <para id="id19260492">hiệu vô ích ?</para>
+      </section>
+      <section id="id-340686045293">
+        <title>Quan hệ giữa CFL và tập hợp chính quy </title>
+        <para id="id19260509">ĐỊNH LÝ 6.5 :Nếu L là CFL và R là tập chính quy thì L  R là CFL.</para>
+        <para id="id19260532">Chứng minh</para>
+        <para id="id19260536">Đặt L là L(M) với PDA M (QM, , , M, q0, Z0, FM) và đặt R là L(A) với DFA A (QA, å, dA, p0, FA). Ta xây dựng PDA M’ cho L  R bằng cách cho M và A cùng “chạy song song”. Tức là với một ký hiệu nhập a thì M và A thực hiện các phép chuyển độc lập nhau. M’ chấp nhận input nếu cả M và A cùng chấp nhận.</para>
+        <figure id="id19260682">
+          <media id="id1163769810766" alt=""><image src="../../media/graphics2-1852.png" mime-type="image/png" height="340" width="415"/></media>
+        </figure>
+        <para id="id19260706">Hình 6.6 - Chạy một FA và PDA song song</para>
+        <para id="id19260726">Một cách hình thức, đặt M’ (QA  QM, , , , [p0, q0], Z0, FA  FM), trong đó hàm chuyển  được xác định như sau : </para>
+        <para id="id19260851"> ([p, q], a, X) chứa ([p’, q’], )  dA(p, a) = p’ và dM(q, a, X) chứa (q’, ). </para>
+        <para id="id19260922">Chú ý rằng a có thể bằng , khi đó p’ = p. </para>
+        <para id="id19260940">Dễ dàng chứng minh quy nạp theo i rằng : ([p0, q0], w, Z0) ⊢iM ’ ([p, q], , )  (q0, w, Z0) ⊢iM (q, , ) và d(p0, w) = p (1)</para>
+        <para id="id19261098">Với i = 0: thì (1) hiển nhiên đúng vì p = p0, q = q0,  = Z0 và w = .</para>
+        <para id="id19261149">Giả sử (1) đúng tới i - 1 (i &gt; 0).</para>
+        <para id="id19261158">Xét ([p0, q0], xa, Z0) ⊢i -1M ’ ([p’, q’], a, ) ⊢M ’ ([p, q], , ) , trong đó w = xa và a là  hoặc là một ký hiệu  . </para>
+        <para id="id19261275">Theo giả thiết quy nạp, dA(p0, x) = p’ và (q0, x, Z0) ⊢i -1M (q’, , ).</para>
+        <para id="id19261357">Theo định nghĩa của d, thực tế ([p’, q’], a, ) ⊢M ‘ ([p, q], , ) nên có thể suy ra dA(p’, a) = p và (q’, a, ) ⊢M (q, , ). Vậy dA(p0, w) = p và (q0, w, Z0) ⊢*M (q, , ). </para>
+        <para id="id19261539">Tương tự, ta có thể chứng minh rằng : Nếu (q0, w, Z0) ⊢iM (q, , ) và dA(p0, w) = p thì ([p0, q0], w, Z0) ⊢*M ’ ([p, q], , ) (xem phần này như bài tập).</para>
+        <para id="id19261684">Tổng kết chương VI: Đến chương này, chúng ta đã có thể nắm bắt được một vài ý tưởng cơ bản liên quan đến các khái niệm về ngôn ngữ chính quy, ngôn ngữ phi ngữ cảnh, và mối quan hệ của chúng với các dạng ôtômát hữu hạn và đẩy xuống. Những khảo sát chứng tỏ ngôn ngữ chính quy thực sự là một tập hợp con của ngôn ngữ phi ngữ cảnh, và do đó, ôtômát đẩy xuống xét về một mặt nào đó có khả năng nhận dạng ngôn ngữ mạnh hơn rất nhiều so với ôtômát hữu hạn. Điều này gợi cho chúng ta một ý tưởng có thể mở rộng hơn nữa về khả năng đoán nhận ngôn ngữ của cơ chế ôtômát. Nếu so sánh ôtômát hữu hạn và ôtômát đẩy xuống, ta thấy rằng bản chất của sự khác biệt thể hiện ở bộ lưu trữ tạm thời dùng Stack. Nếu không có bộ lưu trữ, chúng ta có dạng ôtômát hữu hạn, nếu bộ lưu trữ là Stack, ta có dạng ôtômát đẩy xuống mạnh hơn. Từ suy luận này, chúng ta hoàn toàn có thể mong đợi để định nghĩa ngay cả những họ ngôn ngữ rộng lớn hơn nếu có thể cung cấp cho cơ chế ôtômát một bộ nhớ với khả năng lưu trữ linh hoạt hơn. Điều này dẫn đến khái niệm cơ bản về máy Turing sẽ được giới thiệu trong chương sau, một cơ chế ôtômát có tính máy móc hay tính giải thuật. </para>
+        <para id="id19261734">BÀI TẬP CHƯƠNG VI</para>
+        <para id="id19261743">6.1. Xây dựng PDA chấp nhận các ngôn ngữ :</para>
+        <para id="id19261756">a) {0m 1m 2n  m, n  1}</para>
+        <para id="id19261807">b) {ak bl cn dm  m = k + l + n} </para>
+        <para id="id19261858">c) {w  w  {a, b}* và #a(w) = #b(w)}</para>
+        <para id="id19261893">d) {w  w  {a,b}* và #a(w) = 2#b(w)}</para>
+        <para id="id19261931">6.2. Xây dựng PDA tương đương với văn phạm : </para>
+        <para id="id19261945">a) S ® + SS | *SS | a</para>
+        <para id="id19261963">b)S ® aS | bS | aA</para>
+        <para id="id19262040">A ® bB| b</para>
+        <para id="id19262057">B ® aC</para>
+        <para id="id19262072">C ® b </para>
+        <para id="id19262088">6.3. Xây dựng văn phạm CFG tương đương với các PDA sau :</para>
+        <para id="id19262102">a) M ({q0, q1}, {0, 1}, {Z0, X}, , q0, Z0, ), trong đó  được cho như sau:</para>
+        <para id="id19262179">d(q0, 1, Z0) = {(q0, XZ0)}</para>
+        <para id="id19262226">d(q0, 0, X) = {(q0, XX)}</para>
+        <para id="id19262256">d(q0, 1, X) = {(q1, e)}</para>
+        <para id="id19262294">d(q1, 1, X) = {(q1, e)}</para>
+        <para id="id19262330">d(q1, e, X) = {(q1, e)}</para>
+        <para id="id19262375">d(q1, e, Z0) = {(q1, e)}</para>
+        <para id="id19262428">b) M ({q0, q1}, {0, 1}, {Z0, X}, , q0, Z0, ), trong đó  được cho như sau:</para>
+        <para id="id19262505">d(q0, 1, Z0) = {(q0, XZ0)}</para>
+        <para id="id19262552">d(q0, 1, X) = {(q0, XX)}</para>
+        <para id="id19262582">d(q0, 0, X) = {(q1, X)}</para>
+        <para id="id19262612">d(q0, e, Z0) = {(q0, e)}</para>
+        <para id="id19262665">d(q1, 1, X) = {(q1, e)}</para>
+        <para id="id19262702">d(q1, 0, Z0) = {(q0, Z0)}</para>
+        <para id="id19262747">c) M ({q0, q1}, {a, b, c}, {Z0, X}, , q0, Z0, ), trong đó  được cho như sau:</para>
+        <para id="id19262824">d(q0, a, Z0) = {(q0, X)}</para>
+        <para id="id19262862">d(q0, a, X) = {(q0, XX)}</para>
+        <para id="id19262892">d(q0, c, X) = {(q1, X)}</para>
+        <para id="id19262922">d(q0, b, Z0) = {(q0, X)}</para>
+        <para id="id19262959">d(q0, b, X) = {(q0, XX)}</para>
+        <para id="id19262988">d(q1, c, X) = {(q1, e)}</para>
+      </section>
+    </section>
+  </content>
+</document>

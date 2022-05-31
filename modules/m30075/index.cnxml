@@ -1,0 +1,914 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Văn phạm phi ngữ cảnh</title>
+  <metadata>
+  <md:content-id>m30075</md:content-id><md:title>Văn phạm phi ngữ cảnh</md:title>
+  <md:abstract>Nội dung chính : Trong chương này, ta sẽ nghiên cứu một loại văn phạm khá quan trọng, gọi là văn phạm phi ngữ cảnh (CFG) và lớp ngôn ngữ mà chúng mô tả - ngôn ngữ phi ngữ cảnh (CFL). CFL, cũng như tập hợp chính quy, có nhiều ứng dụng thực tế rất quan trọng, đặc biệt trong việc biểu diễn ngôn ngữ lập trình. Chẳng hạn, CFG dùng hữu ích để mô tả các biểu thức số học trong các dấu ngoặc lồng nhau hay những cấu trúc khối trong ngôn ngữ lập trình (cấu trúc khối begin-end). Sau khi định nghĩa văn phạm phi ngữ cảnh, một số cách biến đổi văn phạm phi ngữ cảnh nhằm giản lược nó và đưa nó về một trong những dạng chuẩn sẽ được trình bày. Cuối chương, bổ đề bơm cho ngôn ngữ CFL và một số tính chất nhằm xác định tập ngôn ngữ này cũng sẽ được giới thiệu. 
+Mục tiêu cần đạt: Cuối chương, sinh viên cần phải nắm vững:
+ Khái niệm CFG, xác định các thành phần của một CFG.
+ Nhận dạng được lớp ngôn ngữ mà một văn phạm CFG đặc tả.
+ Xây dựng các luật sinh cho một CFG đặc tả một lớp ngôn ngữ.
+ Các bước giản lược văn phạm CFG không chứa các giá trị vô ích.
+ Chuẩn hóa CFG về các dạng chuẩn Chomsky hoặc Greibach.
+ Ứng dụng bổ đề bơm cho CFL để chứng tỏ một ngôn ngữ không là ngôn ngữ phi ngữ cảnh.
+ Xác định một ngôn ngữ có thuộc lớp ngôn ngữ phi ngữ cảnh hay không theo các tính chất của CFL.
+ Kiểm tra tính rỗng, hữu hạn hoặc vô hạn của một CFL.
+Kiến thức cơ bản: Để tiếp thu tốt nội dung của chương này, trước hết sinh viên cần hiểu rõ cấu trúc cú pháp của một số ngôn ngữ lập trình cấp cao như Pascal, C; nắm vững lý thuyết đồ thị và cây; phương pháp chứng minh phản chứng và sự phân cấp các lớp văn phạm theo Noam Chomsky; …
+Tài liệu tham khảo : 
+[1] John E. Hopcroft, Jeffrey D.Ullman – Introduction to Automata Theory, Languages and Computation – Addison – Wesley Publishing Company, Inc – 1979 (Chapter 4 : Context – Free Grammars).
+[2] V.J. Rayward-Smith – A First course in Formal Language Theory (Second Editor) –  McGraw-Hill Book Company Europe – 1995 (Chapter 5: Context-Free Languages )
+[3] From Wikipedia, the free encyclopedia – Context-Free Grammar:                                                                 
+http://en.wikipedia.org/wiki/Context-free_grammar</md:abstract>
+  <md:uuid>aee11e06-fda4-4840-8cab-656ee64a962a</md:uuid>
+</metadata>
+
+<content>
+    <section id="id-968491739317">
+      <title>VĂN PHẠM PHI NGỮ CẢNH (CFG : Context Free Grammar)</title>
+      <para id="id19874097">Xuất xứ của văn phạm phi ngữ cảnh là sự mô tả thông qua các ngôn ngữ tự nhiên. Ta có thể viết các quy tắc cú pháp để diễn tả câu “An là sinh viên giỏi“ như sau :</para>
+      <para id="id19874120">&lt; câu đơn &gt;  &lt; chủ ngữ &gt; &lt; vị ngữ &gt;</para>
+      <para id="id19874140">&lt; chủ ngữ &gt;  &lt; danh từ &gt;</para>
+      <para id="id19874160">&lt; vị ngữ &gt;  &lt; động từ &gt; &lt; bổ ngữ &gt;</para>
+      <para id="id19874183">&lt; bổ ngữ &gt;  &lt; danh từ &gt; &lt; tính từ &gt;</para>
+      <para id="id19874206">&lt; danh từ &gt;  An</para>
+      <para id="id19874230">&lt; danh từ &gt;  sinh viên</para>
+      <para id="id19874255">&lt; động từ &gt;  là</para>
+      <para id="id19874280">&lt; tính từ &gt;  giỏi</para>
+      <para id="id19874307">Các từ trong dấu móc nhọn như &lt; câu đơn &gt;, &lt; chủ ngữ &gt;, &lt; vị ngữ &gt;, ... là các phạm trù cú pháp, cho ta vai trò của các bộ phận hợp thành câu. Ta thấy một câu sinh ra qua các bước triển khai dần dần theo các quy tắc cú pháp. Đây cũng chính là dạng của các luật sinh trong văn phạm phi ngữ cảnh. Và như vậy, văn phạm phi ngữ cảnh cũng có thể chọn làm mô hình cho các văn phạm của các ngôn ngữ tự nhiên.</para>
+      <para id="id19874331">Tuy nhiên, trong khoa học máy tính, với nhu cầu biểu diễn các ngôn ngữ lập trình, văn phạm phi ngữ cảnh CFG còn được thiết kế thành một dạng tương đương gọi là văn phạm BNF (Backus - Naur Form). Đây cũng là văn phạm CFG với những thay đổi nhỏ về dạng thức và một số ký hiệu viết tắt mà các nhà khoa học máy tính thường ứng dụng trong việc diễn tả cú pháp của các ngôn ngữ lập trình cấp cao (như ALGOL, PASCAL, ... ). Trong dạng thức của văn phạm BNF, ký hiệu ::= được dùng thay cho ký hiệu . Chẳng hạn, để định nghĩa một biểu thức số học (expression) bao gồm các danh biểu (identifier) tham gia vào các phép toán +, * hoặc biểu thức con lồng trong dấu ngoặc đơn , ta viết :</para>
+      <para id="id19874412">&lt;expression&gt; ::= &lt;expression&gt; + &lt;expression&gt;</para>
+      <para id="id19874427">&lt;expression&gt; ::= &lt;expression&gt; * &lt;expression&gt;</para>
+      <para id="id19874440">&lt;expression&gt; ::= ( &lt;expression&gt; ) </para>
+      <para id="id19874468">&lt;expression&gt; ::= &lt;identifier&gt; </para>
+      <para id="id19874478">Việc nghiên cứu các văn phạm phi ngữ cảnh đã tạo nên một cơ sở lý luận vững chắc cho việc biểu diễn ngôn ngữ lập trình, việc tìm kiếm các giải thuật phân tích cú pháp vận dụng trong chương trình dịch và cho nhiều ứng dụng khác về xử lý chuỗi. Chẳng hạn, nó rất hữu ích trong việc mô tả các biểu thức số học với nhiều dấu ngoặc lồng nhau hoặc cấu trúc khối trong ngôn ngữ lập trình mà biểu thức chính quy không thể đặc tả. </para>
+      <section id="id-450241780994">
+        <title>Định nghĩa </title>
+        <para id="id19874505">Văn phạm phi ngữ cảnh là một tập hợp hữu hạn các biến (còn gọi là các ký hiệu chưa kết thúc), mỗi biến biểu diễn một ngôn ngữ. Ngôn ngữ được biểu diễn bởi các biến được mô tả một cách đệ quy theo thuật ngữ của một khái niệm khác gọi là ký hiệu kết thúc. Quy tắc quan hệ giữa các biến gọi là luật sinh. Mỗi luật sinh có dạng một biến ở vế trái sinh ra một chuỗi có thể gồm biến lẫn các ký hiệu kết thúc trong văn phạm.</para>
+        <para id="id19874557">Văn phạm phi ngữ cảnh (CFG) là một hệ thống gồm bốn thành phần, ký hiệu là văn phạm G (V, T, P, S), trong đó :</para>
+        <para id="id19874578">. V là tập hữu hạn các biến (hay ký tự chưa kết thúc)</para>
+        <para id="id19874587">. T là tập hữu hạn các ký tự kết thúc, V  T = </para>
+        <para id="id19874610">. P là tập hữu hạn các luật sinh mà mỗi luật sinh có dạng A   với A là biến và  là chuỗi các ký hiệu  (V  T)* </para>
+        <para id="id19874673">. S là một biến đặc biệt gọi là ký hiệu bắt đầu văn phạm.</para>
+        <para id="id19874683">Thí dụ 5.1 : Văn phạm G ({S, A, B}, {a, b}, P, S ), trong đó P gồm các luật sinh sau:</para>
+        <para id="id19874698">S ® AB</para>
+        <para id="id19874714">A ® aA</para>
+        <para id="id19874730">A ® a</para>
+        <para id="id19874746">B ® bB</para>
+        <para id="id19874761">B ® b</para>
+        <para id="id19874777">Quy ước ký hiệu:</para>
+        <para id="id19874785">- Các chữ in hoa A, B, C, D, E, ... và S ký hiệu các biến (S thường được dùng làm ký hiệu bắt đầu ).</para>
+        <para id="id19874797">- Các chữ nhỏ a, b, c, d, e, ...; các chữ số và một số ký hiệu khác ký hiệu cho các ký hiệu kết thúc.</para>
+        <para id="id19874805">- Các chữ in hoa X, Y, Z là các ký hiệu có thể là ký hiệu kết thúc hoặc biến.</para>
+        <para id="id19874813">- Các chữ Hi-lạp , , , ... biểu diễn cho chuỗi các ký hiệu kết thúc và biến.</para>
+        <para id="id19874850">Ta sẽ biểu diễn văn phạm một cách tóm tắt bằng cách chỉ liệt kê các luật sinh của nó. Nếu A ® 1, A ® 2 , ... , A ® k là các luật sinh của biến A trong văn phạm nào đó, ta sẽ ghi ngắn gọn là A ® 1 | 2 | ... | k</para>
+        <para id="id19874972">Thí dụ 5.2 : Văn phạm trong Thí dụ 5.1 trên có thể viết gọn là : </para>
+        <para id="id19874988">S ® AB</para>
+        <para id="id19875005">A ® aA  a</para>
+        <para id="id19875032">B ® bB  b</para>
+        <para id="id19875058">Câu hỏi :</para>
+        <para id="id19875070">?</para>
+        <para id="id19875183">Bạn nghĩ gì về lớp ngôn ngữ có thể được sinh bởi văn phạm trong ví dụ trên ? Cơ chế nào có thể được sử dụng cho văn phạm để phát sinh ngôn ngữ ?</para>
+      </section>
+      <section id="id-327884254241">
+        <title>Dẫn xuất và ngôn ngữ</title>
+        <para id="id19875207">Dẫn xuất: Để định nghĩa ngôn ngữ sinh bởi văn phạm CFG G (V, T, P, S), ta dẫn nhập khái niệm dẫn xuất. Trước hết ta giới thiệu hai quan hệ G và *G giữa hai chuỗi trong tập (V  T)*. Nếu A   là một luật sinh trong văn phạm và ,  là hai chuỗi bất kỳ trong tập (V  T)* thì A G , hay ta còn nói luật sinh A   áp dụng vào chuỗi A để thu được chuỗi , nghĩa là A sinh trực tiếp  trong văn phạm G. Hai chuỗi gọi là quan hệ nhau bởi G nếu chuỗi thứ hai thu được từ chuỗi thứ nhất bằng cách áp dụng một luật sinh nào đó.</para>
+        <para id="id19875468">Giả sử 1, 2, ..., m là các chuỗi thuộc (V  T)* với m  1 và :</para>
+        <para id="id19875542">1 G 2, 2 G 3, …, m -1 G m</para>
+        <para id="id19875643">thì ta nói 1*G m hay 1 dẫn xuất ra m trong văn phạm G.</para>
+        <para id="id19875717">Như vậy, *G là bao đóng phản xạ và bắc cầu của G. Nói cách khác,  *G  nếu  được dẫn ra từ  bằng không hoặc nhiều hơn các luật sinh của P. Chú ý rằng  *G  với mọi chuỗi . </para>
+        <para id="id19875855">Thông thường nếu không có nhầm lẫn ta sẽ dùng các ký hiệu  và * thay cho ký hiệu G và *G. Nếu  dẫn ra  bằng i bước dẫn xuất thì ta ký hiệu  i . </para>
+        <para id="id19875966">Ngôn ngữ sinh bởi văn phạm phi ngữ cảnh</para>
+        <para id="id19875975">Cho văn phạm CFG G(V, T, P, S), ta định nghĩa :</para>
+        <para id="id19875993">L(G) = {ww  T * và S *G w}</para>
+        <para id="id19876045">Nghĩa là, một chuỗi thuộc L(G) nếu:</para>
+        <para id="id19876051">1) Chuỗi gồm toàn ký hiệu kết thúc.</para>
+        <para id="id19876057">2) Chuỗi được dẫn ra từ ký hiệu bắt đầu S.</para>
+        <para id="id19876066">Ta gọi L là ngôn ngữ phi ngữ cảnh (CFL) nếu nó là L(G) với một CFG G nào đó. Chuỗi  gồm các ký hiệu kết thúc và các biến, được gọi là một dạng câu sinh từ G nếu S *. Hai văn phạm G1, G2 được gọi là tương đương nếu L(G1) = L(G2)</para>
+        <para id="id19876142">Thí dụ 5.3 : Xét văn phạm G (V, T, P, S), trong đó :</para>
+        <para id="id19876157">V = {S}, T = {a, b}, P = {S ® aSb, S ® ab}. </para>
+        <para id="id19876182">Bằng cách áp dụng luật sinh thứ nhất n -1 lần và luật sinh thứ hai 1 lần, ta có: </para>
+        <para id="id19876192">S Þ aSb Þ aaSbb Þ a3Sb3 Þ ... Þ an-1bn-1 Þ anbn </para>
+        <para id="id19876304">Vậy, L(G) chứa các chuỗi có dạng anbn, hay L(G) = {anbn  n  1}. </para>
+      </section>
+      <section id="id-54545737397">
+        <title>Cây dẫn xuất</title>
+        <para id="id19876372">Để dễ hình dung sự phát sinh ra các chuỗi trong văn phạm phi ngữ cảnh, ta thường diễn tả một chuỗi dẫn xuất qua hình ảnh một cây. Một cách hình thức, ta định nghĩa như sau:</para>
+        <para id="id19876389">Định nghĩa : Cho văn phạm G (V, T, P, S). Cây dẫn xuất (hay cây phân tích cú pháp) của G được định nghĩa như sau :</para>
+        <para id="id19876405">i) Mỗi nút (đỉnh) có một nhãn, là một ký hiệu  (V  T  {})</para>
+        <para id="id19876453">ii) Nút gốc có nhãn là ký hiệu bắt đầu S.</para>
+        <para id="id19876465">iii) Nếu nút trung gian có nhãn A thì A  V</para>
+        <para id="id19876482">iv) Nếu nút n có nhãn A và các đỉnh n1, n2, ..., nk là con của n theo thứ tự từ trái sang phải có nhãn lần lượt là X1, X2, ..., Xk thì A  X1X2 ... Xk là một luật sinh trong tập luật sinh P.</para>
+        <para id="id19876580">v) Nếu nút n có nhãn là từ rỗng  thì n phải là nút lá và là nút con duy nhất của nút cha của nó.</para>
+        <para id="id19876600">Thí dụ 5.4 : Xét văn phạm G ({S, A}, {a, b}, P, S), trong đó P gồm:</para>
+        <para id="id19876615">S ® aAS | a</para>
+        <para id="id19876632">A ® SbA | SS | ba</para>
+        <para id="id19876649">Một cây dẫn xuất từ văn phạm có dạng như hình 5.1 sau :</para>
+        <para id="id19876658">Ta thấy, nút 1 có nhãn S và các con của nó lần lượt là a, A, S (chú ý S  aAS là một luật sinh). Tương tự, nút 3 có nhãn A và các con của nó là S, b, A (từ luật sinh A  SbA). Nút 4, 5 có cùng nhãn S và có nút con nhãn a (luật sinh S  a). Cuối cùng nút 7 có nhãn A và có các nút con b, a (luật sinh A  ba).</para>
+        <para id="id19876713">Trên cây dẫn xuất, nếu ta đọc các lá theo thứ tự từ “trái sang phải“ thì ta có một dạng câu trong G. Ta gọi chuỗi này là chuỗi sinh bởi cây dẫn xuất. </para>
+        <figure id="id19876730">
+          <media id="id1168168070260" alt=""><image src="../../media/graphics1-ae84.png" mime-type="image/png" height="273" width="451"/></media>
+        </figure>
+        <para id="id19876754">Hình 5.1 - Cây dẫn xuất từ văn phạm</para>
+        <para id="id19876771">Một cây con (subtree) của cây dẫn xuất có nút gốc nhãn là A còn được gọi là A-cây con (hoặc A-cây). Cây con cũng giống như cây dẫn xuất, chỉ khác là nhãn của nút gốc không nhất thiết phải là ký hiệu bắt đầu S.</para>
+        <para id="id19876787">Thí dụ 5.5 :Xét văn phạm và cây dẫn xuất trong Hình 5.1. Đọc các lá theo thứ tự từ trái sang phải ta có chuỗi aabbaa, trong trường hợp này tất cả các lá đều là ký hiệu kết thúc, nhưng nói chung cũng không bắt buộc như thế, lá có thể có nhãn là  hoặc biến. Ta thấy dẫn xuất S * aabbaa bằng chuỗi dẫn xuất :</para>
+        <para id="id19876847">S Þ aAS Þ aSbAS Þ aabAS Þ aabbaS Þ aabbaa</para>
+        <para id="id19876898">A-cây có nút đỉnh là 3 tạo ra chuỗi con abba theo chuỗi dẫn xuất :</para>
+        <para id="id19876917">S Þ SbAÞ abA Þ abba</para>
+        <para id="id19876950">Câu hỏi :</para>
+        <para id="id19876962">?</para>
+        <para id="id19877074">Các cây dẫn xuất được sinh từ những chuỗi dẫn xuất khác nhau cho cùng một chuỗi nhập có là những cây dẫn xuất khác nhau không ?</para>
+      </section>
+      <section id="id-797690646262">
+        <title>Quan hệ giữa dẫn xuất và cây dẫn xuất</title>
+        <para id="id19877097">ĐỊNH LÝ 5.1 : Nếu G (V, T, P, S) là một văn phạm phi ngữ cảnh thì S *  nếu và chỉ nếu có cây dẫn xuất trong văn phạm sinh ra .</para>
+      </section>
+    </section>
+    <section id="id-506267162822">
+      <title>Chứng minh</title>
+      <para id="id19877153">Ta chứng minh rằng với biến A bất kỳ, A * nếu và chỉ nếu có một A-cây sinh ra . </para>
+      <para id="id19877193">Nếu: Giả sử  được sinh bởi A-cây, ta chứng minh quy nạp theo số nút trung gian của cây dẫn xuất rằng A *.</para>
+      <para id="id19877248">Nếu có 1 nút trung gian thì cây phải có dạng như hình sau : </para>
+      <para id="id19877258">Khi đó X1X2 ... Xn là chuỗi  và A   là một luật sinh trong P theo định nghĩa cây dẫn xuất.</para>
+      <figure id="id19877322">
+        <media id="id1168171314746" alt=""><image src="../../media/graphics2-50e8.png" mime-type="image/png" height="119" width="220"/></media>
+      </figure>
+      <para id="id19877346">Hình 5.2(a) - A-cây với một nút trong</para>
+      <para id="id19877363">Giả sử kết quả đúng tới k -1 nút trung gian ( k &gt; 1)</para>
+      <para id="id19877373">Ta chứng minh kết quả cũng đúng với k nút. </para>
+      <para id="id19877382">Xét  được sinh ra bởi A-cây có k nút trung gian. Rõ ràng các nút con của nút gốc không phải tất cả đều là lá, ta gọi chúng từ trái sang phải là X1, X2, ..., Xn thì chắc chắn rằng A  X1X2 ... Xn là một luật sinh. Xét nút Xi bất kỳ :</para>
+      <para id="id19877474">- Nếu Xi không là nút lá thì Xi phải là một biến và Xi - cây con sẽ sinh ra một chuỗi i nào đó.</para>
+      <para id="id19877523">- Nếu Xi là nút lá, ta đặt i = Xi. Dễ thấy rằng nếu j &lt; i thì các j ở bên trái j, do vậy chuỗi đọc từ lá vẫn có dạng  = 12 ... n. Mỗi Xi - cây con phải có ít nút trung gian hơn cây ban đầu, vì thế theo giả thiết quy nạp, với mỗi đỉnh i không phải là lá thì Xi *i. </para>
+      <para id="id19877681">Vậy A  X1X2 ... Xn * 1X2 ... Xn * 12X3 ... Xn * ... * 12 ... n =  </para>
+      <para id="id19877885">Hay ta có A *  . Chú ý rằng đây chỉ là một trong nhiều cách dẫn xuất ra .</para>
+      <para id="id19877929">Chỉ nếu : Ngược lại, giả sử A *  ta cần chỉ ra một A - cây sinh ra .</para>
+      <para id="id19877978">Nếu A *  bằng một bước dẫn xuất thì A   là một luật sinh trong P và có cây dẫn xuất sinh ra  như trong hình trên.</para>
+      <para id="id19878037">Giả sử kết quả đúng tới k-1 bước dẫn xuất</para>
+      <para id="id19878046">Xét A *  bằng k bước dẫn xuất, gọi bước đầu tiên là A  X1X2 ... Xn. </para>
+      <para id="id19878111">Rõ ràng, một ký hiệu trong  phải được dẫn ra từ một biến Xi nào đó. Vì vậy, ta có thể viết  = 12 ... n, trong đó mỗi 1  i  n thoả mãn :</para>
+      <para id="id19878201">- i = Xi nếu Xi là ký hiệu kết thúc.</para>
+      <para id="id19878239">- Xi * i nếu Xi là một biến.</para>
+      <para id="id19878290">Nếu Xi là biến thì dẫn xuất của i từ Xi phải có ít hơn k bước. Vì vậy, theo giả thiết quy nạp ta có Xi - cây sinh ra i, đặt cây này là Ti </para>
+      <para id="id19878362">Bây giờ ta dựng A - cây có n lá X1X2 ... Xn. Mỗi Xi không là ký hiệu kết thúc ta thay bằng cây Ti tương ứng. Cuối cùng, ta có cây dẫn xuất sinh ra có dạng như sau :</para>
+      <figure id="id19878420">
+        <media id="id7041448" alt=""><image src="../../media/graphics3-9f1b.png" mime-type="image/png" height="177" width="452"/></media>
+      </figure>
+      <para id="id19878444">Hình 5.2(b) - A-cây</para>
+      <para id="id19878461">Thí dụ 5.6 :Xét chuỗi dẫn xuất S * aabbaa cho văn phạm ở Thí dụ 5.4.</para>
+      <para id="id19878497">Bước đầu tiên trong dẫn xuất đó là S  aAS. Theo dõi các bước suy dẫn sau đó, ta thấy biến A được thay bởi SbA, rồi trở thành abA và cuối cùng thành abba, đó chính là kết quả của cây T2 (A - cây). Còn biến S thì được thay bởi a và đó là kết quả của cây T3 (S -cây). Ghép nối lại, ta được cây dẫn xuất mà kết quả là chuỗi aabbaa như dưới đây.</para>
+      <figure id="id19878557">
+        <media id="id1168167511574" alt=""><image src="../../media/graphics4-71d7.png" mime-type="image/png" height="230" width="621"/></media>
+      </figure>
+      <para id="id19878580">[</para>
+      <para id="id19878589">Hình 5.3 - Ghép nối các cây dẫn xuất </para>
+      <section id="id-393781532062">
+        <title>Dẫn xuất trái nhất, dẫn xuất phải nhất </title>
+        <para id="id19878619">Nếu tại mỗi bước dẫn xuất, luật sinh được áp dụng vào biến bên trái nhất thì ta gọi đó là dẫn xuất trái nhất (leftmost) hay dẫn xuất trái. Tương tự, nếu biến bên phải nhất được thay thế ở mỗi bước dẫn xuất, đó là dẫn xuất phải nhất (rightmost) hay dẫn xuất phải. Nếu chuỗi w  L(G) với CFG G thì w sẽ có ít nhất một cây dẫn xuất ra nó và tương ứng với các cây này, w chỉ có duy nhất một dẫn xuất trái nhất và duy nhất một dẫn xuất phải nhất. Dĩ nhiên, w có thể có nhiều dẫn xuất trái (phải) nhất vì nó có thể có nhiều cây dẫn xuất. </para>
+        <para id="id19878675">Thí dụ 5.7 : Xét cây dẫn xuất ở Hình 5.1 </para>
+        <para id="id19878689">. Dẫn xuất trái nhất của cây :</para>
+        <para id="id19878695">S Þ aAS Þ aSbAS Þ aabAS Þ aabbaS Þ aabbaa.</para>
+        <para id="id19878779">. Dẫn xuất phải nhất tương ứng là :</para>
+        <para id="id19878789">S Þ aAS Þ aAa Þ aSbAa Þ aSbbaa Þ aabbaa.</para>
+      </section>
+      <section id="id-593704331362">
+        <title>Văn phạm mơ hồ </title>
+        <para id="id19878881">Một văn phạm phi ngữ cảnh G có nhiều hơn một cây dẫn xuất cho cùng một chuỗi w, thì G được gọi là văn phạm mơ hồ (ambiguity). Dĩ nhiên, cũng có thể nói rằng văn phạm G là mơ hồ nếu có một chuỗi w được dẫn ra từ ký hiệu bắt đầu S với hai dẫn xuất trái hoặc hai dẫn xuất phải. </para>
+        <para id="id19878909">Thí dụ 5.8 : Xét văn phạm G với các luật sinh như sau :</para>
+        <para id="id19878924">E  E + E  E * E  ( E )  a</para>
+        <para id="id19878983">Văn phạm này sinh ra các chuỗi biểu thức số học với 2 phép toán + và * . Với chuỗi a + a * a, ta có thể vẽ đến hai cây dẫn xuất khác nhau như sau :</para>
+        <figure id="id19879010">
+          <media id="id1168168395677" alt=""><image src="../../media/graphics5-1dbb.png" mime-type="image/png" height="214" width="501"/></media>
+        </figure>
+        <para id="id19879034">(a) (b)</para>
+        <para id="id19879055">Hình 5.4 - Các cây dẫn xuất khác nhau cho cùng chuỗi nhập</para>
+        <para id="id19879073">Điều này có nghĩa là biểu thức a + a * a có thể hiểu theo hai cách khác nhau: thực hiện phép cộng trước hay phép nhân trước ? Để khắc phục sự mơ hồ này, ta có thể :</para>
+        <para id="id19879094">- Hoặc quy định rằng các phép cộng và nhân luôn luôn được thực hiện theo thứ tự từ trái sang phải (trừ khi gặp ngoặc đơn). Ta viết văn phạm G1 không mơ hồ tương đương như sau :</para>
+        <para id="id19879118">E  E + T  E * T  T</para>
+        <para id="id19879163">T  ( E )  a</para>
+        <para id="id19879192">- Hoặc quy định rằng khi không có dấu ngoặc đơn ngăn cách thì phép nhân luôn luôn được ưu tiên hơn phép cộng. Ta viết văn phạm G2 không mơ hồ tương đương như sau :</para>
+        <para id="id19879216">E  E + T  T</para>
+        <para id="id19879247">T  T * F  F</para>
+        <para id="id19879278">F  ( E )  a</para>
+      </section>
+    </section>
+    <section id="id-72813060301">
+      <title>GIẢN LƯỢC CÁC VĂN PHẠM PHI NGỮ CẢNH </title>
+      <para id="id19879317">Thường thì một văn phạm phi ngữ cảnh có thể còn chứa đựng một vài yếu tố thừa, vô ích. Chẳng hạn như theo các đặc tính trên, có những ký hiệu không thực sự tham gia vào quá trình dẫn xuất ra câu, hoặc sẽ có những luật sinh dạng A  B làm kéo dài chuỗi dẫn xuất một cách không cần thiết. Vì vậy, việc giản lược văn phạm phi ngữ cảnh là nhằm loại bỏ những yếu tố vô ích đó mà không làm giảm bớt khả năng sản sinh ngôn ngữ của văn phạm.</para>
+      <para id="id19879352">Nếu L là một CFL, nó có thể tạo ra văn phạm CFG với các đặc tính sau :</para>
+      <list id="id19879363" list-type="enumerated">
+        <item>Mỗi biến và mỗi ký hiệu kết thúc của G đều xuất hiện trong dẫn xuất của một số chuỗi trong L.</item>
+        <item>Không có luật sinh nào dạng A  B, mà trong đó A, B đều là biến.</item>
+      </list>
+      <para id="id19879399">Hơn nữa, nếu   L thì không cần luật sinh A  . Thực tế, nếu   L, ta có mọi luật sinh trong G đều có một trong hai dạng : </para>
+      <para id="id19879462">A  BC hoặc  A  a ( là chuỗi các biến hoặc )</para>
+      <para id="id19879529">A  a</para>
+      <para id="id19879545">Hai dạng đặc biệt này gọi là dạng chuẩn Chomsky và dạng chuẩn Greibach.</para>
+      <section id="id-361367047315">
+        <title>Các ký hiệu vô ích</title>
+        <para id="id19879563">Một ký hiệu X gọi là có ích nếu có một dẫn xuất S * X * w với các chuỗi ,  bất kỳ và w  T *. Ngược lại X gọi là vô ích. </para>
+        <para id="id19267824">Vậy, có 2 đặc điểm cho ký hiệu có ích: </para>
+        <para id="id19267833">- X phải dẫn ra một chuỗi ký hiệu kết thúc.</para>
+        <para id="id19267842">- X phải nằm trong dẫn xuất từ S. </para>
+        <para id="id19267850">Tuy nhiên 2 dấu hiệu trên không đủ để đảm bảo X có ích vì X có thể nằm trong dạng câu chứa một biến nhưng từ đó không có ký hiệu kết thúc được sinh ra.</para>
+        <para id="id19267864">BỔ ĐỀ 1: (Dùng loại bỏ các biến không dẫn ra chuỗi ký hiệu kết thúc)</para>
+        <para id="id19267883">Cho CFG G (V, T, P, S) với L(G)  , có một CFG G’ (V’, T’, P’, S) tương đương sao cho mỗi A  V’ tồn tại w  T* để A * w.</para>
+        <para id="id19267938">Chứng minh</para>
+        <para id="id19267943">Mỗi biến A với luật sinh A  w trong P thì rõ ràng A  V’. Nếu A  X1X2 ... Xn là một luật sinh, trong đó mỗi Xi hoặc là ký hiệu kết thúc hoặc là một biến đã có sẵn trong V’ thì một chuỗi các ký hiệu kết thúc có thể được dẫn ra từ A bằng dẫn xuất bắt đầu A  X1X2 ... Xn, vì vậy A  V’. Tập V’ có thể tính được bằng cách lặp lại giải thuật trên. P’ là tập tất cả các luật sinh mà các ký hiệu của nó thuộc V’  T. </para>
+        <para id="id19268080">Giải thuật tìm V' như sau:</para>
+        <para id="id19268089">Begin</para>
+        <para id="id19268093">(1) OLDV:= Æ;</para>
+        <para id="id19268114">(2) NEWV:= {A  A  w với w  T *};</para>
+        <para id="id19268161">(3) While OLDV ¹ NEWV do</para>
+        <para id="id19268196">begin</para>
+        <para id="id19268209">(4) OLDV := NEWV;</para>
+        <para id="id19268218">(5) NEWV := OLDV  {A  A   với   (T  OLDV)*}</para>
+        <para id="id19268300">end;</para>
+        <para id="id19268315">(6) V' := NEWV;</para>
+        <para id="id19268324">end;</para>
+        <para id="id19268329"/>
+        <para id="id19268351">Rõ ràng rằng nếu biến A được thêm vào V’ tại bước (2) hoặc (5) thì A sẽ dẫn ra được chuỗi ký hiệu kết thúc. Ta chứng minh rằng nếu A dẫn ra được một chuỗi ký hiệu kết thúc thì A được thêm vào tập NEWV. </para>
+        <para id="id19268368">Dùng chứng minh quy nạp theo độ dài của dẫn xuất A * w.</para>
+        <para id="id19268390">Nếu độ dài bằng 1 thì A   là một luật sinh trong P. Vậy A được đưa vào V’ tại bước (2).</para>
+        <para id="id19268418">Giả sử kết quả đúng tới k -1 bước dẫn xuất ( k &gt;1)</para>
+        <para id="id19268428">Nếu A  X1X2 ... Xn * w bằng k bước thì ta có thể viết w = w1w2 ... wn, trong đó Xi * wi, với 1  i  n bằng ít hơn k bước dẫn xuất. Theo giả thiết quy nạp thì các biến Xi này được thêm vào V’. Khi Xi cuối cùng được thêm vào V’ thì vòng lặp (3) vẫn tiếp tục lặp một lần nữa và A sẽ được thêm vào V’ tại (5). </para>
+        <para id="id19268584">Ta chứng minh L(G’) = L(G) :</para>
+        <para id="id19268590">Chọn V’ là tập hợp tại (6) và P' là tập tất cả các luật sinh mà các ký hiệu của nó thuộc (V’  T) thì chắc chắn rằng có tồn tại văn phạm G’ (V’, T, P’, S) thoả mãn tính chất: nếu A  V’ thì A * w với w nào đó thuộc T *. Hơn nữa, mỗi luật sinh của P’ đều là luật sinh của P nên ta có L(G’)  L(G). </para>
+        <para id="id19268659">Ngược lại giả sử một từ w  L(G) - L(G’) thì một dẫn xuất bất kỳ của w phải liên quan đến các biến thuộc V – V’ hoặc luật sinh thuộc P – P’ (các dẫn xuất này đưa ra các biến thuộc V – V’), nhưng do không có biến nào trong V – V’ dẫn đến chuỗi kết thúc, điều này dẫn đến mâu thuẫn. </para>
+        <para id="id19268687">Vậy L(G’) = L(G).</para>
+        <para id="id19268692">Hay có thể nói 2 ngôn ngữ được cho từ 2 văn phạm G và G’ là tương đương nhau, hay nói cách khác: nếu có một văn phạm G thì luôn luôn có một văn phạm G’ tương ứng mà trong đó mỗi biến của G’ đều cho ra ký hiệu kết thúc.</para>
+        <para id="id19268709">BỔ ĐỀ 2: (Dùng loại bỏ các biến không được dẫn ra từ ký hiệu bắt đầu văn phạm)</para>
+        <para id="id19268728">Nếu G (V, T, P, S) là CFG thì ta có thể tìm được CFG G’ (V’, T’, P’, S) tương đương sao cho mỗi X  V’  T’ tồn tại ,   (V’  T’)* để S * X.</para>
+        <para id="id19268827">Chứng minh</para>
+        <para id="id19268832">Tập V’  T’ gồm các ký hiệu xuất hiện trong dạng câu của G được xây dựng bởi giải thuật lặp như sau :</para>
+        <para id="id19268853">. Đặt V’ = {S}; T’ = ;</para>
+        <para id="id19268869">. Nếu A  V’ và A  1| 2 | ... | n là các luật sinh trong P thì thêm tất cả các biến của 1, 2, ... , n vào V’ và các ký hiệu kết thúc của 1, 2 ,..., n vào T’. </para>
+        <para id="id19269014">. Lặp lại giải thuật cho đến khi không còn biến hoặc ký hiệu kết thúc nào được thêm vào nữa.</para>
+        <para id="id19269026">Dễ thấy, X  V’  T’ thì tồn tại ,   (V’  T’)* để S * X, trong đó P’ là tập hợp tất cả các luật sinh của P chỉ chứa các ký hiệu thuộc (V’  T’). </para>
+        <para id="id19269136">Ta dễ dàng chứng minh L(G’) = L(G) .</para>
+        <para id="id19269142">ĐỊNH LÝ 5.2: Mỗi ngôn ngữ phi ngữ cảnh (CFL) không rỗng được sinh ra từ một văn phạm phi ngữ cảnh (CFG) không có ký hiệu vô ích.</para>
+        <para id="id19269159">Chứng minh</para>
+        <para id="id19269164">Đặt L = L(G) là CFL không rỗng. </para>
+        <para id="id19269171">Đặt G1 là kết quả của việc áp dụng bổ đề 1 vào G và G2 là kết quả của việc áp dụng bổ đề 2 vào G1. </para>
+        <para id="id19269208">Giả sử G2 có ký hiệu vô ích là X. Theo bổ đề 2 ta có S *G2 X. Vì tất cả các ký hiệu trong G2 đều có trong G1 nên theo bổ đề 1: S *G1 X *G1 w với w là chuỗi ký hiệu kết thúc. Vì vậy không có ký hiệu nào trong dẫn xuất X *G1 w bị loại bỏ bởi bổ đề 2, vậy X dẫn ra ký hiệu kết thúc trong G2 . Suy ra X là ký hiệu có ích (mâu thuẫn).</para>
+        <para id="id19269381">Vậy văn phạm G2 không có ký hiệu vô ích nào.</para>
+        <para id="id19269399">Thí dụ 5.9 : Xét văn phạm có các luật sinh sau :</para>
+        <para id="id19269413">S ® AB | a</para>
+        <para id="id19269429">A ® a</para>
+        <para id="id19269445">Áp dụng bổ đề 1, ta thấy không có ký hiệu kết thúc được nào dẫn ra từ B nên ta loại bỏ B và luật sinh S  AB. Tiếp tục, áp dụng bổ đề 2 cho văn phạm : </para>
+        <para id="id19269466">S ® a</para>
+        <para id="id19269481">A ® a </para>
+        <para id="id19269497">Ta thấy chỉ có S xuất hiện trong dạng câu. Vậy ({S}, {a}, {S ® a}, S) là văn phạm tương đương với văn phạm đã cho và không có ký hiệu vô ích.</para>
+        <para id="id19269522">Câu hỏi :</para>
+        <para id="id19269534">?</para>
+        <para id="id19269646">Bạn hãy cho nhận xét về thứ tự áp dụng Bổ đề 1 và Bổ đề 2 trong quá trình loại bỏ các ký hiệu vô ích trong văn phạm ?</para>
+      </section>
+      <section id="id-281312077301">
+        <title>Luật sinh </title>
+        <para id="id19269672">Một luật sinh có dạng A   gọi là luật sinh . </para>
+        <para id="id19269707">Ta xét đến việc loại bỏ các luật sinh này. Nếu   L(G) thì không thể loại được tất cả các luật sinh , nhưng nếu   L(G) thì có thể. Phương pháp loại bỏ dựa trên việc xác định liệu một biến A có dẫn xuất A *  hay không ? Nếu có, ta gọi A là biến rỗng (nullable). Ta có thể thay thế mỗi luật sinh B  X1X2 ... Xn bằng tất cả các luật sinh được định dạng bởi việc xóa bỏ tập hợp con các biến Xi rỗng, nhưng không bao gồm luật sinh B  , ngay cả khi tất cả các Xi đều là biến rỗng.</para>
+        <para id="id19269866">ĐỊNH LÝ 5.3 : Nếu L = L(G) với CFG G (V, T, P, S) thì L - {  } là L(G’) với CFG G’ không có ký hiệu vô ích và không có luật sinh .</para>
+        <para id="id19269904">Chứng minh</para>
+        <para id="id19269909">Ta có thể xác định tập hợp các biến rỗng (nullable) của G bằng giải thuật lặp như sau : Bắt đầu, nếu A   là một luật sinh thì A là biến rỗng. Kế tiếp, nếu B  , trong đó  gồm toàn các ký hiệu là các biến rỗng đã được tìm thấy trước đó thì B cũng là biến rỗng. Lặp lại cho đến khi không còn biến rỗng nào được tìm thấy nữa. </para>
+        <para id="id19269974">Tập luật sinh P’ được xây dựng như sau : Nếu A  X1X2 ... Xn là một luật sinh trong P thì ta thêm tất cả các luật sinh A  12 ... n vào P’ với điều kiện :</para>
+        <para id="id19270064">1) Nếu Xi không là biến rỗng thì i = Xi;</para>
+        <para id="id19270102">2) Nếu Xi là biến rỗng thì i là Xi hoặc ;</para>
+        <para id="id19270149">3) Không phải tất cả i đều bằng .</para>
+        <para id="id19270179">Đặt G’’ = (V, T, P’, S). Ta sẽ chứng minh rằng với mọi A  V và w  T *, A *G’’ w nếu và chỉ nếu w   và A *G w.</para>
+        <para id="id19270266">Nếu: Đặt A  iG w và w  , ta chứng minh quy nạp rằng A *G’’ w. </para>
+        <para id="id19270348">Nếu i = 1 ta có A  w là một luật sinh trong P, và vì w   nên luật sinh này cũng thuộc P’. </para>
+        <para id="id19270388">Giả sử kết quả đúng tới i - 1 (i &gt;1)</para>
+        <para id="id19270397">Xét A G X1X2 ...Xn  i -1G w. Ta viết w = w1w2 ...wn sao cho j, Xj *wj. </para>
+        <para id="id19270532">Nếu wj   và Xj là biến thì theo giả thiết quy nạp, ta có Xj *G’’ wj (vì dẫn xuất Xj * wj có ít hơn i bước). Nếu wj =  thì Xj là biến rỗng, vậy A  12 ...n là một luật sinh trong P', trong đó j = Xj nếu wj   và j =  nếu wj = . </para>
+        <para id="id19270797">Vì w   nên không phải tất cả j là . Vậy, ta có dẫn xuất :</para>
+        <para id="id19270846">A Þ 12 ...n Þ* w12 ...n Þ* w1w23 ...n Þ* ... Þ* w1w2 ...wn = w trong G’’.</para>
+        <para id="id19271040">Chỉ nếu: Giả sử A  iG’’ w. Chắc chắn rằng w   vì G’’ không có luật sinh . Ta quy nạp theo i rằng A  G w. </para>
+        <para id="id19271133">Nếu i = 1: Ta thấy A  w là một luật sinh trong P’, do đó cũng phải có luật sinh A  w trong P sao cho bằng việc loại bỏ các ký hiệu rỗng trong , ta có w. Vậy, có tồn tại dẫn xuất A  G  Þ*G w, trong đó  Þ* w liên quan đến các dẫn xuất  từ các biến rỗng của  mà chúng ta đã loại bỏ khỏi w. </para>
+        <para id="id19271255">Giả sử kết quả đúng tới i - 1 (i &gt;1) </para>
+        <para id="id19271264">Xét A G’’ X1X2 ... Xn  i - 1G’’ w. Phải có luật sinh A   trong P sao cho X1X2 ... Xn tìm được khi loại bỏ các biến rỗng của . Vậy A Þ*G X1X2 ...Xn (chứng minh tương tự như ở trên). Ta viết w = w1w2 ...wn sao cho j ta có Xj  *G’’ wj (bằng ít hơn i bước). Theo giả thiết quy nạp Xj  *G’’ wj nếu Xj là biến. Nếu Xj là ký hiệu kết thúc thì wj = Xj và Xj  *G wj là hiển nhiên. Vậy A  *G w.</para>
+        <para id="id19271634">Cuối cùng ta áp dụng bổ đề 2 vào G’’ ta thu được G’ không có ký hiệu vô ích. Vì bổ đề 1 và bổ đề 2 không đưa ra thêm luật sinh mới nào nên G’ không có chứa ký hiệu là biến rỗng hay ký hiệu vô ích. </para>
+        <para id="id19271650">Hơn nữa S  *G’ w nếu và chỉ nếu S  *G w. Vậy L(G’) = L(G) - {}.</para>
+        <para id="id19271703">Thí dụ 5.10 : Loại bỏ luật sinh e trong văn phạm sau :</para>
+        <para id="id19271726">S ® AB </para>
+        <para id="id19271742">A ® aA | e</para>
+        <para id="id19271762">B ® bB | e</para>
+        <para id="id19271782">Trước hết, ta xác định tập các biến rỗng trong văn phạm: A, B là các biến rỗng vì có các luật sinh A ® e và B ® e. S cũng là biến rỗng vì có luật sinh S ® AB với A, B đều là các biến rỗng.</para>
+        <para id="id19271840"> Tập biến rỗng Nullable = {A, B, S} </para>
+        <para id="id19271853">Theo quy tắc xây dựng tập luật sinh P’ trong định lý , ta có tập luật sinh mới như sau :</para>
+        <para id="id19271864">S ® AB | A | B</para>
+        <para id="id19271880">A ® aA | a</para>
+        <para id="id19271896">B ® bB | b</para>
+        <para id="id19271914">Lưu ý rằng văn phạm mới G’ không sản sinh ra , trong khi G lại có sinh ra từ rỗng e. Vậy muốn có một văn phạm thực sự tương đương với văn phạm G thì ta phải bổ sung thêm luật sinh S ® e vào tập luật sinh của G’. Ta có, văn phạm G’ tương đương G.</para>
+      </section>
+      <section id="id-856456177212">
+        <title>Luật sinh đơn vị </title>
+        <para id="id19271977">Một luật sinh có dạng A ® B với A, B đều là biến gọi là luật sinh đơn vị. </para>
+        <para id="id19271996">ĐỊNH LÝ 5.4 : Mỗi CFL không chứa e được sinh ra bởi CFG không có ký hiệu vô ích, luật sinh e hoặc luật sinh đơn vị .</para>
+        <para id="id19272029">Chứng minh</para>
+        <para id="id19272034">Đặt L là CFL không chứa e và L = L(G) với G (V, T, P, S) là một CFG nào đó. </para>
+        <para id="id19272052">Theo định lý 3 ta có thể giả sử G không có luật sinh e. Xây dựng tập hợp mới P’ gồm các luật sinh từ P như sau: </para>
+        <para id="id19272072">Đầu tiên đưa các luật sinh không là luật sinh đơn vị vào P’. </para>
+        <para id="id19272081">Sau đó, nếu có luật sinh đơn vị dạng A * B với A, B  V thì thêm vào P’ tất cả các luật sinh dạng A  , với B  không phải là luật sinh đơn vị của P. </para>
+        <para id="id19272152">Chú ý rằng ta có thể dễ dàng kiểm tra có hay không A  *G B vì G không có luật sinh e và nếu A  G B1  G B2 ...  G Bm  G B (trong đó một vài biến nào đó có thể xuất hiện 2 lần) thì ta có thể tìm một chuỗi rút ngắn hơn A  *G B, vì vậy ta chỉ xét các luật sinh đơn vị không có biến lặp lại. </para>
+        <para id="id19272308">Bây giờ ta sửa lại văn phạm G’ (V, T, P’, S). Chắc chắn rằng nếu A   là một luật sinh trong P’ thì A  *G . Vậy nếu có dẫn xuất trong G’ thì có dẫn xuất trong G. Giả sử rằng w  L(G). Xét dẫn xuất trái của w trong G: </para>
+        <para id="id19272379">S  G 0  G 1  G ...  G n = w.</para>
+        <para id="id19272488">Nếu 0  i &lt; n thì nếu trong G có i  G i+1 bằng luật sinh không là luật sinh đơn vị thì trong G’ cũng có i  G’ i+1 không là luật sinh đơn vị. Giả sử i  G i+1 bằng luật sinh đơn vị, nhưng bước dẫn xuất trước đó i - 1  i không phải bằng luật sinh đơn vị hoặc i = 0. Và chuỗi dẫn xuất trong G từ i + 1  G i + 2  G ...  G j tất cả đều bằng luật sinh đơn vị, còn từ j  G j+1 không là luật sinh đơn vị thì ta thấy tất cả các i, i+1, …, j sẽ có cùng độ dài và vì chuỗi dẫn xuất là dẫn xuất trái nên các ký hiệu thay thế phải ở cùng một vị trí. Do vậy, tại vị trí này j  G j+1 bằng một luật sinh nào đó thuộc P’- P hay có nghĩa là một luật sinh không thuộc văn phạm G. Điều này sinh ra mâu thuẫn. Vậy L(G) = L(G’). </para>
+        <para id="id19272897">Ta còn có G’ không có chứa luật sinh đơn vị (theo chứng minh trên) nên G cũng sẽ không chứa luật sinh đơn vị (do G  G’). </para>
+        <para id="id19272918">Việc áp dụng bổ đề 1, bổ đề 2 để loại các ký hiệu vô ích không đưa ra thêm luật sinh nào chứng tỏ G không chứa ký hiệu vô ích.</para>
+        <para id="id19272931">Vậy, kết quả ta được một văn phạm thỏa điều kiện định lý.</para>
+        <para id="id19272943">Thí dụ 5.11 : Loại bỏ các luật sinh đơn vị trong văn phạm sau :</para>
+        <para id="id19272959">E ® E + T | T</para>
+        <para id="id19272977">T ® T * F | F </para>
+        <para id="id19272997">F ® ( E ) | a</para>
+        <para id="id19253268">Gọi tập A = {B  A  * B}, xét các biến trong văn phạm, ta có : </para>
+        <para id="id19253313"> E = { E, T, F } T = { T, F } F = { F }</para>
+        <para id="id19253359">Vậy tập luật sinh mới, theo định lý sẽ chứa các luật sinh không là luật sinh đơn vị trong P, bổ sung thêm các luật sinh mới thay cho luật sinh đơn vị như sau :</para>
+        <para id="id19253374">E ® E + T | T * F | ( E ) | a</para>
+        <para id="id19253402">T ® T * F | ( E ) | a</para>
+        <para id="id19253432">F ® ( E ) | a</para>
+      </section>
+    </section>
+    <section id="id-583607282839">
+      <title>CHUẨN HÓA VĂN PHẠM PHI NGỮ CẢNH </title>
+      <para id="id19253463">Phần này sẽ giới thiệu hai định lý dùng chuẩn hóa CFG về một trong hai dạng chuẩn Chomsky và Greibach.</para>
+      <section id="id-575846706794">
+        <title>Dạng chuẩn Chomsky - CNF (Chomsky Normal Form) </title>
+        <para id="id19253480">ĐỊNH LÝ 5.5 : (Dạng chuẩn Chomsky, hay CNF )</para>
+        <para id="id19253498">Một ngôn ngữ phi ngữ cảnh bất kỳ không chứa  đều được sinh ra bằng một văn phạm nào đó mà các luật sinh có dạng A  BC hoặc A  a, với A, B, C là biến còn a là ký hiệu kết thúc.</para>
+        <para id="id19253539">Chứng minh</para>
+        <para id="id19253543">Đặt G là CFG sinh ra CFL không chứa . CFG tương đương có dạng chuẩn Chomsky có thể xây dựng từ G theo giải thuật sau :</para>
+        <para id="id19253563">Bước 1 : Thay thế tất cả các luật sinh có độ dài vế phải bằng 1 (luật sinh đơn vị dạng A  B, với A, B là biến )</para>
+        <para id="id19253588">Theo định lý 4.4, ta có thể tìm được CFG tương đương G1(V, T, P, S) không có luật sinh đơn vị và luật sinh . Vậy nếu luật sinh mà vế phải chỉ có một ký hiệu thì đó phải là ký hiệu kết thúc và luật sinh này là luật sinh có dạng đúng trong định lý.</para>
+        <para id="id19253623">Bước 2 : Thay thế các luật sinh có độ dài vế phải &gt;1 và có chứa ký hiệu kết thúc.</para>
+        <para id="id19253637">Xét luật sinh trong P có dạng A  X1X2 ... Xm (m &gt;1). Nếu Xi là ký hiệu kết thúc a thì ta đưa thêm một biến mới Ca và luật sinh mới Ca  a. Thay thế Xi bởi Ca, gọi tập các biến mới là V’ và tập luật sinh mới là P’. </para>
+        <para id="id19253737">Xét CFG G2 (V’, T, P’, S). Nếu   G1  thì  *G2 . Vậy L(G1)  L(G2). Ta chứng minh quy nạp theo số bước dẫn xuất rằng nếu A *G2 w, với A  V và w  T* thì A *G1 w.</para>
+        <para id="id19253907">Kết quả hiển nhiên với 1 bước dẫn xuất.</para>
+        <para id="id19253916">Giả sử kết quả đúng tới k bước dẫn xuất.</para>
+        <para id="id19253926">Xét A *G2 w bằng k +1 bước dẫn xuất. </para>
+        <para id="id19253951">Bước đầu tiên có dạng A  B1B2 ... Bm (m &gt; 1). Ta có thể viết w = w1w2 ...wm trong đó Bi *G2 wi, 1  i  m. Nếu Bi là ký hiệu kết thúc ai nào đó thì wi là ai. Theo cách xây dựng P’ ta có luật sinh A  X1X2 ... Xm của P trong đó Xi = Bi nếu Bi V và Xi = ai nếu Bi V’- V. Với Bi  V, ta đã biết rằng có dẫn xuất Bi *G1 wi bằng ít hơn k bước, do vậy theo giả thiết quy nạp Xi *G1 wi. Vậy A *G1 w. </para>
+        <para id="id19254319">Ta đã có kết quả là một CFL bất kỳ được sinh ra từ một CFG mà mỗi luật sinh có dạng A  a hoặc A  B1B2 ... Bm (m  2) với A, B1, ... ,Bm là các biến và a là ký hiệu kết thúc. Ta sửa G2 bằng cách thêm vào P’ một số luật sinh. </para>
+        <para id="id19254416">Bước 3 : Thay thế các luật sinh có độ dài vế phải &gt; 2 ký hiệu chưa kết thúc.</para>
+        <para id="id19254430">Xét luật sinh trong P’có dạng A  B1B2 ... Bm (m &gt; 2) . Ta thay bằng tập hợp các luật sinh : A  B1D1</para>
+        <para id="id19254483">D1 ® B2D2 </para>
+        <para id="id19254530"> ... </para>
+        <para id="id19254543">Dm - 3 ® Bm - 2Dm - 2 </para>
+        <para id="id19254588">Dm - 2 ® Bm - 1Bm </para>
+        <para id="id19254632">Đặt V’’ là tập các biến mới, P’’ là tập các luật sinh mới và văn phạm mới G3 (V’’, T, P’’, S). Ta có G3 chứa các luật sinh thoả mãn định lý. </para>
+        <para id="id19254662">Hơn nữa, nếu A *G2  thì A *G3 , vậy L(G2)  L(G3). Ngược lại cũng đúng tức là, L(G3)  L(G2). Chúng ta cũng đã có L(G2)  L(G1) và L(G1)  L(G2). Vậy G3 là văn phạm thoả mãn dạng chuẩn CNF.</para>
+        <para id="id19254837">Thí dụ 5.12 : Tìm văn phạm có dạng CNF tương đương văn phạm sau :</para>
+        <para id="id19254852">S ® A | ABA</para>
+        <para id="id19254872">A ® aA | a | B</para>
+        <para id="id19254890">B ® bB | b</para>
+        <para id="id19254909">Bước 1 : Thay thế các luật sinh có độ dài vế phải = 1 (luật sinh đơn vị)</para>
+        <para id="id19254922">Gọi tập A = {B  A  * B }, xét các biến trong văn phạm, ta có : </para>
+        <para id="id19254968"> S = { S, A, B }</para>
+        <para id="id19254985"> A = { A, B}</para>
+        <para id="id19255003"> B = { B }</para>
+        <para id="id19255019">Vậy tập luật sinh mới, theo định lý sẽ chứa các luật sinh không là luật sinh đơn vị trong P, bổ sung thêm các luật sinh mới thay cho luật sinh đơn vị như sau :</para>
+        <para id="id19255034">S ® aA | a | bB | b | ABA</para>
+        <para id="id19255053">A ® aA | a | bB | b </para>
+        <para id="id19255071">B ® bB | b</para>
+        <para id="id19255089">Bước 2 : Thay thế các luật sinh có độ dài vế phải &gt; 1 và có chứa ký hiệu kết thúc.</para>
+        <para id="id19255101">Ta thấy, a và b đều xuất hiện ở vế phải một số luật sinh, do đó ta tạo thêm 2 biến mới Ca, Cb và 2 luật sinh mới Ca ® a và Cb ® b. </para>
+        <para id="id19255165">Văn phạm tương đương có tập luật sinh như sau :</para>
+        <para id="id19255175">S ® CaA | a | CbB | b | ABA</para>
+        <para id="id19255211">A ® CaA | a | CbB | b </para>
+        <para id="id19255246">B ® CbB | b</para>
+        <para id="id19255272"> Ca ® a </para>
+        <para id="id19255305"> Cb ® b</para>
+        <para id="id19255337">Bước 3 : Thay thế các luật sinh có độ dài vế phải &gt; 2</para>
+        <para id="id19255349">Chỉ còn duy nhất một luật sinh cần xét ở bước này : S ® ABA và tập luật sinh mới được thay thế có dạng như sau : </para>
+        <para id="id19255377">S ® CaA | a | CbB| b | AD1</para>
+        <para id="id19255426">A ® CaA | a | CbB| b </para>
+        <para id="id19255461">B ® CbB| b</para>
+        <para id="id19255486"> Ca ® a </para>
+        <para id="id19255518"> Cb ® b</para>
+        <para id="id19255551"> D1 ® BA</para>
+        <para id="id19255582">Cuối cùng, ta sẽ thu được văn phạm có dạng chuẩn Chomsky như trên tương đương với văn phạm đã cho.</para>
+      </section>
+      <section id="id-558914078266">
+        <title>Dạng chuẩn Greibach GNF (Greibach Normal Form) </title>
+        <para id="id19255604">Ta gọi luật sinh với biến A ở bên trái là A - luật sinh.</para>
+        <para id="id19255610">BỔ ĐỀ 3 : (Dùng thay thế các luật sinh trực tiếp)</para>
+        <para id="id19255628">Cho G (V, T, P, S) là một CFG, đặt A ® 1B2 là luật sinh trong P và B ® 1 | 2 | ... | r là các B - luật sinh; văn phạm G1 (V, T, P1, S) thu được từ G bằng cách loại bỏ luật sinh A ® 1B2 và thêm vào luật sinh A ® 112 | 122 | ... | 1r2 thì L(G) = L(G1)</para>
+        <para id="id19255888">Chứng minh</para>
+        <para id="id19255893">. Hiển nhiên L(G1)  L(G) vì nếu A ® 1i2 được dùng trong dẫn xuất của G1 thì ta dùng A G 1B2 G 1i2 </para>
+        <para id="id19256052">. Để chỉ ra L(G)  L(G1) ta cần chú ý rằng A ® 1B2 là luật sinh trong P - P1 (có trong G và không có trong G1). Bất cứ khi nào luật sinh A ® 1B2 được dùng trong dẫn xuất của G thì phải viết lại tại bước sau đó dùng luật sinh dạng B ® i. Hai bước dẫn xuất này có thể được thay thế bằng một bước dẫn xuất duy nhất, hay :</para>
+        <para id="id19256196"> A ® 1B2A G1 1i2 </para>
+        <para id="id19256342">B ® i </para>
+        <para id="id19256374">Vậy L(G) = L(G1)</para>
+        <para id="id19256391">BỔ ĐỀ 4 : (Dùng loại bỏ luật sinh dạng đệ quy trái trong văn phạm)</para>
+        <para id="id19256410">Đặt G (V, T, P, S) là CFG; A ® A1 | A2 | ... | Ar là tập các A - luật sinh có A là ký hiệu trái nhất của vế phải (luật sinh đệ quy trái). Đặt A ® 1 | 2 | ... | s là các A - luật sinh còn lại; G1 (V  {B}, T, P1, S) là CFG được tạo thành bằng cách thêm biến mới B vào V và thay các A - luật sinh bằng các luật sinh dạng:</para>
+        <para id="id19256565">1) A ® i</para>
+        <para id="id19256643">A ® i B với 1  i  s</para>
+        <para id="id19256701">2) B ® i</para>
+        <para id="id19256776">B ® i B với 1  i  r</para>
+        <para id="id19256830">thì L(G) = L(G1).</para>
+        <para id="id19256846">Chứng minh</para>
+        <para id="id19256851">Trong một chuỗi dẫn xuất trái, một chuỗi luật sinh dạng A ® Ai phải kết thúc bằng A ® j. Tức là: </para>
+        <para id="id19256905">A  Ai1  Ai2i1  ...  Aipip-1…i1  jipip-1…i1 </para>
+        <para id="id19257066">Chuỗi dẫn xuất trong G có thể thay bằng chuỗi dẫn xuất trong G1 bởi : </para>
+        <para id="id19257085">A  j BÞ j ipB Þ jipip-1…B Þ ... Þ jipip-1…i2B </para>
+        <para id="id19257242">Þ jipip-1…i1. </para>
+        <para id="id19257296">Sự chuyển đổi ngược lại cũng có thể được. </para>
+        <para id="id19257310">Vậy L(G) = L(G1).</para>
+        <para id="id19257326">ĐỊNH LÝ 5.6 : (Dạng chuẩn Greibach, hay GNF )</para>
+        <para id="id19257344">Mỗi CFL bất kỳ không chứa  được sinh ra bởi một CFG mà mỗi luật sinh có dạng A  a với A là biến, a là một ký hiệu kết thúc, và  là một chuỗi các biến (có thể rỗng).</para>
+        <para id="id19257393">Chứng minh</para>
+        <para id="id19257397">Bước 1: Đặt G là CFG sinh ra CFL không chứa . Xây dựng văn phạm tương đương G’ có dạng chuẩn Chomsky.</para>
+        <para id="id19257425">Bước 2: Đổi tên các biến trong tập của G’ thành A1, A2, ..., Am (m  1) với A1 là ký hiệu bắt đầu. Đặt V = {A1, A2, ..., Am}.</para>
+        <para id="id19257507">Bước 3: Thay thế các luật sinh sao cho nếu Ai  Aj là một luật sinh thì j &gt; i </para>
+        <para id="id19257555">Bắt đầu từ A1 và tiến tới Am, ta thay thế các Ak - luật sinh :</para>
+        <para id="id19257590">Nếu Ak  Aj là luật sinh với j &lt; k: sinh ra một tập luật sinh mới bằng cách thay thế Aj bên vế phải của mỗi Aj - luật sinh theo bổ đề 3. Lặp lại không quá k - 1 lần ta thu được tập luật sinh dạng Ak  Al với l  k. </para>
+        <para id="id19257704">Sau đó, các luật sinh với l = k được thay thế theo bổ đề 4 bằng cách đưa vào các biến mới Bk. </para>
+        <para id="id19257724">Giải thuật cụ thể như sau:</para>
+        <para id="id19257732"/>
+        <para id="id19257755">Begin</para>
+        <para id="id19257759">(1) For k := 1 to m do begin</para>
+        <para id="id19257797">(2) for j := 1 to k-1 do</para>
+        <list id="id19257829" list-type="enumerated">
+          <item>for Mỗi luật sinh dạng Ak  Aj do </item>
+        </list>
+        <para id="id19257888">begin</para>
+        <para id="id19257895">(4) for Tất cả luật sinh Aj   do</para>
+        <para id="id19257949">(5) Thêm luật sinh Ak  ;</para>
+        <para id="id19257990">(6) Loại bỏ luật sinh Ak  Aj</para>
+        <para id="id19258032">end;</para>
+        <list id="id19258046" list-type="enumerated">
+          <item>for Mỗi luật sinh dạng Ak  Ak do </item>
+        </list>
+        <para id="id19258105">begin</para>
+        <para id="id19258112">(8) Thêm các luật sinh Bk   và Bk  Bk;</para>
+        <para id="id19258184">(9) Loại bỏ luật sinh Ak  Ak</para>
+        <para id="id19258226">end;</para>
+        <para id="id19258240">(10) for Mỗi luật sinh Ak   trong đó  không bắt đầu bằng Ak do</para>
+        <para id="id19258311">(11) Thêm luật sinh Ak  Bk</para>
+        <para id="id19258357">end;</para>
+        <para id="id19258371">end;</para>
+        <para id="id19258375">Bằng cách lặp lại bước xử lý trên cho mỗi biến nguồn, trong P chỉ chứa các luật sinh có dạng như sau :</para>
+        <para id="id19258387">1) Ai  Aj với j &gt; i</para>
+        <para id="id19258434">2) Ai  ag với a Î T</para>
+        <para id="id19258483">3) Bk ® g g Î (V È {B1, B2 , ..., Bi - 1})*</para>
+        <para id="id20440443">Bước 4: Thay thế các Ai - luật sinh về đúng dạng.</para>
+        <para id="id20440469">Gọi V’ là tập biến mới phát sinh sau bước 3. </para>
+        <para id="id20440479">Chú ý rằng ký hiệu trái nhất của vế phải trong một luật sinh bất kỳ đối với biến Am phải là một ký hiệu kết thúc, vì Am là biến có chỉ số cao nhất. Ký hiệu trái nhất của vế phải của một Am-1- luật sinh bất kỳ phải là Am hoặc một ký hiệu kết thúc. Nếu là Am, ta tạo ra tập luật sinh mới bằng cách thay thế Am bởi chuỗi vế phải của các Am-luật sinh theo bổ đề 3. Tiếp tục quá trình này cho các luật sinh từ Am-2, ..., A2, A1 cho tới khi vế phải của tất cả các Ai - luật sinh có dạng bắt đầu bằng một ký hiệu kết thúc. </para>
+        <para id="id20440603">Bước 5: Thay thế các Bk -luật sinh về đúng dạng.</para>
+        <para id="id20440625">Bước cuối cùng, ta khảo sát các luật sinh với tập các biến mới B1, B2, ..., Bm. </para>
+        <para id="id20440660">Vì ta bắt đầu từ văn phạm đã có dạng chuẩn Chomsky, nên dễ dàng chứng minh quy nạp theo số lần áp dụng bổ đề 3 và bổ đề 4 rằng vế phải của mỗi Ai -luật sinh, với 1  i  n, bắt đầu bằng ký hiệu kết thúc hoặc AjAk với j, k nào đó. Vậy  (trong bước (7)) không khi nào có thể rỗng hoặc bắt đầu bằng một Bj khác, hay tất cả Bi - luật sinh đều có vế phải bắt đầu bằng ký hiệu kết thúc hoặc Ai. Một lần nữa, lại áp dụng bổ đề 3 cho mỗi Bi - luật sinh.</para>
+        <para id="id20440771">Ta thu được tập luật sinh trong văn phạm sau cùng thỏa đúng dạng chuẩn Greibach.</para>
+        <para id="id20440782">Thí dụ 5.13 : Tìm văn phạm có dạng GNF tương đương văn phạm G sau :</para>
+        <para id="id20440798">A1 ® A2A1 | A2A3</para>
+        <para id="id20440852">A2 ® A3A1 | a </para>
+        <para id="id20440894">A3 ® A2A2 | b</para>
+        <para id="id20440935">Bước 1 : G thỏa dạng chuẩn CNF sinh ra CFL không chứa </para>
+        <para id="id20440952">Bước 2 : Ta có V = {A1, A2, ..., A3}</para>
+        <para id="id20440987">Bước 3 : Thay thế các luật sinh sao cho nếu Ai  Aj  là một luật sinh thì j &gt; i. </para>
+        <para id="id20441037">Ta thấy trong tập luật sinh, các luật sinh cho A1 và A2 đã thỏa điều kiện j &gt; i. Chỉ có luật sinh A3 ® A2A2 cần sửa đổi. Áp dụng bổ đề 3 để thay thế luật sinh này, ta có:A3 ® A3A1A2 | aA2 </para>
+        <para id="id20441160">Sau đó, dùng bổ đề 4 để loại bỏ đệ quy trái, ta được tập luật sinh mới có dạng như sau :</para>
+        <para id="id20441172">A1 ® A2A1 | A2A3</para>
+        <para id="id20441230">A2 ® A3A1 | a </para>
+        <para id="id20441272">A3 ® aA2 | b | aA2B | bB</para>
+        <para id="id20441324">B ® A1A2 | A1A2 B</para>
+        <para id="id20441376">Bước 4 : Thay thế các Ai -luật sinh về đúng dạng.</para>
+        <para id="id20441396">Ở bước này, ta có thể thấy tất cả các A3 - luật sinh đã có dạng chuẩn. Tiếp tục, áp dụng bổ đề 3 để thay thế các A3 - luật sinh vào A2, A1, thu được tập luật sinh mới như sau:</para>
+        <para id="id20441445">A1 ® aA2A1A1 | bA1A1 | aA2BA1A1 | bBA1A1 | aA1|</para>
+        <para id="id20441564">aA2A1A3 | bA1A3 | aA2BA1A3 | bBA1A3 | aA3</para>
+        <para id="id20441660">A2 ® aA2A1 | bA1 | aA2BA1| bBA1| a</para>
+        <para id="id20441738">A3 ® aA2 | b | aA2B | bB</para>
+        <para id="id20441790">B ® A1A2 | A1A2 B</para>
+        <para id="id20441845">Bước 5 : Thay thế các Bk - luật sinh về đúng dạng.</para>
+        <para id="id20441863">B ® aA2A1A1A2 | bA1A1A2 | aA2BA1A1A2 | bBA1A1A2 | aA1A2</para>
+        <para id="id20442011">| aA2A1A3A2 | bA1A3A2 | aA2BA1A3A2 | bBA1A3A2 | aA3A2</para>
+        <para id="id20442150">| aA2A1A1A2B | bA1A1A2B | aA2BA1A1A2B | bBA1A1A2B | aA1A2 B</para>
+        <para id="id20442302">| aA2A1A3A2B | bA1A3A2B | aA2BA1A3A2B | bBA1A3A2B | aA3A2B</para>
+        <para id="id20442446">Cuối cùng, ta thu được văn phạm có dạng GNF với 39 luật sinh.</para>
+      </section>
+    </section>
+    <section id="id-18855186722">
+      <title>TÍNH CHẤT CỦA NGÔN NGỮ PHI NGỮ CẢNH </title>
+      <para id="id20442468">Cũng như lớp ngôn ngữ chính quy, có một vài tính chất giúp xác định một ngôn ngữ có thuộc lớp ngôn ngữ phi ngữ cảnh hay không ?</para>
+      <section id="id-932585812206">
+        <title>Bổ đề bơm đối với CFL </title>
+        <para id="id20442485">(Dùng chứng minh một ngôn ngữ không là ngôn ngữ phi ngữ cảnh)</para>
+        <para id="id20442492">Cho L là một CFL bất kỳ, tồn tại một số n chỉ phụ thuộc vào L sao cho nếu z  L và | z |  n thì ta có thể viết z = uvwxy sao cho:</para>
+        <para id="id20442522">1) | vx | ³ 1</para>
+        <para id="id20442538">2) | vwx |  n và</para>
+        <para id="id20442555">3) i ³ 0 : uviwxiy Î L</para>
+        <para id="id20442604">Chứng minh</para>
+        <para id="id20442609">Đặt G là văn phạm có dạng chuẩn CHOMSKY sinh L - {}. Chú ý rằng nếu z  L(G) và cây dẫn xuất không có đường đi dài hơn i thì chuỗi sinh ra từ văn phạm có độ dài không dài hơn 2 i -1.</para>
+        <figure id="id20442652">
+          <media id="id7028142" alt=""><image src="../../media/graphics6-8f4b.png" mime-type="image/png" height="656" width="529"/></media>
+        </figure>
+        <para id="id20442676">z3  z2  z4</para>
+        <para id="id20442723">z = u v w x y</para>
+        <para id="id20442759">Hình 5.5 - Các bước dẫn xuất trong chứng minh Bổ đề bơm</para>
+        <para id="id20442780">Giả sử G có k biến, ta đặt n = 2k. Nếu z  L(G) và | z |  n thì | z | &gt; 2k-1, vậy có một đường đi nào đó trên cây dẫn xuất có độ dài lớn hơn hoặc bằng k+1. Như vậy đường đi đó sẽ có ít nhất k+2 đỉnh, hay có ít nhất k+1 biến trên đường đi (chỉ có nút lá mới có thể không là biến), suy ra phải có biến xuất hiện hai lần, hơn nữa ta phải có:</para>
+        <para id="id20442834">1) Có hai đỉnh v1 và v2 có cùng nhãn là A</para>
+        <para id="id20442860">2) Đỉnh v1 gần gốc hơn v2</para>
+        <para id="id20442881">3) Phần đường đi từ v1 tới lá có độ dài nhiều nhất là k+1 (đi từ lá lên tới gốc theo đường đi, chỉ có lá mới có thể là ký hiệu kết thúc vì vậy trong k+2 đỉnh đầu tiên phải có ít nhất k+1 biến và phải có ít nhất hai biến trùng nhau)</para>
+        <para id="id20442907">Xét cây con T1 có đỉnh là v1 biểu diễn dẫn xuất của chuỗi con có độ dài không quá 2k (vì trong cây con T1 không có đường đi nào có độ dài vượt quá k+1). Đặt z1 là chuỗi sinh ra từ cây T1. Ta gọi T2 là một cây con có nút gốc là v2, rõ ràng T2 là cây con của T1. Giả sử T2 sinh ra chuỗi z2 thì ta có thể viết z1 = z3z2z4. Hơn nữa z3 và z4 không thể đồng thời bằng  vì luật sinh đầu tiên trong cây dẫn xuất của T1 là A  BC với biến B, C nào đó. Cây con T2 phải thuộc vào cây con sinh bởi bút biến B hoặc cây con sinh bởi nút biến C. Ta có :</para>
+        <para id="id20443122">A *G z3Az4 và A *G z2 trong đó | z3z2z4 |  2k = n.</para>
+        <para id="id20443230">Vậy A *G z3i z2 z4i , i  0. </para>
+        <para id="id20443305">Hiển nhiên chuỗi z = uz3z2z4y, với các chuỗi u, y nào đó. </para>
+        <para id="id20443340">Nếu đặt z3 = v, z2 = w và z4 = x, thì ta sẽ hoàn thành việc chứng minh.</para>
+        <para id="id20443375">Ứng dụng bổ đề bơm </para>
+        <para id="id20443383">Thí dụ 5.14 :Chứng minh L = {aibici | i  1} không phải là ngôn ngữ phi ngữ cảnh.</para>
+        <para id="id20443433">Chứng minh</para>
+        <para id="id20443438">Giả sử L là ngôn ngữ phi ngữ cảnh, khi đó có tồn tại số n (theo bổ đề bơm). </para>
+        <para id="id20443448">Xét chuỗi z = anbncn với | z |  n, ta có thể viết z = uvwxy thoả mãn bổ đề. </para>
+        <para id="id20443492">Ta thấy vx nằm trong anbncn và | vwx |  n, vậy vx không thể chứa cả ký hiệu a và ký hiệu c (do sau ký hiệu a bên phải nhất n+1 vị trí mới đến vị trí của c bên trái nhất). Nếu vx chỉ có chứa ký hiệu a, thì chuỗi uwy (trường hợp uviwxiy với i = 0) sẽ có chứa số ký hiệu b và c ít hơn số ký hiệu a vì | vx |  1. Vậy uwy không có dạng ajbjcj. Tương tự cho các trường hợp chuỗi vx chỉ chứa ký hiệu b hay c. Còn nếu trong vx có chứa ký hiệu a và b thì chuỗi uvy sẽ có chứa số ký hiệu c lớn hơn a và b, nên nó cũng không thể thuộc L. Cũng tương tự cho trường hợp vx chứa hai ký hiệu b và c. Cuối cùng, ta suy ra chuỗi uviwxiy  L, vì các ký hiệu a, b, c trong chúng không thể bằng nhau với mọi i. Mà theo giả thiết của bổ đề bơm, chuỗi này phải thuộc L, mâu thuẫn.</para>
+        <para id="id20443639">Vậy L không thể là CFL.</para>
+        <para id="id20443644">Thí dụ 5.15 :Chứng minh L = {aibjcidj | i, j  1} không phải là ngôn ngữ phi ngữ cảnh.</para>
+        <para id="id20443703">Chứng minh</para>
+        <para id="id20443707">Giả sử L là ngôn ngữ phi ngữ cảnh, khi đó có tồn tại số n (theo bổ đề bơm). </para>
+        <para id="id20443718">Xét chuỗi z = anbncndn với | z |  n, ta có thể viết z = uvwxy thoả mãn bổ đề. </para>
+        <para id="id20443770">Ta thấy vì vx nằm trong anbncndn và | vwx |  n, nên vx không thể chứa ít nhất hai ký hiệu khác nhau. Hơn nữa, nếu vx có chứa hai ký hiệu khác nhau, thì chúng phải là hai ký hiệu liên tiếp đứng cạnh nhau, chẳng hạn a và b. Nếu vx chỉ có chứa ký hiệu a, thì chuỗi uwy sẽ có số ký hiệu a ít hơn số ký hiệu c nên không thuộc L, mâu thuẫn. Tương tự với trường hợp chuỗi vx chỉ chứa ký hiệu b, c hoặc d. Bây giờ giả sử chuỗi vx có chứa a và b thì vwy vẫn có số ký hiệu a ít hơn c. Mâu thuẫn tương tự cũng xuất hiện khi chuỗi vx có chứa b và c hoặc c và d. Vì chỉ có thể có một trong các trường hợp này nên ta có thể kết luận rằng L không thể là CFL.</para>
+        <para id="id20443847">Câu hỏi :</para>
+        <para id="id20443859">?</para>
+        <para id="id20443972">Hãy so sánh các yếu tố ràng buộc trong phát biểu Bổ đề bơm cho ngôn ngữ phi ngữ cảnh và Bổ đề bơm cho ngôn ngữ chính quy ?</para>
+      </section>
+      <section id="id-715447033781">
+        <title>Tính chất đóng của CFL </title>
+        <para id="id20443994">ĐỊNH LÝ 5.7 : CFL đóng với phép hợp, phép nối kết và phép bao đóng Kleene.</para>
+        <para id="id20444010">Chứng minh</para>
+        <para id="id20444014">Đặt L1 và L2 là hai CFL sinh bởi các CFG G1 (V1, T1, P1, S1) và G2 (V2, T2, P2, S2).</para>
+        <para id="id20444123">Vì các biến có thể đổi tên mà không ảnh hưởng tới ngôn ngữ sinh ra nên ta có thể xem tập V1 và V2 là rời nhau. Ta cũng giả sử các biến mới S3, S4, S5  V1 hoặc V2</para>
+        <para id="id20444199">. Đối với L1  L2: Xây dựng văn phạm G3 (V1  V2  {S3}, T1  T2, P3, S3),</para>
+        <para id="id20444317">trong đó P3 = P1  P2  {S3  S1 | S2}. </para>
+        <para id="id20444668">Nếu w  L1 thì dẫn xuất S3 G3 S1 *G1 w là một dẫn xuất trong G3 (vì mỗi luật sinh trong G1 cũng là luật sinh trong G3). Tương tự mỗi chuỗi trong L2 có dẫn xuất trong G3 bắt đầu bằng S3  S2. Vậy L1  L2  L(G3).</para>
+        <para id="id20444860">Ngược lại, nếu w  L(G3) thì dẫn xuất S3 *G3 w phải bắt đầu bằng S3  S1 hoặc S3  S2. Tức là dẫn xuất có dạng S3 G3 S1 *G3 w hoặc S3 G3 S2 *G3 w. Trong trường hợp thứ nhất, do V1 và V2 rời nhau nên chỉ có các ký hiệu của G1 xuất hiện trong dẫn xuất S1 *G3 w. Vì trong các luật sinh của P3 chỉ có chứa các ký hiệu thuộc G1 và nằm trong tập luật sinh P1, nên ta có thể kết luận chỉ có những luật sinh thuộc P1 được dùng trong dẫn xuất S1 *G3 w. Vì thế S1 *G1 w và w  L1. Tương tự cho trường hợp dẫn xuất S3 G3 S2, ta cũng có w  L2. Vậy L(G3)  L1  L2, và vì thế L(G3) = L1  L2.</para>
+        <para id="id20445375">Vậy ta đã chứng minh xong L(G3) = L1  L2, hay L1  L2 là CFL.</para>
+        <para id="id20445447">. Đối với L1L2 : Xây dựng văn phạm G4 (V1  V2  {S4}, T1  T2, P4, S4) , </para>
+        <para id="id20445564">trong đó P4 = P1  P2  {S4  S1S2}. </para>
+        <para id="id20445648">Chứng minh tương tự như trên ta có L(G4) = L1L2, vậy L1L2 cũng là CFL.</para>
+        <para id="id20445700">. Đối với L1* : Xây dựng văn phạm G5 (V1  {S5}, T1, P5, S5), </para>
+        <para id="id20445780">trong đó P5 = P1  { S5  S1S5 | }. </para>
+        <para id="id20445856">Ta cũng dễ dàng chứng minh được L(G5) = (L(G1))*.</para>
+        <para id="id20445891">ĐỊNH LÝ 5.8 : CFL không đóng với phép giao</para>
+        <para id="id20445904">Chứng minh</para>
+        <para id="id20445909">Ta đã biết ngôn ngữ L1 = {aibici | i  1} không là CFL. Ta có thể chứng minh :</para>
+        <para id="id20445961">. L2 = {aibicj | i  1 và j  1} là CFL vì L2 được sinh bởi văn phạm :</para>
+        <para id="id20446030">S ® AB</para>
+        <para id="id20446048">A ® aAb | ab </para>
+        <para id="id20446066">B ® cB | c </para>
+        <para id="id20446084">. L3 = {aibjcj | i  1 và j  1} cũng là CFL vì L3 được sinh từ văn phạm :</para>
+        <para id="id20446153">S ® CD</para>
+        <para id="id20446170">C ® aC | a</para>
+        <para id="id20446189">D ® bDc | bc</para>
+        <para id="id20446207">Tuy nhiên L2  L3 = L1 không phải là CFL. </para>
+        <para id="id20446249">Vậy CFL không đóng với phép giao.</para>
+        <para id="id20446258">Hệ quả: CFL không đóng với phép lấy phần bù.</para>
+        <para id="id20446272">Chứng minh</para>
+        <para id="id20446277">Giả sử CFL đóng với phép lấy phần bù, vậy với L1, L2 là hai CFL bất kỳ, theo quy luật DeMorgan ta có 
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>1</m:mn></m:mrow></m:mstyle></m:msub></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{L rSub { size 8{1} } } {}</m:annotation></m:semantics></m:math>  
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>2</m:mn></m:mrow></m:mstyle></m:msub></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{L rSub { size 8{2} } } {}</m:annotation></m:semantics></m:math> = 
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:mover accent="true"><m:mtable><m:mtr><m:mtd><m:mrow><m:mover accent="true"><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>1</m:mn></m:mrow></m:mstyle></m:msub><m:mo>¯</m:mo></m:mover><m:mrow/></m:mrow></m:mtd><m:mtd><m:mrow><m:mrow/><m:mover accent="true"><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>2</m:mn></m:mrow></m:mstyle></m:msub><m:mo>¯</m:mo></m:mover><m:mrow/></m:mrow></m:mtd></m:mtr></m:mtable><m:mo>¯</m:mo></m:mover></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{ {overline  { matrix {
+ {overline  {L rSub { size 8{1} } }}  {} #  union  {overline  {L rSub { size 8{2} } }} {}
+} }} } {}</m:annotation></m:semantics></m:math> nên L1  L2 là CFL hay CFL cũng đóng với phép giao. ( Điều này mâu thuẫn với định lý 6.6)</para>
+        <para id="id20446558">Câu hỏi :</para>
+        <para id="id20446570">?</para>
+        <para id="id20446681">Hãy so sánh các tính chất đóng của lớp ngôn ngữ phi ngữ cảnh với lớp ngôn ngữ chính quy ?</para>
+      </section>
+    </section>
+    <section id="id-759583004468">
+      <title>CÁC GIẢI THUẬT QUYẾT ĐỊNH CFL </title>
+      <para id="id20446703">Có một vài câu hỏi về CFL mà chúng ta cần phải trả lời. Chẳng hạn, liệu một ngôn ngữ phi ngữ cảnh cho trước là rỗng, hữu hạn hay vô hạn hay một chuỗi nào đó liệu có thuộc ngôn ngữ này không ? Tuy nhiên, cũng có những câu hỏi về CFL mà không có giải thuật nào để có thể trả lời. Chẳng hạn, liệu hai CFG thì có tương đương nhau, hay phần bù của một CFL có là CFL hay không, hoặc một CFG cho trước nào đó có phải là văn phạm mơ hồ ? Trong phần này, chúng ta chỉ đưa ra giải thuật cho một số các câu hỏi có thể trả lời.</para>
+      <section id="id-660696196783">
+        <title>Giải thuật xác định ngôn ngữ phi ngữ cảnh </title>
+        <para id="id20446740">ĐỊNH LÝ 5.9 : Tồn tại giải thuật để xác định CFL là: rỗng, hữu hạn, vô hạn.</para>
+        <para id="id20446755">Chứng minh</para>
+        <para id="id20446760">Với văn phạm G (V, T, P, S) :</para>
+        <para id="id20446768">. Để kiểm tra L(G) có rỗng hay không, ta dùng bổ đề 5. 1: Rõ ràng L(G) không rỗng khi và chỉ khi S sinh ra một chuỗi ký hiệu kết thúc nào đó.</para>
+        <para id="id20446790">. Để kiểm tra L(G) hữu hạn hay vô hạn, ta dùng định lý 5. 5 để tìm văn phạm tương đương G’ (V’, T, P’, S) có dạng chuẩn CHOMSKY và không có ký hiệu vô ích sinh ra L(G) - {}. L(G) hữu hạn khi và chỉ khi L(G’) hữu hạn.</para>
+        <para id="id20446824">Để kiểm tra tính hữu hạn của CFG có dạng chuẩn CHOMSKY, ta chỉ cần vẽ đồ thị có hướng với mỗi đỉnh trên đồ thị là một biến thuộc văn phạm và cạnh từ A đến B nếu và chỉ nếu có luật sinh A  BC hoặc A  CB với biến C bất kỳ. Khi đó, ngôn ngữ sinh ra là hữu hạn nếu và chỉ nếu đồ thị không có chu trình. Vì :</para>
+        <para id="id20446858">Nếu đồ thị có chu trình, giả sử chu trình là A0, A1,... , An, A0 thì sẽ có chuỗi dẫn xuất: A0  1A11  2A22 ...  nAnn  n+1 A0n+1, trong đó i, i là chuỗi các biến và | ii | = i. Vì không có ký hiệu vô ích nên n+1* w và n+1* x với mọi chuỗi w, x là các chuỗi ký hiệu kết thúc và độ dài tổng cộng ít nhất bằng n+1. Vì n  0, nên w và x không thể đồng thời bằng .</para>
+        <para id="id20447183">Kế tiếp, cũng do văn phạm không có chứa ký hiệu vô ích nên ta có thể tìm được các chuỗi y, z sao cho S * yA0z và chuỗi ký hiệu kết thúc v sao cho A0 * v. Vậy i ta có : </para>
+        <para id="id20447248">S * yA0z * ywA0xz * yw2A0x2z * ... * ywiA0xiz * ywivwiz. </para>
+        <para id="id20447414">Vì | wx | &gt; 0, nên chuỗi ywivwiz không thể bằng ywjvwjz nếu i  j. Vậy văn phạm sinh ngôn ngữ vô hạn.</para>
+        <para id="id20447467">Ngược lại, giả sử đồ thị không có chu trình. Ta gọi hạng của biến A là độ dài lớn nhất của đường đi bắt đầu từ A. Vì không có chu trình nên A sẽ có hạng hữu hạn. Nếu A  BC là một luật sinh thì hạng của B và C phải nhỏ hơn hạng của A. Ta chứng minh quy nạp theo r (hạng của A) rằng không có chuỗi ký hiệu kết thúc nào có độ dài lớn hơn 2r</para>
+        <para id="id20447502">Với r = 0: hạng của A bằng 0, vậy không có cạnh từ A. Do đó, tất cả các A - luật sinh đều có dạng A  a, hay A dẫn ra chuỗi có độ dài l = 20.</para>
+        <para id="id20447533">Xét r &gt; 0: nếu ta dùng luật sinh A  a thì dẫn ra chuỗi chỉ có độ dài 1, nếu dùng luật sinh A  BC thì vì B, C có hạng í hơn hoặc bằng r -1 nên theo giả thiết quy nạp B, C dẫn ra chuỗi có độ dài ngắn hơn 2r -1 . Vậy BC không thể dẫn ra chuỗi có độ dài lớn hơn 2r. Giả sử S có hạng là r0 thì các chuỗi do S sinh ra có độ dài không quá 2r0 . Vì thế suy ra ngôn ngữ là hữu hạn.</para>
+        <para id="id20447607">Thí dụ 5.16 : Xét văn phạm G chứa các luật sinh sau :</para>
+        <para id="id20447622">S ® AB</para>
+        <para id="id20447640">A ® BC | a </para>
+        <para id="id20447658">B ® CC | b </para>
+        <para id="id20447676">C ® a </para>
+        <para id="id20447694"/>
+        <para id="id20447698">Ta thấy văn phạm G có các luật sinh đã thỏa dạng chuẩn Chomsky. </para>
+        <para id="id20447708">. Để kiểm tra tính rỗng của văn phạm, ta áp dụng Bổ đề 5.1 lên tập biến V để tìm tập biến mới mới V­1 chỉ chứa các biến có khả năng dẫn ra chuỗi ký hiệu kết thúc trong văn phạm :</para>
+        <para id="id20447732">Ta có : V­1 = { A, B, C, S } vì A ® a , B ® b, C ® a và S ® AB </para>
+        <para id="id20447786">Hay S  V­1 có nghĩa là S có thể sinh ra các chuỗi ký hiệu kết thúc. Vậy ngôn ngữ sinh bởi văn phạm G : L(G) không rỗng.</para>
+        <para id="id20447815">. Để kiểm tra tính hữu hạn của văn phạm, ta vẽ đồ thị có hướng tương ứng với các luật sinh trong văn phạm như sau :</para>
+        <figure id="id20447831">
+          <media id="id1168169671995" alt=""><image src="../../media/graphics7-9f06.png" mime-type="image/png" height="133" width="220"/></media>
+        </figure>
+        <para id="id20447855">  Hình 5.6 - Đồ thị có hướng tương ứng</para>
+        <para id="id20447894">Rõ ràng, ta thấy đồ thị không có chu trình. Hạng của S, A, B, C lần lượt là 3, 2, 1 và 0. Chẳng hạn, một đường đi dài nhất từ S là S  A  B  C. Vậy văn phạm này là hữu hạn, nó sinh ra hữu hạn chuỗi và độ dài các chuỗi không lớn hơn 23 = 8. </para>
+        <para id="id20447946">Thực tế, chuỗi dài nhất dẫn xuất được từ S là :</para>
+        <para id="id20447959">S  AB  BCB  CCCB  CCCCC * aaaaa ,với độ dài chuỗi là 5.</para>
+        <para id="id20448019">Nếu ta thêm vào văn phạm một luật sinh mới : C  AB, thì đồ thị có hướng tương ứng lúc đó có dạng như sau : </para>
+        <figure id="id20448044">
+          <media id="id7629162" alt=""><image src="../../media/graphics8-230a.png" mime-type="image/png" height="133" width="220"/></media>
+        </figure>
+        <para id="id20448068"/>
+        <para id="id20448093">Hình 5.7 - Đồ thị có hướng tương ứng văn phạm bổ sung</para>
+        <para id="id20448113">Đồ thị mới này có nhiều chu trình, chẳng hạn A  B  C  A. Vậy ta phải tìm được một dẫn xuất dạng A * 3A3 , cụ thể là A  BC  CCC  CABC, trong đó 3 = C và 3 = BC. Vì C * a và BC * ba nên A * aAba. </para>
+        <para id="id20448282">Mặt khác, S * Ab và A * a, suy ra : S * aia(ba)ib, i. Vậy ngôn ngữ sinh từ văn phạm mới là vô hạn.</para>
+      </section>
+      <section id="id-640788502414">
+        <title>Giải thuật thành viên (Membership) </title>
+        <para id="id20448368">ĐỊNH LÝ 5.10 : Tồn tại giải thuật để xác định với một CFL nào đó sinh ra từ CFG G(V, T, P, S) và một chuỗi x bất kỳ thì x có thuộc L(G) hay không ?</para>
+        <para id="id20448386">Chứng minh</para>
+        <para id="id20448390">Có một vài giải thuật được đề nghị cho bài toán thành viên này. Sau đây trình bày một giải thuật theo vòng lặp đơn giản, ta gọi là giải thuật CYK (Cocke-Younger-Kasami) với thời gian tỷ lệ với  x 3. </para>
+        <para id="id20448430">Giả sử văn phạm G (V, T, P, S) đã có dạng chuẩn Chomsky và  x  = n  1. Trước hết, ta phải xác định với mỗi i, j và mỗi biến A, phải chăng A * xij , trong đó xij là một chuỗi con của chuỗi x tính từ vị trí thứ i và có độ dài j. </para>
+        <para id="id20448503">Ta chứng minh quy nạp theo độ dài j :</para>
+        <list id="id20448508" list-type="bulleted">
+          <item>Với j = i : ta có A * xij khi và chỉ khi A  xij là một luật sinh.</item>
+          <item>Với j &gt; i : ta có A * xij khi và chỉ khi có một luật sinh dạng A  BC và số k, 1  k &lt; j sao cho B dẫn xuất ra k ký hiệu đầu tiên của xij và C dẫn xuất ra j – k ký hiệu cuối của xij. Có nghĩa là : </item>
+        </list>
+        <para id="id20469392">B * xik và C * x i+ k, j - k</para>
+        <para id="id20469438">Vì cả k và j – k đều nhỏ hơn j, nên theo giả thiết quy nạp ta đã xác định được liệu hai chuỗi dẫn xuất này có tồn tại hay không ? Thế thì cũng có thể c]xác định được liệu A * xij hay không ?</para>
+        <para id="id20469474">Với cách thực hiện như thế, ta sẽ xác định được phải chăng S * x1n , nhưng x1n = x, vậy x  L(G) khi và chỉ khi S * x1n.</para>
+        <para id="id20469546">Sau đây trình bày giải thuật CYK theo giải thuật trên, trong đó Vij là tập hợp tất cả các biến A sao cho A * xij . Chú ý rằng ta có thể giả thiết 1  i  n – j + 1, bởi vì lúc đó chuỗi con xij với độ dài j mới thực sự tồn tại.</para>
+        <para id="id20469618">Bước (1) và (2) xử lý trường hợp j = i. Vì văn phạm G đã cho sẵn, cho nên bước (2) chiếm mộ thời gian cố định. Vậy các bước (1) và (2) chiếm thời gian O(n). các vòng lặp For ở các dòng (3) và (4) làm cho các bước từ (5) đến (7) lặp lại nhiều nhất là n2 lần (do i, j  n). Bước (5) mỗi lần thực hiện cũng chiếm một khoảng thời gian cố định. Vậy tổng thời gian để thực hiện bước (5) là O(n2). Vòng lặp For ở dòng (6) làm cho bước (7) lặp lại n lần hoặc ít hơn. Vì bước (7) cũng chiếm một thời gian cố định, nên các bước (6) và (7) gộp lại chiếm thời gian O(n). Vì các bước này được thực hiện O(n2), nên tổng thời gia thực hiện cho bước (7) là O(n3). Vậy thời gian thực hiện toàn bộ giải thuật là ở cấp O(n3). </para>
+        <para id="id20469710">Giải thuật CYK: </para>
+        <para id="id20469717"/>
+        <para id="id20469740">Begin</para>
+        <para id="id20469751">(1) For i := 1 to n do</para>
+        <para id="id20469775">(2)Vij := { A  A  a là một luật sinh và a là ký hiệu thứ i trong x }</para>
+        <para id="id20469817">(3) For j := 2to n do</para>
+        <para id="id20469843">(4)for i := 1 to n – j + 1 do</para>
+        <para id="id20469865"> begin</para>
+        <para id="id20469882">(5)Vij := 0;</para>
+        <para id="id20469905">(6)for k := 1 to j - 1 do</para>
+        <para id="id20469927">(7) Vij := Vij  { A  A  BC là một luật sinh, B  Vik </para>
+        <para id="id20470006">và C  Vi+ k, j – k }</para>
+        <para id="id20470032"> end;</para>
+        <para id="id20470047">End;</para>
+        <para id="id20470052">Thí dụ 5.17 : Cho văn phạm G có dạng chuẩn Chomsky chứa các luật sinh sau :</para>
+        <para id="id20470068">S ® AB | BC</para>
+        <para id="id20470086">A ® BA | a </para>
+        <para id="id20470104">B ® CC | b </para>
+        <para id="id20470122">C ® AB | a </para>
+        <para id="id20470140">Xét chuỗi nhập x = baaba.</para>
+        <para id="id20470157">Bảng các Vij cho ở hình 5.8 dưới đây. Dòng đầu tiên trong bảng được cho bởi các bước (1) và (2) trong giải thuật. Vì x11 = x41 = b nên V11 = V41 = {B} vì B là biến duy nhất dẫn xuất ra b, còn x21 = x31 = x51 = a, suy ra V21 = V31 = V51 = {A, C} vì A và C có các luật sinh với a bên vế phải.</para>
+        <table id="id20470273" summary="">
+          <tgroup cols="6">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <colspec colnum="4" colname="c4"/>
+            <colspec colnum="5" colname="c5"/>
+            <colspec colnum="6" colname="c6"/>
+            <tbody>
+              <row>
+                <entry/>
+                <entry>b</entry>
+                <entry>a</entry>
+                <entry>a</entry>
+                <entry>b</entry>
+                <entry>a</entry>
+              </row>
+              <row>
+                <entry/>
+                <entry/>
+                <entry>i</entry>
+                <entry/>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry>j</entry>
+                <entry>1</entry>
+                <entry>2</entry>
+                <entry>3</entry>
+                <entry>4</entry>
+                <entry>5</entry>
+              </row>
+              <row>
+                <entry>1</entry>
+                <entry>B</entry>
+                <entry>A, C</entry>
+                <entry>A, C</entry>
+                <entry>B</entry>
+                <entry>A, C</entry>
+              </row>
+              <row>
+                <entry>2</entry>
+                <entry>S, A</entry>
+                <entry>B</entry>
+                <entry>S, C</entry>
+                <entry>S, A</entry>
+                <entry/>
+              </row>
+              <row>
+                <entry>3</entry>
+                <entry></entry>
+                <entry>B</entry>
+                <entry>B</entry>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry>4</entry>
+                <entry></entry>
+                <entry>S, A, C</entry>
+                <entry/>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry>5</entry>
+                <entry>S, A, C</entry>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id20470843">Hình 5.8 – Bảng các Vij</para>
+        <para id="id20470864">Để tính Vij với j &gt; i, ta phải thực hiện vòng lặp For ở bước (6) và (7). Ta phải đối chiếu Vik với Vi+ k, j – k với k = 1, 2, …, j - 1 để tìm biến D trong Vik và biến E trong Vi+ k, j – k sao cho DE là vế phải của một hay nhiều luật sinh. Các vế trái của những luật sinh đó được đưa vào trong Vij. Quá trình đối chiếu đó diễn ra bằng cách giảm dần giá trị cột i, đồng thời tăng dần lên theo đường chéo qua Vij về phía phải như các chiều mũi tên vẽ trong hình 5.9.</para>
+        <table id="id20470950" summary="">
+          <tgroup cols="6">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <colspec colnum="4" colname="c4"/>
+            <colspec colnum="5" colname="c5"/>
+            <colspec colnum="6" colname="c6"/>
+            <tbody>
+              <row>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry/>
+                <entry>Vij</entry>
+                <entry></entry>
+                <entry/>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+                <entry/>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id20471278">Hình 5.9 – Quá trình tính các Vij</para>
+        <para id="id20471299">Chẳng hạn, để tính V24, đầu tiên ta đối chiếu V21 = {A, C} với V33 = {B}. Ta có V21 V33 = {AB, CB}. Vì có các luật sinh S  AB và C  AB nên S và C được đưa vào V24. Tiếp đến ta lại xét V22 V42 = {A}{S, A} = {BS, BA}. Vì có luật sinh A  BA, vậy ta đưa thêm A vào V24. Cuối cùng ta xét V23 V51 = {B}{A, C} = {BA, BC} gặp lại các vế phải đã xét, vậy không thể thêm gì vào V24. Vậy V24 = {S, AC}.</para>
+        <para id="id20471461">Cuối cùng, vì S  V15 , vậy chuỗi baaba là thuộc ngôn ngữ sinh ra bởi văn phạm đã cho.</para>
+        <para id="id20471494">Tổng kết chương V: Việc mô tả ngôn ngữ phi ngữ cảnh bằng phương tiện văn phạm phi ngữ cảnh tỏ ra rất hữu hiệu, cũng tương tự như việc sử dụng văn phạm BNF trong định nghĩa các ngôn ngữ lập trình. Trong chương này, chúng ta đã khảo sát tương đối cặn kẽ các phương tiện mô tả ngôn ngữ của văn phạm CFG thông qua các giải thuật tối ưu biến, giản lược, quy chuẩn và các tính chất của lớp ngôn ngữ mà nó mô tả. Câu hỏi đặt ra tiếp theo là có hay không một lớp ôtômát tương ứng để nhận dạng lớp ngôn ngữ phi ngữ cảnh. Như chúng ta đã thấy, lớp ngôn ngữ phi ngữ cảnh thực sự chứa lớp ngôn ngữ chính quy trong đó, nên ôtômát hữu hạn không thể nhận biết tất cả ngôn ngữ phi ngữ cảnh. Một cách trực quan, ôtômát hữu hạn có bộ nhớ bị hạn chế nghiêm ngặt, trong khi việc nhận dạng CFL có thể yêu cầu phải lưu trữ một lượng thông tin khá lớn. Khả năng cho sự mở rộng này sẽ được chúng ta xét đến trong nội dung của chương tiếp theo. </para>
+        <para id="id20471544">BÀI TẬP CHƯƠNG V</para>
+        <list id="id20471552" list-type="bulleted">
+          <item>. Hãy mô tả ngôn ngữ sinh bởi các văn phạm sau :</item>
+        </list>
+        <para id="id20471564">a) S ® aS | Sb | aSb | c</para>
+        <para id="id20471588">b) S ® SS | a | b </para>
+        <para id="id20471618">c) S ® SaS | b  </para>
+        <para id="id20471647">d) S ® aSS | b</para>
+        <para id="id20471671">e)S ® aA | bB| c</para>
+        <para id="id20471738">A ® Sa</para>
+        <para id="id20471754">B ® Sb</para>
+        <para id="id20471772">f)S ® AB</para>
+        <para id="id20471845">A ® Sc | a</para>
+        <para id="id20471866">B ® dB | b</para>
+        <para id="id20471885">g)S ® TT</para>
+        <para id="id20471957">T ® aTa | bTb | c</para>
+        <para id="id20471975"/>
+        <para id="id20471982">5.2. Hãy chỉ ra một văn phạm phi ngữ cảnh sinh ra tập hợp :</para>
+        <para id="id20471996">a) Tập hợp các chuỗi đọc xuôi đọc ngược như nhau trên bộ chữ cái  = {0,1}.</para>
+        <para id="id20472015">b) Tập hợp chuỗi các dấu ngoặc đúng trong biểu thức số học.</para>
+        <para id="id20472025">c) Tập hợp {aibicj  i, j  0}</para>
+        <para id="id20472076">d) Tập hợp {ambn  m, n &gt; 0}</para>
+        <para id="id20472111">e) Tập hợp {aicaj  i  j  0}</para>
+        <para id="id20472161">f) Tập hợp {ajbjcidi  i, j  1}</para>
+        <para id="id20472217">5.3. Cho văn phạm G với các luật sinh sau :</para>
+        <para id="id20472231">S ® aB | bA</para>
+        <para id="id20472298">A ® a | aS | bAA</para>
+        <para id="id20472316">B ® b | bS | aBB</para>
+        <para id="id20472335">Với chuỗi aaabbabbba , hãy tìm:</para>
+        <para id="id20472352">a) Dẫn xuất trái nhất.</para>
+        <para id="id20472357">b) Dẫn xuất phải nhất.</para>
+        <para id="id20472363">c) Cây dẫn xuất.</para>
+        <para id="id20472368">d) Văn phạm này có là văn phạm mơ hồ không ?</para>
+        <para id="id20472377">5.4. Cho văn phạm G với các luật sinh sau :</para>
+        <para id="id20472391">E ® T | E + T | E - T</para>
+        <para id="id20472458">T ® F | T  F | T / F</para>
+        <para id="id20472485">F ® a | b | c | (E)</para>
+        <para id="id20472503">Hãy vẽ cây dẫn xuất sinh ra các chuỗi nhập sau :</para>
+        <para id="id20472510">a) a – (b  c / a)</para>
+        <para id="id20472520">b) a  (b - c)</para>
+        <para id="id20472531">c) (a + b) / c</para>
+        <para id="id20472536">5.5. Cho văn phạm : S ® aSbS | bSaS |  </para>
+        <para id="id20472568">a) Chứng tỏ văn phạm này là văn phạm mơ hồ .</para>
+        <para id="id20472577">b) Xây dựng dẫn xuất trái (phải) và cây dẫn xuất tương ứng cho chuỗi abab.</para>
+        <para id="id20472588">c) Văn phạm này sinh ra ngôn ngữ gì ?</para>
+        <para id="id20472597">5.6. Chứng tỏ văn phạm sau đây là mơ hồ :</para>
+        <para id="id20472611">S ® If b then S else S</para>
+        <para id="id20472684">S ® If b then S </para>
+        <para id="id20472709">S ® a</para>
+        <para id="id20472729">Trong đó a, b, if, then, else là các ký hiệu kết thúc và S là biến.</para>
+        <para id="id20472740">5.7. Chứng tỏ văn phạm sau đây là mơ hồ :</para>
+        <para id="id20472754">S ® aBS | aB | bAS | bA</para>
+        <para id="id20472819">A ® bAA | a </para>
+        <para id="id20472836">B ® aBB | b </para>
+        <para id="id20472856">Hãy đề nghị một văn phạm không mơ hồ tương đương ?</para>
+        <para id="id20472864">5.8. Tìm CFG không có chứa ký hiệu vô ích tương đương với văn phạm:</para>
+        <para id="id20472878">a)S ® A | a </para>
+        <para id="id20472951">A ® AB</para>
+        <para id="id20472970">B ® b</para>
+        <para id="id20472990">b)S ® AB | CA</para>
+        <para id="id20473058">A ® a</para>
+        <para id="id20473074">B ® BC | AB</para>
+        <para id="id20473090">C ® aB | b</para>
+        <para id="id20473106">5.9. Tìm văn phạm tương đương với văn phạm sau không có chứa ký hiệu vô ích, luật sinh  và luật sinh đơn vị : </para>
+        <para id="id20473135">a)S ® aSbS | bSaS |  </para>
+        <para id="id20473162">b) S ® A | B </para>
+        <para id="id20473234">A ® aB | bS | b</para>
+        <para id="id20473253">B ® AB | Ba </para>
+        <para id="id20473276">C ® AS | b</para>
+        <para id="id20473297">c) S ® ABC</para>
+        <para id="id20473369">A ® BB | </para>
+        <para id="id20473398">B ® CC | a</para>
+        <para id="id20473414">C ® AA | b</para>
+        <para id="id20473430">d) S ® A | B </para>
+        <para id="id20473497">A ® C | D</para>
+        <para id="id20473513">B ® D | E </para>
+        <para id="id20473529">C ® S | a | </para>
+        <para id="id20473550">D ® S | b</para>
+        <para id="id20473566">E ® S | c | </para>
+        <para id="id20473586">5.10. Tìm văn phạm chỉ có chứa một luật sinh  duy nhất S ®  tương đương với văn phạm sau :</para>
+        <para id="id20473632">S ® AB </para>
+        <para id="id20473702">A ® SA | BB | bB</para>
+        <para id="id20473722">B ® b | aA | </para>
+        <para id="id20473742"/>
+        <para id="id20473751">5.11. Biến đổi các văn phạm sau đây về dạng chuẩn CHOMSKY:</para>
+        <para id="id20473765">a)S ® bA | aB </para>
+        <para id="id20473838">A ® bAA | aS | a</para>
+        <para id="id20473858">B ® aBB | bS | b</para>
+        <para id="id20473877">b)S ® aAB | BA </para>
+        <para id="id20473950">A ® BBB| a</para>
+        <para id="id20473970">B ® AS| b</para>
+        <para id="id20473989">c)S ® adAda | aSa | aca</para>
+        <para id="id20474060">A ® bAb | bdSdb</para>
+        <para id="id20474079">d) S ® 0S1 | 01</para>
+        <para id="id20474098">e) S ® #S | [ S  S] | p | q</para>
+        <para id="id20474125">5.12. Biến đổi các văn phạm sau đây về dạng chuẩn GREIBACH:</para>
+        <para id="id20474140">a) G ( {S, A}, {0, 1}, P, S) với các luật sinh :</para>
+        <para id="id20474146">S ® AA | 0</para>
+        <para id="id20474211">A ® SS | 1</para>
+        <para id="id20474227">b) G ( {A1, A2, A3}, {a, b}, P, A1) với các luật sinh :</para>
+        <para id="id20474269">A1 ® A2A3</para>
+        <para id="id20474354">A2 ® A3A1 | b</para>
+        <para id="id20474395">A3 ® A1A2 | a</para>
+        <para id="id20474435">c) G ( {A1, A2, A3, A4}, {a, b}, P, A1) với các luật sinh :</para>
+        <para id="id20474486">A1 ® A2A3 | A3A4</para>
+        <para id="id20474592">A2 ® A3A2 | a</para>
+        <para id="id20474632">A3 ® A4A4 | b</para>
+        <para id="id20474673">A4 ® A2A3 | a</para>
+        <para id="id20474718">5.13. Chứng minh rằng các ngôn ngữ sau không phải là CFL:</para>
+        <para id="id20474732">a)L = {ai bj ck i &lt; j &lt; k }</para>
+        <para id="id20474780">b)L = {ai bj j = i2 }</para>
+        <para id="id20474820">c)L = {ai i là số nguyên tố }</para>
+        <para id="id20474843">d) L = {anbncndn  n  0} </para>
+        <para id="id20474911">BÀI TẬP LẬP TRÌNH</para>
+        <para id="id20474916">5.14. Viết chương trình loại bỏ các ký hiệu vô ích trong một CFG.</para>
+        <para id="id20474931">5.15. Viết chương trình chuẩn hóa một CFG thành dạng chuẩn CHOMSKY (CNF).</para>
+        <para id="id20474950">5.16. Viết chương trình chuẩn hóa một CFG thành dạng chuẩn GREIBACH (GNF).</para>
+      </section>
+    </section>
+  </content>
+</document>

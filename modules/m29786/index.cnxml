@@ -1,0 +1,454 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Bổ túc toán</title>
+  <metadata>
+  <md:content-id>m29786</md:content-id><md:title>Bổ túc toán</md:title>
+  <md:abstract>Nội dung chính : Trong chương này, chúng ta sẽ nhắc lại một cách khái quát các thuật ngữ và kiến thức toán học sẽ được dùng đến trong suốt giáo trình. Đó là các kiến thức liên quan đến đồ thị, cây, tập hợp, quan hệ và một vài phương pháp chứng minh toán học thông thường. Nếu các khái niệm này là mới đối với bạn, bạn nên xem lại một cách cẩn thận. Ngược lại, nếu chúng không là mới, bạn có thể đọc lướt nhanh qua chương này, nhưng hãy chắc chắn rằng mình đã nắm rõ về chúng. 
+Mục tiêu cần đạt : Sau chương này, sinh viên có thể :
+ Xác định tập hợp và các phép toán cơ bản trên tập hợp
+ Định nghĩa một quan hệ, lớp quan hệ và các tính chất của quan hệ.
+ Xác định quan hệ tương đương và phép bao đóng.
+ Chứng minh một phát biểu toán học theo phương pháp quy nạp.
+ Nắm vững các khái niệm về đồ thị và cây.
+Kiến thức cơ bản : Các kiến thức Toán có liên quan.
+Tài liệu tham khảo : 
+[1] John E. Hopcroft, Jeffrey D.Ullman – Introduction to Automata Theory, Languages and Computation – Addison – Wesley Publishing Company, Inc – 1979 (trang 1 – trang 12).
+[2] V.J. Rayward-Smith – A First course in Formal Language Theory (Second Editor) –  McGraw-Hill Book Company Europe – 1995 (Chapter 1: Mathematical Prerequisites)
+[3] Các giáo trình về Toán rời rạc</md:abstract>
+  <md:uuid>92bc9190-0932-48e4-9276-ed341f426a56</md:uuid>
+</metadata>
+
+<content>
+    <section id="id-874360444284">
+      <title>TẬP HỢP (Sets)</title>
+      <para id="id19857280"/>
+      <para id="id19857284">Một tập hợp là tập các đối tượng không có sự lặp lại. Mỗi đối tượng trong tập hợp được gọi là phần tử (element) của tập hợp đó. </para>
+      <section id="id-0611593969908">
+        <title>Ký hiệu tập hợp </title>
+        <para id="id19857314">Nếu số phần tử trong một tập hợp không quá lớn, hay nói cách khác – tập hợp là hữu hạn, tập hợp có thể được đặc tả bằng cách liệt kê các phần tử của nó.</para>
+        <para id="id19857328">Thí dụ 1.1 :  D xác định tập hợp các ngày trong tuần :</para>
+        <para id="id19857340">D = { Mon, Tues, Wed, Thurs, Fri, Sat, Sun }</para>
+        <para id="id19857358">Các phần tử trong tập hợp viết cách nhau bởi dấu “, “ và đặt trong cặp dấu { và }. Không có sự bắt buộc về thứ tự liệt kê các phần tử trong tập hợp. Chẳng hạn, tập hợp D cũng tương đương với tập hợp sau :</para>
+        <para id="id19857383">D = { Mon, Wed, Fri, Thurs, Sun, Tues, Sat }</para>
+        <para id="id19857399">Nếu phần tử x là thành phần của tập hợp A, ta viết x  A (đọc là x thuộc A), và nếu x không là phần tử của A, ta viết x  A (đọc là x không thuộc A). Chẳng hạn : Mon  D nhưng Kippers  D.</para>
+        <para id="id19857449">Nếu một tập hợp chứa một số khá lớn các phần tử hay thậm chí là một số vô hạn, người ta có thể không liệt kê tất cả các phần tử mà đặc tả tập hợp theo một số tính chất đặc trưng của nó. </para>
+        <para id="id19857465">Thí dụ 1.2 : D = { x  x là một ngày trong tuần }</para>
+        <para id="id19857488">P = { y  y là số nguyên tố }</para>
+        <para id="id19857505">X = { x  x &gt; 2 }</para>
+        <para id="id19857536">Mọi tập hợp đều chứa các phần tử thuộc vào một không gian xác định nào đó, ký hiệu là U. Không gian tương ứng có thể được định nghĩa là một tập số nguyên, số thực, …</para>
+        <para id="id19857547">Một trường hợp đặc biệt của tập hợp là tập hợp rỗng (empty set). Tập hợp này không có chứa bất kỳ phần tử nào, ký hiệu bởi  hoặc { }.</para>
+        <para id="id19857569">Ta nói tập hợp A là tập hợp con (subset) của tập hợp B khi mọi phần tử của A là thành phần của B ( ký hiệu A  B). Ngược lại, A không là tập con của B (A  B ). </para>
+        <para id="id19857592">Thí dụ 1.3 : { 1, 2, 4 }  { 1, 2, 3, 4, 5 } nhưng { 2, 4, 6 }  { 1, 2, 3, 4, 5 }</para>
+        <para id="id19857681">Có thể suy ra rằng tập hợp A  U và   A, A</para>
+        <para id="id19857709">Hai tập hợp A và B được gọi là bằng nhau (A = B), khi A  B và B  A </para>
+        <para id="id19857727">Thí dụ 1.4 : { 1, 2, 3, 4 } = { 2, 1, 4, 3 } nhưng { 1, 2, 3, 4 }  { 2, 1, 3, 5 }</para>
+        <para id="id19857805">Tập hợp tất cả các tập hợp con của tập A được gọi là tập lũy thừa (power set) của A và xác định bởi 2A.</para>
+        <para id="id19857819">Thí dụ 1.5 : Giả sử A = { 1, 2, 3 }</para>
+        <para id="id19857850">Thì 2A = { , {1 }, {2 }, {3}, {1, 2}, {2, 3}, {3, 1}, {1, 2, 3} } </para>
+      </section>
+      <section id="id-483473299979">
+        <title>Các phép toán trên tập hợp </title>
+        <para id="id19857878">Các toán tử cơ bản trên tập hợp bao gồm các toán tử một ngôi (unary) và hai ngôi (binary) như sau :</para>
+        <para id="id19857889">1) Phép phần bù (complement) : A' = {x  x  A }</para>
+        <para id="id19857908">2) Phép hợp (union) : A  B = {x  x A hoặc x B}</para>
+        <para id="id19857941">3) Phép giao (intersection) : A  B = {x  x A và x B}</para>
+        <para id="id19857972">4) Phép trừ (difference) : A \ B = {x  x A nhưng x B}</para>
+        <para id="id19857999">5) Tích Đecac : A  B = {(a,b)  a A và bB}</para>
+        <para id="id19858031">Thí dụ 1.6 :  Cho A = {1, 2} và B = {2, 3}</para>
+        <para id="id19858076"> Ta có : A  B = {1, 2, 3}</para>
+        <para id="id19858094">A  B = {2}</para>
+        <para id="id19858107">A \ B = {1}</para>
+        <para id="id19858111">A  B = {(1, 2 ), (1, 3), (2, 2), (2, 3)}</para>
+        <para id="id19858121">2A = {, {1}, {2}, {1, 2}}</para>
+        <para id="id19858136">Lưu ý : Nếu A và B lần lượt có số phần tử là n và m thì tập hợp A  B có n  m phần tử và tập 2A có 2n phần tử. </para>
+      </section>
+    </section>
+    <section id="id-519435350755">
+      <title>QUAN HỆ (Relations)</title>
+      <para id="id19858185">Cho hai tập hợp A và B. Một quan hệ hai ngôi R giữa A và B là tập hợp chứa tất cả các tập hợp con của A  B mà thành phần thứ nhất A được gọi là miền xác định (domain) của R, còn B gọi là miền giá trị (range) của R (có thể trùng với miền xác định). Chúng ta sẽ thường dùng quan hệ hai ngôi mà miền xác định và miền giá trị cùng thuộc một tập hợp S nào đó. Trong trường hợp này, ta gọi đây là một quan hệ trên S. Nếu R là một quan hệ và (a,b) là một cặp trong R thì ta viết aRb.</para>
+      <para id="id19858238">Thí dụ 1.7 : Cho S = { 0, 1, 2, 3} </para>
+      <para id="id19858265">. Quan hệ "thứ tự nhỏ hơn" trên S được xác định bởi tập :</para>
+      <para id="id19858275">L = {(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)}</para>
+      <para id="id19858281">. Quan hệ "bằng" trên S được xác định bởi tập :</para>
+      <para id="id19858291">E = {(0, 0), (1, 1), (2, 2), (3, 3)}</para>
+      <para id="id19858296">. Quan hệ "chẵn lẻ" trên S được xác định bởi tập :</para>
+      <para id="id19858306">P = {(0, 0), (1, 1), (2, 2), (3, 3), (0, 2), (2, 0), (1, 3), (3, 1)}</para>
+      <para id="id19858312">Các tính chất của quan hệ</para>
+      <para id="id19858318">Ta gọi một quan hệ R trên tập S là:</para>
+      <para id="id19858323"> Phản xạ (reflexive) : nếu aRa là đúng a  S</para>
+      <para id="id19858348"> Đối xứng (symmetric) : nếu aRb thì bRa</para>
+      <para id="id19858365"> Bắc cầu (transitive) : nếu aRb và bRc thì aRc</para>
+      <para id="id19858383">Thí dụ 1.8 : </para>
+      <para id="id19858387">. L không là quan hệ phản xạ trên S vì (0, 0)  L, nhưng E và P là 2 quan hệ mang tính phản xạ.</para>
+      <para id="id19858408">. L không là quan hệ đối xứng trên S vì (0, 1)  L nhưng (1, 0)  L, tuy nhiên cả E và P đều mang tính đối xứng.</para>
+      <para id="id19858439">. Cả L, E và P đều là các quan hệ mang tính bắc cầu, nhưng X = {(1, 0),(0, 3)} thì không vì (1, 3)  X.</para>
+      <section id="id-799185743997">
+        <title>Quan hệ tương đương </title>
+        <para id="id19858468">Một quan hệ R trên tập S có đủ các tính chất phản xạ, đối xứng và bắt cầu được gọi là quan hệ tương đương.</para>
+        <para id="id19858477">Thí dụ 1.9 :E và P là các quan hệ tương đương, còn L và X không là các quan hệ tương đương trên S.</para>
+        <para id="id19858496">Một tính chất quan trọng của quan hệ tương đương là nếu R là quan hệ tương đương trên tập S thì R phân hoạch tập S thành các lớp tương đương (equivalence class) Si không rỗng và rời nhau, tức là S = S1  S2 ... và với mọi i  j ta có :</para>
+        <para id="id19858546"> + Si Ç Sj = Æ</para>
+        <para id="id19858576"> + Với mỗi a,b cùng thuộc Si thì aRb là đúng.</para>
+        <para id="id19858592"> + Với mỗi a  Si và b  Sj thì aRb là sai.</para>
+        <para id="id19858625">Lưu ý rằng số lớp tương đương có thể là vô hạn. Vậy nếu R là quan hệ tương trên S và a  S, ta có :</para>
+        <para id="id19858642">Si = [a] = {b Î S  aRb}</para>
+        <para id="id19858663">Thí dụ 1.10 : </para>
+        <para id="id19858669">. E có 4 lớp tương đương khác nhau: [0] = {0}, [1] = {1}, [2] = {2} và [3] = {3}</para>
+        <para id="id19858678">. P có 2 lớp tương đương khác nhau: [0] = [2] = {0, 2} và [1] = [3] = {1, 3}</para>
+      </section>
+      <section id="id-759922488791">
+        <title>Bao đóng của quan hệ </title>
+        <para id="id19858699">Giả sử P là tập hợp một số tính chất của các quan hệ, bao đóng P (P - closure) của một quan hệ R trên tập S là quan hệ nhỏ nhất có chứa tất cả các cặp của R thoả mãn các tính chất trong P.</para>
+        <para id="id19858712"> Bao đóng bắc cầu R+ của R được xác định như sau :</para>
+        <para id="id19858732">i) Nếu (a,b) thuộc R thì (a,b) thuộc R+.</para>
+        <para id="id19858743">ii) Nếu (a,b) thuộc R+ và (b,c) cũng thuộc R thì (a,c) thuộc R+.</para>
+        <para id="id19858760">iii) Không còn gì thêm trong R+.</para>
+        <para id="id19858771"> Bao đóng phản xạ và bắc cầu R* của R được xác định như sau :</para>
+        <para id="id19858792">R* = R+  {(a, a) a  S}</para>
+        <para id="id19858826">Thí dụ 1.11 :Cho quan hệ R = {(1, 2), (2, 2), (2, 3)} trên tập hợp S = {1, 2, 3}</para>
+        <para id="id19858844">Khi đó ta có :</para>
+        <para id="id19858848">R+ = {(1, 2), (2, 2), (2, 3), (1, 3)}</para>
+        <para id="id19858861">R* = {(1, 1), (1, 2), (1, 3), (2, 2), (2, 3), (3, 3)}</para>
+      </section>
+    </section>
+    <section id="id-43162758298">
+      <title>PHÉP CHỨNG MINH QUY NẠP </title>
+      <para id="id19858881">Phần lớn các định lý trong giáo trình sẽ được chứng minh bằng phương pháp quy nạp toán học : </para>
+      <para id="id19858897">Giả sử ta cần chứng minh một mệnh đề P(n) với n là một số nguyên không âm. Nguyên lý quy nạp toán học cho P(n) được chứng minh theo 2 bước như sau :</para>
+      <para id="id19858911">i) P (0) , và </para>
+      <para id="id19858919">ii) P( n - 1) kéo theo P (n), n  1.</para>
+      <para id="id19858947">Bước (i) được gọi là cơ sở quy nạp, bước (ii) được gọi là bước quy nạp với P(n-1) là giả thiết quy nạp.</para>
+      <para id="id19858964">Thí dụ 1.12 :Dùng quy nạp, chứng minh biểu thức :</para>
+      <para id="id19858972">
+        <m:math>
+          <m:semantics>
+            <m:mrow>
+              <m:mstyle fontsize="12pt">
+                <m:mrow>
+                  <m:mrow>
+                    <m:mrow>
+                      <m:munderover>
+                        <m:mo stretchy="false">∑</m:mo>
+                        <m:mstyle fontsize="8pt">
+                          <m:mrow>
+                            <m:mrow>
+                              <m:mi>i</m:mi>
+                              <m:mo stretchy="false">=</m:mo>
+                              <m:mn>0</m:mn>
+                            </m:mrow>
+                          </m:mrow>
+                        </m:mstyle>
+                        <m:mstyle fontsize="8pt">
+                          <m:mrow>
+                            <m:mi>n</m:mi>
+                          </m:mrow>
+                        </m:mstyle>
+                      </m:munderover>
+                      <m:msup>
+                        <m:mi>i</m:mi>
+                        <m:mstyle fontsize="8pt">
+                          <m:mrow>
+                            <m:mn>2</m:mn>
+                          </m:mrow>
+                        </m:mstyle>
+                      </m:msup>
+                    </m:mrow>
+                    <m:mo stretchy="false">=</m:mo>
+                    <m:mfrac>
+                      <m:mrow>
+                        <m:mi>n</m:mi>
+                        <m:mo stretchy="false">(</m:mo>
+                        <m:mrow>
+                          <m:mi>n</m:mi>
+                          <m:mo stretchy="false">+</m:mo>
+                          <m:mn>1</m:mn>
+                        </m:mrow>
+                        <m:mo stretchy="false">)</m:mo>
+                        <m:mo stretchy="false">(</m:mo>
+                        <m:mrow>
+                          <m:mn>2n</m:mn>
+                          <m:mo stretchy="false">+</m:mo>
+                          <m:mn>1</m:mn>
+                        </m:mrow>
+                        <m:mo stretchy="false">)</m:mo>
+                      </m:mrow>
+                      <m:mn>6</m:mn>
+                    </m:mfrac>
+                  </m:mrow>
+                </m:mrow>
+              </m:mstyle>
+              <m:mrow/>
+            </m:mrow>
+            <m:annotation encoding="StarMath 5.0"> size 12{ Sum cSub { size 8{i=0} }  cSup { size 8{n} }  {i rSup { size 8{2} } } = {  {n \( n+1 \)  \( 2n+1 \) }  over  {6} } } {}</m:annotation>
+          </m:semantics>
+        </m:math>
+      </para>
+      <para id="id19884768">Cơ sở quy nạp : Thay n = 0 trong vế phải của biểu thức và nhận thấy cả 2 vế đều bằng 0  P (0) luôn đúng.</para>
+      <para id="id19884791">Bước quy nạp : Thay n bởi n - 1 để có được giả thiết quy nạp P(n-1), sau đó tìm cách để chứng minh P(n), tức chứng minh n  1, ta có :</para>
+      <para id="id19884827">
+        <m:math>
+          <m:semantics>
+            <m:mrow>
+              <m:mstyle fontsize="12pt">
+                <m:mrow>
+                  <m:mrow>
+                    <m:mrow>
+                      <m:mrow>
+                        <m:munderover>
+                          <m:mo stretchy="false">∑</m:mo>
+                          <m:mstyle fontsize="8pt">
+                            <m:mrow>
+                              <m:mrow>
+                                <m:mtext>i </m:mtext>
+                                <m:mo stretchy="false">=</m:mo>
+                                <m:mtext> 0</m:mtext>
+                              </m:mrow>
+                            </m:mrow>
+                          </m:mstyle>
+                          <m:mstyle fontsize="8pt">
+                            <m:mrow>
+                              <m:mtext>n - 1</m:mtext>
+                            </m:mrow>
+                          </m:mstyle>
+                        </m:munderover>
+                        <m:msup>
+                          <m:mi>i</m:mi>
+                          <m:mstyle fontsize="8pt">
+                            <m:mrow>
+                              <m:mn>2</m:mn>
+                            </m:mrow>
+                          </m:mstyle>
+                        </m:msup>
+                      </m:mrow>
+                      <m:mo stretchy="false">=</m:mo>
+                      <m:mfrac>
+                        <m:mrow>
+                          <m:mo stretchy="false">(</m:mo>
+                          <m:mtext>n - 1</m:mtext>
+                          <m:mo stretchy="false">)</m:mo>
+                          <m:mtext> n </m:mtext>
+                          <m:mo stretchy="false">(</m:mo>
+                          <m:mtext>2n -1</m:mtext>
+                          <m:mo stretchy="false">)</m:mo>
+                        </m:mrow>
+                        <m:mn>6</m:mn>
+                      </m:mfrac>
+                    </m:mrow>
+                    <m:mo stretchy="false">⇒</m:mo>
+                    <m:mrow>
+                      <m:mrow>
+                        <m:munderover>
+                          <m:mo stretchy="false">∑</m:mo>
+                          <m:mstyle fontsize="8pt">
+                            <m:mrow>
+                              <m:mrow>
+                                <m:mtext>i </m:mtext>
+                                <m:mo stretchy="false">=</m:mo>
+                                <m:mtext> 0</m:mtext>
+                              </m:mrow>
+                            </m:mrow>
+                          </m:mstyle>
+                          <m:mstyle fontsize="8pt">
+                            <m:mrow>
+                              <m:mi>n</m:mi>
+                            </m:mrow>
+                          </m:mstyle>
+                        </m:munderover>
+                        <m:msup>
+                          <m:mi>i</m:mi>
+                          <m:mstyle fontsize="8pt">
+                            <m:mrow>
+                              <m:mn>2</m:mn>
+                            </m:mrow>
+                          </m:mstyle>
+                        </m:msup>
+                      </m:mrow>
+                      <m:mo stretchy="false">=</m:mo>
+                      <m:mfrac>
+                        <m:mrow>
+                          <m:mtext>n </m:mtext>
+                          <m:mo stretchy="false">(</m:mo>
+                          <m:mrow>
+                            <m:mi>n</m:mi>
+                            <m:mo stretchy="false">+</m:mo>
+                            <m:mn>1</m:mn>
+                          </m:mrow>
+                          <m:mo stretchy="false">)</m:mo>
+                          <m:mo stretchy="false">(</m:mo>
+                          <m:mrow>
+                            <m:mtext>2n </m:mtext>
+                            <m:mo stretchy="false">+</m:mo>
+                            <m:mn>1</m:mn>
+                          </m:mrow>
+                          <m:mo stretchy="false">)</m:mo>
+                        </m:mrow>
+                        <m:mn>6</m:mn>
+                      </m:mfrac>
+                    </m:mrow>
+                  </m:mrow>
+                </m:mrow>
+              </m:mstyle>
+              <m:mrow/>
+            </m:mrow>
+            <m:annotation encoding="StarMath 5.0"> size 12{ Sum cSub { size 8{"i "=" 0"} }  cSup { size 8{"n - 1"} }  {i rSup { size 8{2} } } = {  { \( "n - 1" \) " n " \( "2n -1" \) }  over  {6} }  drarrow  Sum cSub { size 8{"i "=" 0"} }  cSup { size 8{n} }  {i rSup { size 8{2} } } = {  {"n " \( n+1 \)  \( "2n "+1 \) }  over  {6} } } {}</m:annotation>
+          </m:semantics>
+        </m:math>
+      </para>
+      <para id="id19885041">Ta có nhận xét rằng :</para>
+      <para id="id19885047">
+        <m:math>
+          <m:semantics>
+            <m:mrow>
+              <m:mstyle fontsize="12pt">
+                <m:mrow>
+                  <m:mrow>
+                    <m:mrow>
+                      <m:munderover>
+                        <m:mo stretchy="false">∑</m:mo>
+                        <m:mstyle fontsize="8pt">
+                          <m:mrow>
+                            <m:mrow>
+                              <m:mtext>i </m:mtext>
+                              <m:mo stretchy="false">=</m:mo>
+                              <m:mtext> 0</m:mtext>
+                            </m:mrow>
+                          </m:mrow>
+                        </m:mstyle>
+                        <m:mstyle fontsize="8pt">
+                          <m:mrow>
+                            <m:mi>n</m:mi>
+                          </m:mrow>
+                        </m:mstyle>
+                      </m:munderover>
+                      <m:msup>
+                        <m:mi>i</m:mi>
+                        <m:mstyle fontsize="8pt">
+                          <m:mrow>
+                            <m:mn>2</m:mn>
+                          </m:mrow>
+                        </m:mstyle>
+                      </m:msup>
+                    </m:mrow>
+                    <m:mo stretchy="false">=</m:mo>
+                    <m:mrow>
+                      <m:mrow>
+                        <m:munderover>
+                          <m:mo stretchy="false">∑</m:mo>
+                          <m:mstyle fontsize="8pt">
+                            <m:mrow>
+                              <m:mrow>
+                                <m:mtext>i </m:mtext>
+                                <m:mo stretchy="false">=</m:mo>
+                                <m:mtext> 0</m:mtext>
+                              </m:mrow>
+                            </m:mrow>
+                          </m:mstyle>
+                          <m:mstyle fontsize="8pt">
+                            <m:mrow>
+                              <m:mtext>n - 1</m:mtext>
+                            </m:mrow>
+                          </m:mstyle>
+                        </m:munderover>
+                        <m:msup>
+                          <m:mi>i</m:mi>
+                          <m:mstyle fontsize="8pt">
+                            <m:mrow>
+                              <m:mn>2</m:mn>
+                            </m:mrow>
+                          </m:mstyle>
+                        </m:msup>
+                      </m:mrow>
+                      <m:mo stretchy="false">+</m:mo>
+                      <m:msup>
+                        <m:mi>n</m:mi>
+                        <m:mstyle fontsize="8pt">
+                          <m:mrow>
+                            <m:mn>2</m:mn>
+                          </m:mrow>
+                        </m:mstyle>
+                      </m:msup>
+                    </m:mrow>
+                  </m:mrow>
+                </m:mrow>
+              </m:mstyle>
+              <m:mrow/>
+            </m:mrow>
+            <m:annotation encoding="StarMath 5.0"> size 12{ Sum cSub { size 8{"i "=" 0"} }  cSup { size 8{n} }  {i rSup { size 8{2} } } = Sum cSub { size 8{"i "=" 0"} }  cSup { size 8{"n - 1"} }  {i rSup { size 8{2} } } +n rSup { size 8{2} } } {}</m:annotation>
+          </m:semantics>
+        </m:math>
+      </para>
+      <para id="id19885191"><m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:mrow><m:mrow><m:mfrac><m:mrow><m:mo stretchy="false">(</m:mo><m:mtext>n -1</m:mtext><m:mo stretchy="false">)</m:mo><m:mtext> n </m:mtext><m:mo stretchy="false">(</m:mo><m:mtext>2n -1</m:mtext><m:mo stretchy="false">)</m:mo></m:mrow><m:mn>6</m:mn></m:mfrac><m:mo stretchy="false">+</m:mo><m:msup><m:mi>n</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mtext>2 </m:mtext></m:mrow></m:mstyle></m:msup></m:mrow><m:mo stretchy="false">=</m:mo><m:mfrac><m:mrow><m:mtext>n </m:mtext><m:mo stretchy="false">(</m:mo><m:mrow><m:mtext>n </m:mtext><m:mo stretchy="false">+</m:mo><m:mn>1</m:mn></m:mrow><m:mo stretchy="false">)</m:mo><m:mo stretchy="false">(</m:mo><m:mrow><m:mtext>2n </m:mtext><m:mo stretchy="false">+</m:mo><m:mn>1</m:mn></m:mrow><m:mo stretchy="false">)</m:mo></m:mrow><m:mn>6</m:mn></m:mfrac></m:mrow></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{ {  { \( "n -1" \) " n " \( "2n -1" \) }  over  {6} } +n rSup { size 8{"2 "} } = {  {"n " \( "n "+1 \)   \( "2n "+1 \) }  over  {6} } } {}</m:annotation></m:semantics></m:math>Vậy nếu ta vận dụng giả thiết quy nạp thì chỉ còn phải chứng minh biểu thức :</para>
+      <para id="id19885339">Với một vài phép biến đổi đại số đơn giản, biểu thức trên có thể được chứng minh dễ dàng. Hay P(n) được chứng minh, n.</para>
+    </section>
+    <section id="id-698293476261">
+      <title>ĐỒ THỊ VÀ CÂY </title>
+      <section id="id-622598152739">
+        <title>Đồ thị (Graph)</title>
+        <para id="id19885375">Một đồ thị, ký hiệu G = (V, E), bao gồm một tập hữu hạn các đỉnh V (còn gọi là nút) và một tập các cạnh E nối giữa 2 nút. </para>
+        <para id="id19885404">Thí dụ 1.13 :Đồ thị cho bởi :V = {1, 2, 3, 4, 5} </para>
+        <para id="id19885419">và  E = {(n, m)  n + m = 4 hoặc n + m = 7}</para>
+        <figure id="id19885442">
+          <media id="id1168304460299" alt=""><image src="../../media/graphics1-4c22.png" mime-type="image/png" height="144" width="302"/></media>
+        </figure>
+        <para id="id19885465">Hình 1.1 - Ví dụ về đồ thị</para>
+        <para id="id19885478">Một đường đi (path) trên một đồ thị là dãy các đỉnh v1, v2 , . . ., vk, k  1, sao cho trong đó có một cạnh (vi ,vi +1) cho mỗi i, 1  i &lt; k. Độ dài của đường đi là k - 1. Nếu v1 = vk thì đường đi là một chu trình.</para>
+        <para id="id19885570">Chẳng hạn : 1, 3, 4 là một đường đi trong đồ thị trên.</para>
+        <para id="id19885580">Đồ thị có hướng (directed graph) </para>
+        <para id="id19885588">Một đồ thị có hướng cũng là dạng đồ thị được xác định bởi G = (V, E), trong đó V là tập các đỉnh, còn E là tập các đỉnh có thứ tự gọi là các cung (hay các đường nối có hướng giữa 2 đỉnh). Ký hiệu một cung từ v đến w có dạng v  w. </para>
+        <para id="id19885614">Thí dụ 1.14 : Đồ thị có hướng G = ({1, 2, 3, 4 }, { i  j  i &lt; j })</para>
+        <figure id="id19885650">
+          <media id="id1168301393374" alt=""><image src="../../media/graphics2-ab30.png" mime-type="image/png" height="77" width="333"/></media>
+        </figure>
+        <para id="id19885673">Hình 1.2 - Một đồ thị có hướng</para>
+        <para id="id19885686">Một đường đi trên một đồ thị có hướng là dãy các đỉnh v1, v2 , . . ., vk, k  1, sao cho với mỗi i, 1  i &lt; k, có một cung từ vi đến vi +1. Chẳng hạn 1  2  3  4 là một đường đi trên đồ thị định hướng trên (từ 1 đến 4). </para>
+      </section>
+      <section id="id-462756680059">
+        <title>Cây (trees) </title>
+        <para id="id19885798">Cây (cây định hướng có thứ tự) là một đồ thị có hướng với các tính chất sau :</para>
+        <para id="id19885809">i) Có một nút đỉnh gọi là nút gốc</para>
+        <para id="id19885820">ii) Mỗi nút còn lại đều được dẫn ra từ một nút cha ở trên nó :</para>
+        <para id="id19885830">- Các nút có dẫn ra nút con sau nó được gọi là nút trung gian hay nút trong.</para>
+        <para id="id19885844">- Các nút không dẫn ra nút con gọi là nút lá.</para>
+        <para id="id19885853">iii) Thứ tự duyệt trên cây là từ trái sang phải.</para>
+        <para id="id19885859">Trong một cây, người ta thường dùng các khái niệm nút cha và nút con để lần lượt chỉ thứ tự trước và sau của sự phát sinh nút từ nút gốc trên cây. Nếu có một đường đi từ nút v1 đến nút v2 thì v1 được gọi là nút cha của v2 và ngược lại, v2 sẽ là nút con của nút v1. </para>
+        <para id="id19885928">Ta thường vẽ cây với nút gốc ở trên cùng và các cung chỉ xuống phía dưới, do vậy các ký hiệu mũi tên trở nên không còn cần thiết nữa. Các nút con của mỗi nút trên cây sẽ được vẽ lần lượt từ trái qua phải theo thứ tự đã xác định.</para>
+        <para id="id19885946">Thí dụ 1.15 : Cây minh họa cấu trúc cú pháp của một câu đơn trong ngôn ngữ tiếng Việt "An là sinh viên giỏi"</para>
+        <figure id="id19885968">
+          <media id="id6610710" alt=""><image src="../../media/graphics3-df2f.png" mime-type="image/png" height="256" width="504"/></media>
+        </figure>
+        <para id="id19885992">Hình 1.3 - Cây minh họa một câu đơn</para>
+        <para id="id19886005">BÀI TẬP CHƯƠNG I</para>
+        <para id="id19886013">1.1. Nếu không gian tập hợp là tập các số nguyên dương nhỏ hơn 20. Hãy viết rõ các phần tử trong các tập hợp được xác định như sau :</para>
+        <list id="id19886035" list-type="enumerated">
+          <item>{ x  x + 2 &lt; 10}</item>
+          <item>{ x  x là số nguyên tố }</item>
+          <item>{ x  x = x2}</item>
+          <item>{ x  2x = 1}</item>
+          <item>{ x  3x &lt; 20}</item>
+        </list>
+        <para id="id19886134">1.2. Cho tập hợp S = {0, 1, 2, 3, 4, 5, 6}</para>
+        <para id="id19886147">Hãy viết rõ các phần tử trong các tập hợp được xác định như sau :</para>
+        <list id="id19886159" list-type="enumerated">
+          <item>{ x  x  S và x chẳn }</item>
+          <item>{ x  x  S và x  x2 + 1 }</item>
+        </list>
+        <para id="id19886237">1.3. Cho A = {0, 1, 2} và B = {0, 3, 4}. Hãy viết rõ các tập hợp sau : </para>
+        <para id="id19886251">A  B ; A  B ; A \ B ; A x B và 2A</para>
+        <para id="id19886273">1.4. Cho ví dụ về quan hệ :</para>
+        <para id="id19886285">a) Phản xạ và đối xứng, nhưng không bắc cầu.</para>
+        <para id="id19886296">b) Phản xạ và bắc cầu, nhưng không đối xứng.</para>
+        <para id="id19886306">c) Đối xứng và bắc cầu, nhưng không phản xạ.</para>
+        <para id="id19886317">Trong mỗi trường hợp trên, chỉ rõ tập hợp trên đó quan hệ được xác định.</para>
+        <para id="id19886327">1.5. Chứng minh các quan hệ sau đây là các quan hệ tương đương và cho các lớp tương đương của chúng.</para>
+        <para id="id19886348">a) Quan hệ R1 trên các số nguyên định nghĩa bởi : iR1j khi và chỉ khi i = j.</para>
+        <para id="id19886380">b) Quan hệ R2 trên một tập thể người định nghĩa bởi : pR2q khi và chỉ khi p, q sinh cùng ngày và cùng năm.</para>
+        <para id="id19886414">1.6. Cho tập hữu hạn A. Hãy tìm những quan hệ tương đương trên A có số các lớp tương đương là lớn nhất hay nhỏ nhất.</para>
+        <para id="id19886430">1.7. Cho hai tập hợp sau A = {2, 3, 4, 5} và B = {1, 3, 5, 7, 9}. Giả sử R là quan hệ :</para>
+        <para id="id19886445">R = {(x, y)  A  B  x &lt; y}</para>
+        <para id="id19886479">Hãy liệt kê các cặp quan hệ thứ tự trong R. </para>
+        <para id="id19886488">1.8. Tìm bao đóng bắc cầu, bao đóng phản xạ và bắc cầu của quan hệ được cho như sau trên S = { 1, 2, 3, 4, 5}: </para>
+        <para id="id19886506">{(1, 2), (2, 3), (3, 4), (5, 4)}</para>
+        <para id="id19886511">1.9. Cho S = {0, 1, 2} và R = {(0, 1), (1, 2)}. Tìm R* và R+. </para>
+      </section>
+    </section>
+  </content>
+</document>

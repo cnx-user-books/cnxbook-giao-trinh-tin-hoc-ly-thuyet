@@ -1,0 +1,963 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Ôtômat hữu hạn và biểu thức chính quy</title>
+  <metadata>
+  <md:content-id>m30085</md:content-id><md:title>Ôtômat hữu hạn và biểu thức chính quy</md:title>
+  <md:abstract>Nội dung chính: Trong chương này, ta sẽ nghiên cứu một loại "máy trừu tượng" gọi là ôtômát hữu hạn. Chúng là công cụ dùng đoán nhận một lớp ngôn ngữ khá đơn giản gọi là lớp ngôn ngữ chính quy. Trước hết, hai dạng của ôtômát hữu hạn sẽ lần lượt được trình bày và có sự chứng minh rằng chúng tương đương nhau về khả năng đoán nhận ngôn ngữ. Tiếp đó, ta sẽ đề cập đến biểu thức chính quy - một phương tiện khác để xác định ngôn ngữ và ta lại thấy rằng lớp ngôn ngữ do các ôtômát hữu hạn chấp nhận chính là lớp ngôn ngữ chính quy. Phần tiếp theo của chương sẽ đề cập đến mối quan hệ giữa cơ chế ôtômát và các biểu thức chính quy dùng ký hiệu cho ngôn ngữ. Cuối chương này, một vài ứng dụng cụ thể của ôtômát hữu hạn sẽ được trình bày.
+Mục tiêu cần đạt: Kết thúc chương này, sinh viên cần nắm vững :
+ Khái niệm ôtômát hữu hạn, các thành phần, các dạng và sự khác biệt cơ bản giữa hai dạng.
+ Cách thức chuyển đổi tương đương từ dạng đơn định sang không đơn định và ngược lại.
+ Viết biểu thức chính quy ký hiệu cho tập ngôn ngữ chính quy.
+ Mối liên quan giữa ôtômát hữu hạn và biểu thức chính quy.
+ Vẽ sơ đồ chuyển trạng thái (đơn định hoặc không đơn định) từ một biểu thức chính quy.
+ Tìm các ứng dụng thực tế khác từ mô hình ôtômát hữu hạn.
+Kiến thức cơ bản: Để tiếp thu tốt nội dung của chương này, sinh viên cần có một số các kiến thức liên quan về lý thuyết đồ thị, lý thuyết mạch; hiểu các khái niệm cơ bản về kiến trúc máy tính; có sử dụng qua một số trình soạn thảo văn bản thông thường …
+Tài liệu tham khảo : 
+[1] John E. Hopcroft, Jeffrey D.Ullman – Introduction to Automata Theory, Languages and Computation – Addison – Wesley Publishing Company, Inc – 1979 (Chapter 2 : Finite Automata and Regular Expressions).
+[2] Phan Thị Tươi – Trình biên dịch – Nhà xuất bản Giáo dục – 1986 (Chương 3 : Bộ phân tích từ vựng).
+[3] J.A.Garcia and S.Moral- Theory of Finite Automata :
+ http://decsai.ugr.es/~jags/fat.html
+[4] Donald R. Biggar - Regular Expression Matching Using Finite Automata:
+http://www3.sympatico.ca/dbiggar/FA.home.html</md:abstract>
+  <md:uuid>09fcd066-8881-41f0-a0cf-0e91c2f84a60</md:uuid>
+</metadata>
+
+<content>
+    <section id="id-977659630569">
+      <title>ÔTÔMÁT HỮU HẠN (FA : Finite Automata)</title>
+      <para id="id19273988">Ôtômát hữu hạn FA là một mô hình tính toán của hệ thống với sự mô tả bởi các input và output. Tại mỗi thời điểm, hệ thống có thể được xác định ở một trong số hữu hạn các cấu hình nội bộ gọi là các trạng thái (states). Mỗi trạng thái của hệ thống thể hiện sự tóm tắt các thông tin liên quan đến những input đã chuyển qua và xác định các phép chuyển kế tiếp trên dãy input tiếp theo. </para>
+      <para id="id19274017">Trong khoa học máy tính, ta có thể tìm thấy nhiều ví dụ về hệ thống trạng thái hữu hạn, và lý thuyết về ôtômát hữu hạn là một công cụ thiết kế hữu ích cho các hệ thống này. Chẳng hạn, một hệ chuyển mạch như bộ điều khiển (Control Unit) trong máy tính. Một chuyển mạch thì bao gồm một số hữu hạn các cổng (gate) input, mỗi cổng có 2 giá trị 0 hoặc 1. Các giá trị đầu vào này sẽ xác định 2 mức điện thế khác nhau ở cổng output. Mỗi trạng thái của một mạng chuyển mạch với n cổng bất kỳ sẽ là một trường hợp trong 2n phép gán của 0 và 1 đối với các cổng khác nhau. Các chuyển mạch thì được thiết kế theo cách này, vì thế chúng có thể được xem như hệ thống trạng thái hữu hạn. Các chương trình sử dụng thông thường, chẳng hạn trình sọan thảo văn bản hay bộ phân tích từ vựng trong trình biên dịch máy tính cũng được thiết kế như các hệ thống trạng thái hữu hạn. Ví dụ bộ phân tích từ vựng sẽ quét qua tất cả các dòng ký tự của chương trình máy tính để tìm nhóm các chuỗi ký tự tương ứng với một tên biến, hằng số, từ khóa, …Trong quá trình xử lý này, bộ phân tích từ vựng cần phải nhớ một số hữu hạn thông tin như các ký tự bắt đầu hình thành những chuỗi từ khóa. Lý thuyết về ôtômát hữu hạn thường được dùng đến nhiều cho việc thiết kế các công cụ xử lý chuỗi hiệu quả. </para>
+      <para id="id19274086">Máy tính cũng có thể được xem như một hệ thống trạng thái hữu hạn. Trạng thái hiện thời của bộ xử lý trung tâm, bộ nhớ trong và các thiết bị lưu trữ phụ ở mỗi thời điểm bất kỳ là một trong những số rất lớn và hữu hạn của số trạng thái. Bộ não con người cũng là một hệ thống trạng thái hữu hạn, vì số các tế bào thần kinh hay gọi là neurons là số có giới hạn, nhiều nhất có thể là 235. </para>
+      <para id="id19274112">Lý do quan trọng nhất cho việc nghiên cứu các hệ thống trạng thái hữu hạn là tính tự nhiên của khái niệm và khả năng ứng dụng đa dạng trong nhiều lĩnh vực thực tế. Ôtômát hữu hạn (FA) được chia thành 2 loại: đơn định (DFA) và không đơn định (NFA). Cả hai loại ôtômát hữu hạn đều có khả năng nhận dạng chính xác tập chính quy. Ôtômát hữu hạn đơn định có khả năng nhận dạng ngôn ngữ dễ dàng hơn ôtômát hữu hạn không đơn định, nhưng thay vào đó thông thường kích thước của nó lại lớn hơn so với ôtômát hữu hạn không đơn định tương đương.</para>
+      <section id="id-677134322353">
+        <title>Ôtômát hữu hạn đơn định - DFA (Deterministic Finite Automata) </title>
+        <para id="id19274152">Một ôtômát hữu hạn đơn định (DFA) - gọi tắt là FA -gồm một tập hữu hạn các trạng thái và một tập các phép chuyển từ trạng thái này tới trạng thái khác trên các ký hiệu nhập (input symbols) được chọn từ một bộ chữ cái  nào đó. Mỗi ký hiệu nhập có đúng một phép chuyển khỏi mỗi trạng thái (có thể chuyển trở về chính nó). Một trạng thái, thường ký hiệu là q0, gọi là trạng thái bắt đầu (trạng thái ôtômát bắt đầu). Một số trạng thái được thiết kế như là các trạng thái kết thúc hay trạng thái chấp nhận. </para>
+        <para id="id19274215">Một đồ thị có hướng, gọi là sơ đồ chuyển (transition diagram) tương ứng với một DFA như sau: các đỉnh của đồ thị là các trạng thái của DFA; nếu có một đường chuyển từ trạng thái q đến trạng thái p trên input a thì có một cung nhãn a chuyển từ trạng thái q đến trạng thái p trong sơ đồ chuyển. DFA chấp nhận một chuỗi x nếu như tồn tại dãy các phép chuyển tương ứng trên mỗi ký hiệu của x dẫn từ trạng thái bắt đầu đến một trong những trạng thái kết thúc. </para>
+        <para id="id19274243">Chẳng hạn, sơ đồ chuyển của một DFA được mô tả trong hình 3.1. Trạng thái khởi đầu q0 được chỉ bằng mũi tên có nhãn "Start". Chỉ có duy nhất một trạng thái kết thúc, cũng là q0 trong trường hợp này, được chỉ ra bằng hai vòng tròn. Ôtômát này chấp nhận tất cả các chuỗi số 0 và số 1 với số số 0 và số số 1 là số chẵn. </para>
+        <para id="id19274281">Thí dụ 3.1 : </para>
+        <figure id="id19274289">
+          <media id="id1171167046715" alt=""><image src="../../media/graphics1-e080.png" mime-type="image/png" height="303" width="391"/></media>
+        </figure>
+        <para id="id19274313">Hình 3.1 - Sơ đồ chuyển của một DFA</para>
+        <para id="id19274330">Một điều cần lưu ý, DFA sử dụng mỗi trạng thái của nó để giữ chỉ một phần của chuỗi số 0 và 1 chứ không phải chứa một số thực sự, vì thế DFA cần dùng một số hữu hạn trạng thái.</para>
+        <para id="id19274346">Định nghĩa</para>
+        <para id="id19274354">Một cách hình thức ta định nghĩa ôtômát hữu hạn là bộ gồm năm thành phần (Q, , , q0, F), trong đó :</para>
+        <para id="id19274391">. Q là tập hợp hữu hạn các trạng thái.</para>
+        <para id="id19274397">.  là bộ chữ cái nhập hữu hạn.</para>
+        <para id="id19274414">.  là hàm chuyển ánh xạ từ Q    Q, tức là (q, a) là một trạng thái được cho bởi phép chuyển từ trạng thái q trên ký hiệu nhập a.</para>
+        <para id="id19480869">. q0  Q là trạng thái bắt đầu</para>
+        <para id="id19480894">. F  Q là tập các trạng thái kết thúc.</para>
+        <para id="id19480914">Ta vẽ DFA như là bộ điều khiển hữu hạn, với mỗi trạng thái thuộc Q, DFA đọc một chuỗi các ký hiệu a từ  viết trên băng (như hình vẽ). </para>
+        <figure id="id19480939">
+          <media id="id1171169458765" alt=""><image src="../../media/graphics2-4df7.png" mime-type="image/png" height="127" width="388"/></media>
+        </figure>
+        <para id="id19480963">Hình 3.2 - Mô tả một DFA</para>
+        <para id="id19480980">Trong một lần chuyển, DFA đang ở trạng thái q đọc ký hiệu nhập a trên băng, chuyển sang trạng thái được xác định bởi hàm chuyển (q, a), rồi dịch đầu đọc sang phải một ký tự. Nếu (q, a) chuyển đến một trong những trạng thái kết thúc thì DFA chấp nhận chuỗi được viết trên băng input phía trước đầu đọc, nhưng không bao gồm ký tự tại vị trí đầu đọc vừa dịch chuyển đến. Trong trường hợp đầu đọc đã dịch đến cuối chuỗi trên băng, thì DFA mới chấp nhận toàn bộ chuỗi trên băng.</para>
+        <para id="id19481022">Hàm chuyển trạng thái mở rộng</para>
+        <para id="id19481028">Để có thể mô tả một cách hình thức hoạt động của một DFA trên chuỗi, ta mở rộng hàm chuyển  để áp dụng đối với một trạng thái trên chuỗi hơn là một trạng thái trên từng ký hiệu. Ta định nghĩa hàm chuyển  như một ánh xạ từ Q  *  Q với ý nghĩa (q, w) là trạng thái DFA chuyển đến từ trạng thái q trên chuỗi w. Một cách hình thức, ta định nghĩa : </para>
+        <list id="id19481106" list-type="enumerated">
+          <item>d (q, ) = q</item>
+          <item> (q, wa) = ( (q, w), a), với mọi chuỗi w và ký hiệu nhập a.</item>
+        </list>
+        <para id="id19481168">Một số quy ước về ký hiệu :</para>
+        <list id="id19481176" list-type="bulleted">
+          <item>Q là tập các trạng thái. Ký hiệu q và p (có hoặc không có chỉ số) là các trạng thái, q0 là trạng thái bắt đầu.</item>
+          <item> là bộ chữ cái nhập. Ký hiệu a, b (có hoặc không có chỉ số) và các chữ số là các ký hiệu nhập.</item>
+          <item> là hàm chuyển.</item>
+          <item>F là tập các trạng thái kết thúc.</item>
+          <item>w, x, y và z (có hoặc không có chỉ số) là các chuỗi ký hiệu nhập.</item>
+        </list>
+        <para id="id19481247">Ngôn ngữ được chấp nhận bởi DFA</para>
+        <para id="id19481252">Một chuỗi w được chấp nhập bởi ôtômát hữu hạn M (Q, , , q0, F) nếu (q0, w) = p với p  F. Ngôn ngữ được chấp nhận bởi M, ký hiệu L(M) là tập hợp:</para>
+        <para id="id19481326">L(M) = { w   (q0, w)  F }</para>
+        <para id="id19481371">Thí dụ 3.2 : Xét sơ đồ chuyển ở hình 3.1. Theo khái niệm hình thức, ta có DFA được xác định bởi M (Q, , , q0, F) với Q = {q0, q1, q2, q3},  = {0, 1}, F = {q0} và hàm chuyển  như sau:</para>
+        <table id="id19247906" summary="">
+          <tgroup cols="3">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <tbody>
+              <row>
+                <entry>d</entry>
+                <entry namest="c2" nameend="c3">Inputs</entry>
+              </row>
+              <row>
+                <entry>Trạng thái</entry>
+                <entry>0</entry>
+                <entry>1</entry>
+              </row>
+              <row>
+                <entry>q0</entry>
+                <entry>q2</entry>
+                <entry>q1</entry>
+              </row>
+              <row>
+                <entry>q1</entry>
+                <entry>q3</entry>
+                <entry>q0</entry>
+              </row>
+              <row>
+                <entry>q2</entry>
+                <entry>q0</entry>
+                <entry>q3</entry>
+              </row>
+              <row>
+                <entry>q3</entry>
+                <entry>q1</entry>
+                <entry>q2</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id19248198">Giả sử chuỗi w = 110101 được nhập vào M.</para>
+        <para id="id19248207">Ta có (q0, 1) = q1 và (q1, 1) = q0 ,vậy (q0, 11) = ((q0,1),1) = (q1, 1) = q0. </para>
+        <para id="id19248334">Tiếp tục (q0, 0) = q2, vậy (q0, 110) = ((q0, 11), 0) = q2. </para>
+        <para id="id19248419">Tiếp tục ta có (q0, 1101) = q3, (q0, 11010) = q1</para>
+        <para id="id19248474">Và cuối cùng (q0, 110101) = q0  F.</para>
+        <para id="id19248515">(Hay d(q0, 110101) = d(q1, 10101) = d(q0, 0101) = d(q2, 101) = d(q3, 01) = d(q1, 1) = q0  F)</para>
+        <para id="id19864909">Vậy 110101 thuộc L(M). Ta có thể chứng minh rằng L(M) là tập mọi chuỗi có số chẵn số 0 và số chẵn số 1.</para>
+        <para id="id19864918">Theo mô tả DFA như trên, ta thấy cũng có thể dùng bảng hàm chuyển (transition table) để mô tả các phép chuyển trạng thái của một ôtômát hữu hạn. Trong bảng hàm chuyển, hàng chứa các trạng thái thuộc tập trạng thái của ôtômát và cột là các ký hiệu thuộc bộ chữ cái nhập. Bảng hàm chuyển gợi ý cho chúng ta một cấu trúc dữ liệu để mô tả cho một ôtômát hữu hạn, đồng thời cũng cho thấy có thể dễ dàng mô phỏng hoạt động của DFA thông qua một chương trình máy tính, chẳng hạn dùng cấu trúc vòng lặp.</para>
+        <para id="id19864948">Giải thuật mô phỏng hoạt động của một DFA </para>
+        <para id="id19864957">. Input : Chuỗi nhập x kết thúc bởi $. Output : Câu trả lời "YES" nếu DFA chấp nhận chuỗi x và "NO" nếu ngược lại.. Giải thuật :q := q0 ;c := nextchar ; { c là ký hiệu nhập được đọc tiếp theo }While c &lt; &gt; $ dobeginq := d(q, c);c := nextchar ;endIf q in F then write ("YES") else write("NO");</para>
+        <para id="id19865138">Nhận xét :</para>
+        <para id="id19865149">Một cách tổng quát, ta thấy tập Q của DFA thể hiện các trạng thái lưu trữ của ôtômát trong quá trình đoán nhận ngôn ngữ, và như vậy khả năng lưu trữ của ôtômát là hữu hạn. Mặt khác, hàm chuyển d là hàm toàn phần và đơn trị, cho nên các bước chuyển của ôtômát luôn luôn được xác định một cách duy nhất. Chính vì hai đặc điểm này mà DFA mô tả như trên được gọi là ôtômát hữu hạn đơn định.</para>
+      </section>
+      <section id="id-416766024418">
+        <title>Ôtômát hữu hạn không đơn định - NFA (Nondeterministic Finite Automata) </title>
+        <para id="id19865193">Xét một dạng sửa đổi mô hình DFA để chấp nhận không, một hoặc nhiều hơn một phép chuyển từ một trạng thái trên cùng một ký hiệu nhập. Mô hình mới này gọi là ôtômát hữu hạn không đơn định (NFA). </para>
+        <para id="id19865209">Một chuỗi ký hiệu nhập a1 a2 ... an được chấp nhận bởi một NFA nếu có tồn tại một chuỗi các phép chuyển, tương ứng với chuỗi nhập, từ trạng thái bắt đầu đến trạng thái kết thúc. Chẳng hạn, chuỗi 01001 được chấp nhận bởi ôtômát trong hình dưới đây vì có chuỗi phép chuyển qua các trạng thái q0, q0, q0, q3, q4, q4 có nhãn tương ứng là 0, 1, 0, 0, 1. NFA này chấp nhận tất cả các chuỗi có hai số 0 liên tiếp hoặc hai số 1 liên tiếp. </para>
+        <para id="id19865307">Thí dụ 3.3 : </para>
+        <figure id="id19865315">
+          <media id="id1171164135940" alt=""><image src="../../media/graphics3-3251.png" mime-type="image/png" height="381" width="363"/></media>
+        </figure>
+        <para id="id19865339">Hình 3.3 ­- Sơ đồ chuyển của một NFA</para>
+        <para id="id19865352">Chú ý rằng có thể xem ôtômát hữu hạn đơn định - DFA (hay gọi tắt là FA) là một trường hợp đặc biệt của NFA, trong đó mỗi trạng thái chỉ có duy nhất một phép chuyển trên mỗi ký hiệu nhập. Vì thế trong DFA, với một chuỗi nhập w và trạng thái q, chỉ có đúng một đường đi nhãn w bắt đầu từ q. Để xác định chuỗi w có được chấp nhận bởi DFA hay không chỉ cần kiểm tra đường đi này. Nhưng đối với NFA, có thể có nhiều đường đi có nhãn là w, và do đó tất cả phải được kiểm tra để thấy có hay không có đường đi tới trạng thái kết thúc.</para>
+        <para id="id19865382">Tương tự như DFA, NFA cũng hoạt động với một bộ điều khiển hữu hạn đọc trên băng nhập. Tuy nhiên, tại mỗi thời điểm, bộ điều khiển có thể chứa một số bất kỳ trạng thái. Khi có sự lựa chọn trạng thái kế tiếp, chẳng hạn như từ trạng thái q0 trên ký hiệu nhập 0 ở hình 3.3, ta phải tưởng tượng như có các bản sao của ôtômát đang thực hiện đồng thời. Mỗi trạng thái kế tiếp mà ôtômát có thể chuyển đến sẽ tương ứng với một bản sao của ôtômát mà tại đó bộ điều khiển đang chứa trạng thái đó.</para>
+        <para id="id19865422">Chẳng hạn, với chuỗi 01001, ta có :</para>
+        <figure id="id19865431">
+          <media id="id1171176298012" alt=""><image src="../../media/graphics4-231c.png" mime-type="image/png" height="207" width="525"/></media>
+        </figure>
+        <para id="id19865455">Định nghĩa</para>
+        <para id="id19865462">Một cách hình thức ta định nghĩa ôtômát hữu hạn không đơn định NFA là một bộ 5 thành phần (Q, , , q0, F) trong đó Q, , q0 và F có ý nghĩa như trong DFA, nhưng  là hàm chuyển ánh xạ từ Q    2Q.</para>
+        <para id="id20452737">Khái niệm (q, a) là tập hợp tất cả các trạng thái p sao cho có phép chuyển trên nhãn a từ trạng thái q tới p.</para>
+        <para id="id20452755">Hàm chuyển trạng thái mở rộng</para>
+        <para id="id20452761">Để thuận tiện trong việc mô tả hoạt động ôtômát trên chuỗi, ta mở rộng hàm chuyển  ánh xạ từ Q  *  2Q như sau :</para>
+        <para id="id20452818">1. d(q, e) = {q}</para>
+        <list id="id20452843" list-type="enumerated">
+          <item>(q, wa) = { p  có một trạng thái r trong (q, w) mà p thuộc (r, a)}</item>
+        </list>
+        <para id="id20452892">= ((q, w), a)</para>
+        <list id="id20452920" list-type="enumerated">
+          <item>d(P, w) = Èq  P d(q, w) , P  Q. </item>
+        </list>
+        <para id="id20452987">Ngôn ngữ được chấp nhận bởi NFA</para>
+        <para id="id20452992">Ngôn ngữ L(M), với M là ôtômát hữu hạn không đơn định NFA (Q, , , q0, F) là tập hợp :</para>
+        <para id="id20453037">L(M) = {w  (q0, w) có chứa một trạng thái trong F }</para>
+        <para id="id20453072">Thí dụ 3.4 : Xét sơ đồ chuyển của hình 3.3. Theo khái niệm hình thức, ta có :</para>
+        <para id="id20453087">NFA M ({q0, q1, q2, q3, q4}, {0, 1}, d, q0, {q2, q4}) với hàm chuyển d như sau :</para>
+        <table id="id20453180" summary="">
+          <tgroup cols="3">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <tbody>
+              <row>
+                <entry>d</entry>
+                <entry namest="c2" nameend="c3">Inputs</entry>
+              </row>
+              <row>
+                <entry>Trạng thái</entry>
+                <entry>0</entry>
+                <entry>1</entry>
+              </row>
+              <row>
+                <entry>q0</entry>
+                <entry>{q0,q3}</entry>
+                <entry>{q0,q1}</entry>
+              </row>
+              <row>
+                <entry>q1</entry>
+                <entry>Æ</entry>
+                <entry>{q2}</entry>
+              </row>
+              <row>
+                <entry>q2</entry>
+                <entry>{q2}</entry>
+                <entry>{q2}</entry>
+              </row>
+              <row>
+                <entry>q3</entry>
+                <entry>{q4}</entry>
+                <entry>Æ</entry>
+              </row>
+              <row>
+                <entry>q4</entry>
+                <entry>{q4}</entry>
+                <entry>{q4}</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id20453562">Xét chuỗi nhập w = 01001</para>
+        <para id="id20453567">Ta có :d (q0, 0) = {q0, q­3}</para>
+        <para id="id20453610">d (q0, 01) = d(d(q0, 0),1) = d({q0, q­3},1) = d (q0, 1) È d (q3, 1) = {q0, q­1}</para>
+        <para id="id20453739">Tương tự , ta có thể tính :</para>
+        <para id="id20453747">d (q0, 010) = {q0, q­3}</para>
+        <para id="id20453790">d (q0, 0100) = {q0, q­3, q­4}</para>
+        <para id="id20453842">và d (q0, 01001) = {q0, q­1, q­4}</para>
+        <para id="id20453895">Do q4  F nên w  L (M).</para>
+        <para id="id20453928">Câu hỏi :</para>
+        <para id="id20453940">?</para>
+        <list id="id20454053" list-type="enumerated">
+          <item>Hãy cho nhận xét về điểm khác biệt quan trọng giữa DFA và NFA ?</item>
+          <item>Theo bạn, dạng đơn định hay không đơn định sẽ dùng nhận dạng một chuỗi</item>
+        </list>
+        <para id="id20454073">dễ dàng hơn ?</para>
+      </section>
+      <section id="id-577139972922">
+        <title>Sự tương đương giữa DFA và NFA</title>
+        <para id="id20454087">Vì mỗi DFA là một NFA, nên rõ ràng lớp ngôn ngữ được chấp nhận bởi NFA cũng bao gồm các tập chính quy (đây chính là ngôn ngữ được chấp nhận bởi DFA ). Tuy nhiên, không có cơ sở để nói rằng NFA chỉ chấp nhận duy nhất các tập hợp này. Điều đó cho thấy DFA có thể mô phỏng được hoạt động của NFA, nghĩa là với mỗi NFA, ta có thể xây dựng một DFA tương đương (chấp nhận cùng một ngôn ngữ với nó). Đặt một DFA mô phỏng hoạt động của NFA là cho phép các trạng thái của DFA tương ứng với tập các trạng thái của NFA. Tại mỗi thời điểm, DFA lưu giữ trong bộ điều khiển tất cả các trạng thái mà NFA có thể chuyển đến khi đọc cùng một input như DFA. </para>
+        <para id="id20454124">ĐỊNH LÝ 3.1 : Nếu L là tập được chấp nhận bởi một NFA thì tồn tại một DFA chấp nhận L.</para>
+        <para id="id20454139">Chứng minh</para>
+        <para id="id20454144">Đặt M (Q, , , q0, F) là NFA chấp nhận L.</para>
+        <para id="id20454186">Ta xây dựng DFA M' (Q’, , ’, q0’, F’) tương đương như sau: </para>
+        <para id="id20454230">- Các trạng thái của M’ là tất cả các tập hợp con của tập trạng thái của M, hay Q’= 2Q. Tại mỗi thời điểm, M’ sẽ lưu giữ trong trạng thái của nó tất cả các trạng thái có thể của M. Một phần tử trong Q’ được ký hiệu là [q1, q2,..., qi], trong đó các trạng thái q1, q2,..., qi  Q. Ta xem [q1, q2,..., qi] là một trạng thái đơn của DFA tương ứng với một tập trạng thái của NFA.</para>
+        <para id="id20454345">- q0’ = [q0].</para>
+        <para id="id20454385">- F' là tập hợp các trạng thái của Q’ có chứa ít nhất một trạng thái kết thúc trong tập F của M.</para>
+        <para id="id20454394">- Ta định nghĩa hàm chuyển ’ như sau :</para>
+        <para id="id20454416">d’ ([q1, q2,..., qi], a) = [p1, p2,..., pj] nếu và chỉ nếu  ({q1, q2,..., qi }, a) = {p1, p2,..., pj}</para>
+        <para id="id20454563">Bây giờ ta chứng minh quy nạp theo độ dài của chuỗi nhập x rằng:</para>
+        <para id="id20454573">d’(q0’, x) = [q1, q2,..., qi] Û d(q0, x) = {q1, q2,..., qi} (1)</para>
+        <para id="id19484616">Với x= 0 , ta có x =  và q0’ = [q0] nên (1) hiển nhiên đúng</para>
+        <para id="id19484677">Giả sử (1) đúng với các chuỗi nhập có độ dài tới m.</para>
+        <para id="id19484687">Xét chuỗi nhập có độ dài m + 1, đặt chuỗi này là xa với a  , ta có :</para>
+        <para id="id19484714">d’(q0’, xa) = d’(d’(q0’, x), a)</para>
+        <para id="id19484777">Theo định nghĩa : </para>
+        <para id="id19484785">d’([p1, p2,..., pi], a) = [r1, r2,..., rk] Û d({p1, p2,..., pj}, a) = {r1, r2,..., rk}.</para>
+        <para id="id19484915">Mặt khác theo giả thiết quy nạp d’(q0’, x) = [p1, p2,..., pj] Û d(q0, x) = {p1, p2,..., pj}, nên thay vào ta có : d’(q0’, xa) = [r1, r2,..., rk] Û d(q0, xa) = {r1, r2,..., rk}.</para>
+        <para id="id19485131">Dễ thấy rằng d’(q0’, x)  F' khi và chỉ khi d(q0, x) có chứa ít nhất một trạng thái  F.</para>
+        <para id="id19485201">Vậy L(M) = L(M’)</para>
+        <para id="id19485206">Vì NFA và DFA chấp nhận cùng các tập hợp, nên ta sẽ không phân biệt chúng trừ khi điều đó thật sự cần thiết, sẽ đơn giản hơn để hiểu cả hai cùng là ôtômát đơn định.</para>
+        <para id="id19485220">Thí dụ 3.5 : Cho NFA M ({q0, q1}, {0, 1}, d, q0, {q1}) với hàm chuyển d như sau :</para>
+        <para id="id19485285">d(q0, 0) = {q0, q1},d(q0,1) = {q1},d(q1, 0) = , d(q1, 1) = {q0, q1}</para>
+        <para id="id19485446">Ta xây dựng DFA tương đương M’ (Q’, {0, 1}, d’, [q0], F’) chấp nhận L(M) như sau :</para>
+        <para id="id19485473">. Q’ : chứa tất cả các tập con của {q0, q1}, vậy Q’ = {[q0], [q1], [q0, q1], }</para>
+        <para id="id19485543">. Hàm chuyển d’ :</para>
+        <para id="id19485560">Vì d(q0, 0) = {q0, q­1} nên d’([q0], 0) = [q0, q­1]</para>
+        <para id="id20482027">Tương tự : d’([q0], 1) = [q­1]</para>
+        <para id="id20482064">d’([q­1], 0) =  </para>
+        <para id="id20482100">d’([q­1], 1) = [q­0, q­1]</para>
+        <para id="id20482145">Mặt khác : d’(, 0) = d’(, 1) =  </para>
+        <para id="id20482199">Cuối cùng : d’([q0, q1],0) = [q0, q­1]</para>
+        <para id="id20482252">( vì d({q0, q1},0) = d(q0, 0)  d(q1, 0) = {q0, q­1}   = {q0, q­1})</para>
+        <para id="id20482379">d’([q0, q1], 1) = [q0, q­1]</para>
+        <para id="id20482431">( vì d({q0, q1},1) = d(q0, 1)  d(q1, 1) = {q­1}  {q0, q­1} = {q0, q­1})</para>
+        <para id="id20482558">. Tập trạng thái kết thúc F' = {[q­1], [q0, q­1]}</para>
+        <para id="id20482594">Thực tế, có rất nhiều trạng thái của NFA không có hàm chuyển đến từ trạng thái bắt đầu [q0]. Do đó, thông thường, cách tốt nhất là ta nên xây dựng DFA tương đương bắt đầu từ trạng thái [q0] và thêm vào các trạng thái mới cho DFA chỉ khi có các hàm chuyển từ một trạng thái đã được thêm vào trước đó.</para>
+        <para id="id20482631">Câu hỏi :</para>
+        <para id="id20482636">?</para>
+        <para id="id20482748">Bạn có nhận xét gì về kích thước giữa một DFA và một NFA tương đương với nó</para>
+        <para id="id20482756">chấp nhận cùng một tập ngôn ngữ ?</para>
+      </section>
+      <section id="id-0309795189093">
+        <title>NFA với -dịch chuyển (NFA) </title>
+        <para id="id20482782">Ta mở rộng mô hình NFA cho phép các phép chuyển trên nhãn rỗng . Sơ đồ chuyển sau đây của một NFA chấp nhận chuỗi gồm một số bất kỳ (có thể là 0) chữ số 0 sau đó là một số bất kỳ chữ số 1 và sau nữa là một số bất kỳ chữ số 2. Thông thường, ta nói NFA chấp nhận một chuỗi w nếu có đường truyền nhãn w từ trạng thái bắt đầu đến một trạng thái kết thúc. Chẳng hạn, chuỗi 002 được chấp nhận bởi đường truyền q0, q0, q0, q1, q2, q2 với các cung nhãn 0, 0, , , 2. </para>
+        <para id="id20482883">Thí dụ 3.6 : Sơ đồ chuyển của một NFA với -dịch chuyển :</para>
+        <figure id="id20482907">
+          <media id="id1171174036175" alt=""><image src="../../media/graphics5-f18f.png" mime-type="image/png" height="82" width="341"/></media>
+        </figure>
+        <para id="id20482930">Hình 3.4 - NFA với -dịch chuyển</para>
+        <para id="id20482962">Định nghĩa: Một cách hình thức ta định nghĩa NFA với -dịch chuyển là bộ 5 thành phần (Q, , , q0, F) với tất cả các thành phần có ý nghĩa như trên, nhưng hàm chuyển  là ánh xạ từ Q  (  {})  2Q.</para>
+        <para id="id20483085">Khái niệm (q, a) gồm tất cả các trạng thái p sao cho có phép chuyển nhãn a từ q tới p, trong đó a là một ký hiệu thuộc  hoặc là .</para>
+        <para id="id20483124">Hàm chuyển trạng thái mở rộng: Ta mở rộng hàm chuyển  thành hàm chuyển * ánh xạ từ Q  *  2Q. *(q,w) chứa tất cả các trạng thái p sao cho có thể đi từ q tới p theo đường đi nhãn w (có thể chứa cạnh nhãn ). </para>
+        <para id="id20483225">Ta sử dụng -CLOSURE(q) để xác định tập tất cả các đỉnh p sao cho có đường đi từ q tới p với nhãn .</para>
+        <para id="id20483254">Thí dụ 3.7 : Trong hình 3.4, -CLOSURE(q0) = {q0, q1, q2}. </para>
+        <para id="id20483311">Vì đường đi chỉ có một đỉnh q0 (không có cung trên đường đi) là đường đi từ q0 tới q0 có tất cả các cạnh nhãn là . Đường đi q0, q1 chỉ ra rằng q1 thuộc -CLOSURE(q0). Và đường đi q0, q1, q2 chỉ ra rằng q2 thuộc -CLOSURE(q0).</para>
+        <para id="id20483453">Đặt -CLOSURE(P) = qP -CLOSURE(q), trong đó P là một tập các trạng thái và q là một trạng thái. Ta định nghĩa hàm * như sau:</para>
+        <para id="id19277805">1. *(q, e) = e-CLOSURE(q)</para>
+        <para id="id19277842">2. *(q, wa) = e-CLOSURE(P), </para>
+        <para id="id19277871">trong đó tập P = {p  có r trong *(q, w) sao cho p  (r, a)}, w  * và a  </para>
+        <para id="id19277966">Hay *(q, wa) = e-CLOSURE(d(*(q, w), a)</para>
+        <para id="id19278016">Ta mở rộng  và * trên tập hợp các trạng thái R như sau :</para>
+        <para id="id19278047">3.  (R, a) = È qR (q, a), và</para>
+        <para id="id19278098">4. *(R, w) = ÈqR *(q, w)</para>
+        <para id="id19278152">Câu hỏi :</para>
+        <para id="id19278164">?</para>
+        <para id="id19278277">Hãy so sánh sự khác biệt giữa hàm chuyển  và * ?</para>
+        <para id="id19278307">Nhận xét : *(q, a) và (q, a) không nhất thiết bằng nhau vì *(q, a) gồm tất cả các trạng thái có thể chuyển đến được từ q trên nhãn a gồm cả đường đi nhãn e, trong khi đó d(q, a) chỉ gồm các trạng thái có thể đến được từ q chỉ bằng các cung nhãn a. Tương tự *(q, e) có thể cũng không bằng (q, e). Vì vậy ta phải phân biệt ký hiệu  và * đối với NFA với e-dịch chuyển.</para>
+        <para id="id19278484">Ngôn ngữ được chấp nhận bởi NFA: </para>
+        <para id="id19278502">Ta định nghĩa L(M), ngôn ngữ được chấp nhận bởi NFA M = (Q, , , q0, F) là tập hợp các chuỗi :</para>
+        <para id="id19278564">L(M) = {w  *(q0, w) có chứa ít nhất một trạng thái trong F}</para>
+        <para id="id19278604">Thí dụ 3.8 : Xét sơ đồ chuyển của hình 3.4. </para>
+        <para id="id19278620">Theo khái niệm hình thức, ta có NFA M ({q0, q1, q2}, {0, 1, 2}, , q0, {q2}) với hàm chuyển  như sau :</para>
+        <table id="id19278689" summary="">
+          <tgroup cols="5">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <colspec colnum="4" colname="c4"/>
+            <colspec colnum="5" colname="c5"/>
+            <tbody>
+              <row>
+                <entry>d</entry>
+                <entry namest="c2" nameend="c5">Inputs</entry>
+              </row>
+              <row>
+                <entry>Trạng thái</entry>
+                <entry>0</entry>
+                <entry>1</entry>
+                <entry>2</entry>
+                <entry>e</entry>
+              </row>
+              <row>
+                <entry>q0</entry>
+                <entry>{q0 }</entry>
+                <entry>Æ</entry>
+                <entry>Æ</entry>
+                <entry>{ q1}</entry>
+              </row>
+              <row>
+                <entry>q1</entry>
+                <entry>Æ</entry>
+                <entry>{q1}</entry>
+                <entry>Æ</entry>
+                <entry>{q1}</entry>
+              </row>
+              <row>
+                <entry>q2</entry>
+                <entry>Æ</entry>
+                <entry>Æ</entry>
+                <entry>{q2}</entry>
+                <entry>Æ</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id19279032">Xét chuỗi nhập w = 012. </para>
+        <para id="id19279038">Ta cần tính *(q0, 012)</para>
+        <para id="id19279068">Ta có : *(q0, e) = e-CLOSURE(q0) = {q0, q1, q2}</para>
+        <para id="id19279147">vậy *(q0, 0) = e-CLOSURE((*(q0, e), 0)</para>
+        <para id="id19279225">= e-CLOSURE(d({q0, q1, q2}, 0))</para>
+        <para id="id19279277">= e-CLOSURE(d(q0, 0) È d(q1, 0) È d(q2, 0))</para>
+        <para id="id19279364">= e-CLOSURE({q0} È Æ È Æ )</para>
+        <para id="id19856970">= e-CLOSURE({q0}) = {q0, q1, q2}</para>
+        <para id="id19857022">và *(q0, 01) = e-CLOSURE((*(q0, 0), 1))</para>
+        <para id="id19857089">= e-CLOSURE(d({q0, q1, q2}, 1))</para>
+        <para id="id19857141"> = e-CLOSURE(d(q0, 1) È d(q1, 1) È d(q2, 1))</para>
+        <para id="id19857230">= e-CLOSURE(Æ È {q1} ÈÆ )</para>
+        <para id="id19857282"> = e-CLOSURE({q1}) = {q1, q2}</para>
+        <para id="id19857332"> *(q0, 012) = e-CLOSURE(d( *(q0, 01), 2))</para>
+        <para id="id19857409">= e-CLOSURE(d({q1, q2}, 2))</para>
+        <para id="id19857453"> = e-CLOSURE(d(q1, 2) È d(q2, 2))</para>
+        <para id="id19857516">= e-CLOSURE(Æ È {q2})</para>
+        <para id="id19857560"> = e-CLOSURE({q2}) = {q2}</para>
+        <para id="id19857605">Do *(q0, 012) có chứa trạng thái q2  F nên chuỗi w  L(M).</para>
+        <para id="id19857662">Giải thuật mô phỏng hoạt động của một NFA :</para>
+        <para id="id19857680"/>
+        <para id="id19857702">. Input : Chuỗi nhập x được kết thúc bởi $.</para>
+        <para id="id19857712">. Output : Câu trả lời "YES" nếu NFA chấp nhận chuỗi x và "NO" nếu</para>
+        <para id="id19857719">ngược lại.</para>
+        <para id="id19857726">. Giải thuật :</para>
+        <para id="id19857731">q := e-CLOSURE(q0);</para>
+        <para id="id19857762">c := nextchar ; { c là ký hiệu nhập được đọc tiếp theo }</para>
+        <para id="id19857774">While c &lt;&gt; $ do</para>
+        <para id="id19857790">begin</para>
+        <para id="id19857796">q := e-CLOSURE(d(q, c));</para>
+        <para id="id19857824">c := nextchar ;</para>
+        <para id="id19857830">end</para>
+        <para id="id19857837">If q in F then write ("YES") else write ("NO");</para>
+      </section>
+      <section id="id-131846204344">
+        <title>Sự tương đương giữa NFA có và không có e-dịch chuyển</title>
+        <para id="id19857882">Tương tự như NFA, khả năng có thể thực hiện phép chuyển trên nhãn e của NFAe cũng không làm cho NFAe chấp nhận được các tập hợp không chính quy. Ta có thể dẫn chứng điều này bằng cách mô phỏng hoạt động của một NFAe bởi một NFA không có e-dịch chuyển.</para>
+        <para id="id19857942"/>
+        <para id="id19857946">ĐỊNH LÝ 3.2 : Nếu L được chấp nhận bởi một NFA có e-dịch chuyển thì L cũng được chấp nhận bởi một NFA không có e-dịch chuyển.</para>
+        <para id="id19857980">Chứng minh</para>
+        <para id="id19857984">Đặt M (Q, , , q0, F) là NFA với e-dịch chuyển. </para>
+        <para id="id19858036">Ta xây dựng NFA M’(Q, , ’, q0, F’) tương đương không có e-dịch chuyển, trong đó:</para>
+        <para id="id19858089">  F  {q0} nếu e-CLOSURE(q0) chứa một trạng thái thuộc F</para>
+        <para id="id19858192">. F’ = </para>
+        <para id="id19858200"> F trong các trường hợp còn lại</para>
+        <para id="id19858222">. ’(q, a) là *(q, a) với q  Q và a  . Chú ý rằng M’ không có e-dịch chuyển nên ta có thể dùng ’ thay cho *’, nhưng phải phân biệt  và *. </para>
+        <para id="id19858344">Ta chứng minh bằng quy nạp trên  x  rằng ’(q0, x) =  *(q0, x). Tuy nhiên, điều đó có thể không đúng với x = e vì ’(q0, e) = {q0} trong khi  *(q0, e) = e-CLOSURE(q0). Do đó, cơ sở quy nạp bắt đầu với độ dài chuỗi là 1.</para>
+        <para id="id19858519">Với | x | = 1 thì x là một ký hiệu a và ’(q, a) =  *(q, a) theo định nghĩa ’.</para>
+        <para id="id19858574">Xét | x | &gt; 1: đặt x = wa với a là một ký hiệu trong . </para>
+        <para id="id19858592">Ta có ’(q, wa) = ’(’(q0, w), a)</para>
+        <para id="id19858648">Theo giả thiết quy nạp thì ’(q0, w) =  *(q0, w). Đặt  *(q0, w) = P, ta cần chỉ ra rằng (P, a) =  *(q0, wa). </para>
+        <para id="id19858765">Ta có ’(P, a) = ÈqP ’(q, a) = ÈqP  *(q, a). </para>
+        <para id="id19858858">Hơn nữa vì P =  *(q0, w) nên ÈqP  *(q, a) =  *(q0, wa) ( theo quy tắc 2 trong định nghĩa  *). </para>
+        <para id="id19275382">Vậy ’(q0, wa) =  *(q0, wa)</para>
+        <para id="id19275432">Để đầy đủ chứng minh ta còn phải chỉ ra rằng ’(q0, x) chứa một trạng thái trong F’ nếu và chỉ nếu  *(q0, x) chứa một trạng thái trong F.</para>
+        <para id="id19275489">Nếu x = e thì điều đó hiển nhiên đúng (theo định nghĩa của F’)</para>
+        <para id="id19275507">Nếu x  e thì ta đặt x = wa với a  . </para>
+        <para id="id19275550">Nếu  *(q0, x) chứa một trạng thái trong F thì chắc chắn ’(q0, x) chứa cùng trạng thái trong F’. Ngược lại, nếu ’(q0, x) chứa một trạng thái trong F’ khác hơn q0 thì (q0, x) phải chứa một trạng thái trong F (vì tập F và F’ chỉ chênh lệch nhau trạng thái q0). Nếu ’(q0, x) có chứa trạng thái q0 và q0 cũng là một trạng thái thuộc tập trạng thái kết thúc F thì vì  *(q0, x) = e-CLOSURE(( *(q0, w),a)), nên trạng thái chung trong e-CLOSURE(q0) và trong F phải ở trong  *(q0, x).</para>
+        <para id="id19275814">Thí dụ 3.9 : Chuyển NFA với e-dịch chuyển ở hình 3.4 sang dạng NFA không có chứa e-dịch chuyển. </para>
+        <para id="id19275850">Ta xây dựng NFA tương đương M’(Q, , ’, q0, F’) chấp nhận L(M) với các thành phần : . Q = {q0, q1, q2}</para>
+        <para id="id19275924"> . å = {0, 1, 2}</para>
+        <para id="id19275946"> . Trạng thái bắt đầu : q0</para>
+        <para id="id19275967">. F' = {q0, q2} do e-CLOSURE(q0) = {q0, q1, q2} có chứa q2  F</para>
+        <para id="id19276053">. Hàm chuyển ’ của M’ được xác định theo công thức :</para>
+        <para id="id19276079">d’(q, a) = d*(q, a) = e-CLOSURE(d(d*(q0, e), a)</para>
+        <para id="id19276149">Kết quả được chỉ ra trong bảng hàm chuyển sau :</para>
+        <table id="id19276160" summary="">
+          <tgroup cols="4">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <colspec colnum="4" colname="c4"/>
+            <tbody>
+              <row>
+                <entry>d’</entry>
+                <entry namest="c2" nameend="c4">Inputs</entry>
+              </row>
+              <row>
+                <entry>Trạng thái</entry>
+                <entry>0 </entry>
+                <entry>1</entry>
+                <entry>2</entry>
+              </row>
+              <row>
+                <entry>q0</entry>
+                <entry>{q0, q1, q2} </entry>
+                <entry>{q1, q2}</entry>
+                <entry>{q2}</entry>
+              </row>
+              <row>
+                <entry>q1</entry>
+                <entry>Æ</entry>
+                <entry>{q1, q2}</entry>
+                <entry>{q2}</entry>
+              </row>
+              <row>
+                <entry>q2</entry>
+                <entry>Æ</entry>
+                <entry>Æ</entry>
+                <entry>{q2}</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id19276510">Sơ đồ chuyển trạng thái: </para>
+        <figure id="id19276519">
+          <media id="id1171168555663" alt=""><image src="../../media/graphics6-d03e.png" mime-type="image/png" height="127" width="341"/></media>
+        </figure>
+        <para id="id19276543">Hình 3.5 - NFA tương đương cho thí dụ 3.9</para>
+      </section>
+      <section id="id-317299450098">
+        <title>Giải thuật xây dựng DFA từ NFA</title>
+        <para id="id19276566">Qua khảo sát các dạng mở rộng từ mô hình ôtômát hữu hạn ban đầu, ta thấy DFA thực chất là một trường hợp đặc biệt của NFA, nhưng :</para>
+        <para id="id19276579">- Nó không có sự truyền rỗng (truyền trên nhãn e)</para>
+        <para id="id19276596">- Với mỗi trạng thái q và ký hiệu nhập a, chỉ có duy nhất một đường truyền đến một trạng thái khác. </para>
+        <para id="id19276611">Giả sử mỗi trạng thái của DFA là một tập trạng thái của NFA, DFA dùng trạng thái của mình để lưu giữ tất cả các trạng thái của NFA đạt được sau khi NFA đọc một ký tự nhập. Như vậy sau khi đọc các ký tự nhập a1, a2, ... , an, DFA ở trạng thái là tập con của các trạng thái thuộc NFA, đạt được khi NFA đi từ trạng thái bắt đầu theo một con đường nào đó có tên a1a2 ... an. Số trạng thái của DFA lúc đó phải bằng số phần tử trong tập lũy thừa của số trạng thái NFA. Song, trên thực tế trường hợp xấu nhất này ít khi xảy ra. Các trạng thái thực sự được dùng trong sơ đồ chuyển cho một DFA sẽ được xác định theo các phép chuyển trạng thái trên nhãn là mọi ký hiệu từ trạng thái bắt đẩu của DFA, và sau đó lần lượt được bổ sung thêm vào tập trạng thái nếu như nó chưa có trong đó.</para>
+        <para id="id19276697">Giải thuật chi tiết được trình bày như sau : </para>
+        <para id="id19276703">Input: Một ôtômát hữu hạn không đơn định NFA.</para>
+        <para id="id19276721">Output: Một ôtômát hữu hạn đơn định DFA nhận dạng cùng ngôn ngữ như NFA.</para>
+        <para id="id19276736">Phương pháp: Xây dựng bảng hàm chuyển cho DFA mô phỏng đồng thời tất cả các chuyển dịch của NFA trên chuỗi nhập cho trước.</para>
+        <para id="id19276753">Ta dùng các tác vụ sau để lưu giữ các tập trạng thái của NFA :</para>
+        <para id="id19276763">(q : là một trạng thái của NFA, T : là tập trạng thái của NFA)</para>
+        <para id="id19276770">a) e-closure(q) : là tập trạng thái của NFA đạt được từ trạng thái q trên sự truyền rỗng.</para>
+        <para id="id19276789">b) e-closure(T) : là tập trạng thái của NFA đạt được từ tất cả các trạng thái q thuộc tập T trên sự truyền rỗng.</para>
+        <para id="id19276810">c) d(T, a) : là tập trạng thái của NFA đạt được từ tất cả các trạng thái q thuộc tập T trên sự truyền bằng ký hiệu a.</para>
+        <para id="id19276830">Phân tích: </para>
+        <para id="id19276843">Trước khi đọc vào một ký tự nhập, DFA có thể ở một trạng thái bất kỳ trong các trạng thái thuộc e-closure(q0) với q0 là trạng thái bắt đầu của NFA. Gọi trạng thái này là T. Giả sử các trạng thái của T là các trạng thái đạt được từ q0 trên các ký hiệu nhập và giả sử a là ký hiệu nhập kế tiếp. Khi đọc a, NFA có thể chuyển đến một trạng thái bất kỳ trong tập trạng thái d(T, a). Khi chúng ta cho phép sự truyền rỗng, NFA có thể ở bất kỳ trạng thái nào trong e-closure(d(T, a)) sau khi đã đọc a.</para>
+        <para id="id19276931">Giải thuật :</para>
+        <para id="id19276935"/>
+        <para id="id19276958">Trạng thái bắt đầu -closure(q0) chỉ là một trạng thái trong các trạng thái </para>
+        <para id="id19276985">của DFA và trạng thái này chưa được đánh dấu;</para>
+        <para id="id19276995">While Có một trạng thái T của DFA chưa được đánh dấu do </para>
+        <para id="id19277016">Begin</para>
+        <para id="id19277024"> Đánh dấu T; { xét trạng thái T}</para>
+        <para id="id19277039"> For Với mỗi ký hiệu nhập a do</para>
+        <para id="id19277064">begin</para>
+        <para id="id19277077"> U:= -closure((T, a))</para>
+        <para id="id19277108">If U không có trong tập trạng thái của DFA then</para>
+        <para id="id19277134">begin</para>
+        <para id="id19277148">Thêm U vào tập các trạng thái của DFA và trạng thái</para>
+        <para id="id19277154">này chưa được đánh dấu;</para>
+        <para id="id19277163"> [T, a] := U; {[T, a] là phần tử của bảng chuyển DFA}end;</para>
+        <para id="id19277204">end;</para>
+        <para id="id19277217"> End;</para>
+        <para id="id19277232">Ta xây dựng các trạng thái và bảng hàm chuyển cho DFA theo cách như sau :</para>
+        <para id="id19277243">- Mỗi trạng thái của DFA tượng trưng bởi một tập trạng thái của NFA mà NFA có thể chuyển đến sau khi đọc một chuỗi ký hiệu nhập gồm: tất cả sự truyền rỗng có thể xảy ra trước hoặc sau các ký hiệu được đọc. </para>
+        <para id="id19277261">- Trạng thái bắt đầu của DFA là e-closure(q0)</para>
+        <para id="id19277287">- Các trạng thái và hàm chuyển sẽ được thêm vào D bằng giải thuật trên.</para>
+        <para id="id19277299">- Một trạng thái của DFA là trạng thái kết thúc nếu nó là tập các trạng thái của NFA chứa ít nhất một trạng thái kết thúc của NFA.</para>
+        <para id="id19277310">Việc tính toán e-closure(T) có thể xem như quá trình tìm kiếm một đồ thị của các nút từ các nút cho trước và đồ thị bao gồm toàn những cạnh có nhãn e của NFA. Giải thuật đơn giản để tìm e-closure(T) là dùng Stack để lưu giữ các trạng thái mà cạnh của chúng chưa được kiểm tra cho sự truyền rỗng.</para>
+        <para id="id19277357">Thí dụ 3.10 : Tạo DFA từ NFAe sau </para>
+        <figure id="id19277381">
+          <media id="id8891068" alt=""><image src="../../media/graphics7-38e6.png" mime-type="image/png" height="198" width="622"/></media>
+        </figure>
+        <para id="id19277405"/>
+        <para id="id19277410">Hình 3.6 – Thí dụ chuyển NFA có -dịch chuyển</para>
+        <para id="id19277432">Các bước xây dựng tập trạng thái cho DFA :</para>
+        <list id="id19277441" list-type="enumerated">
+          <item>Trạng thái bắt đầu của DFA : -closure(0) = {0, 1, 2, 4, 7} = A*</item>
+          <item>-closure((A, a)) = -closure({3, 8}) = {1, 2, 3, 4, 6, 7, 8} = B*</item>
+          <item>-closure((A, b)) = -closure({5}) = {1, 2, 4, 5, 6, 7} = C*</item>
+          <item>-closure((B, a)) = -closure({3, 8}) = B</item>
+          <item>-closure((B, b)) = -closure({5, 9}) = {1, 2, 4, 5, 6, 7, 9} = D*</item>
+          <item>-closure((C, a)) = -closure({3, 8}) = B</item>
+          <item>-closure((C, b)) = -closure({5}) = C</item>
+          <item>-closure((D, a)) = -closure({3, 8}) = B</item>
+          <item>-closure((D, b)) = -closure({5, 10}) = {1, 2, 4, 5, 6, 7, 10} = E*</item>
+          <item>-closure((E, a)) = -closure({3, 8}) = B</item>
+          <item>-closure((E, b)) = -closure({5}) = C</item>
+        </list>
+        <para id="id20449129">Từ các tập trạng thái này, ta xác định được A là trạng thái bắt đầu, E là trạng thái kết thúc (vì trong E có chứa trạng thái 10 là trạng thái kết thúc của NFA) và bảng hàm chuyển của DFA như sau :</para>
+        <table id="id20449145" summary="">
+          <tgroup cols="3">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <tbody>
+              <row>
+                <entry>Trạng thái</entry>
+                <entrytbl namest="c2" nameend="c3" cols="2">
+                  <colspec colnum="1" colname="c1"/>
+                  <colspec colnum="2" colname="c2"/>
+                  <tbody>
+                    <row>
+                      <entry namest="c1" nameend="c2">Ký hiệu nhập</entry>
+                    </row>
+                    <row>
+                      <entry>a</entry>
+                      <entry>b</entry>
+                    </row>
+                  </tbody>
+                </entrytbl>
+              </row>
+              <row>
+                <entry>A</entry>
+                <entry>B</entry>
+                <entry>C</entry>
+              </row>
+              <row>
+                <entry>B</entry>
+                <entry>B</entry>
+                <entry>D</entry>
+              </row>
+              <row>
+                <entry>C</entry>
+                <entry>B</entry>
+                <entry>C</entry>
+              </row>
+              <row>
+                <entry>D</entry>
+                <entry>B</entry>
+                <entry>E</entry>
+              </row>
+              <row>
+                <entry>E</entry>
+                <entry>B</entry>
+                <entry>C</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id20449393">Từ bảng hàm chuyển như trên, ta xây dựng sơ đồ chuyển trạng thái cho DFA tương đương nhận dạng cùng ngôn ngữ có dạng như sau :</para>
+        <figure id="id20449409">
+          <media id="id1171176022425" alt=""><image src="../../media/graphics8-f6ce.png" mime-type="image/png" height="175" width="380"/></media>
+        </figure>
+        <para id="id20449433">Hình 3.7 – DFA tương đương cho thí dụ 3.10</para>
+        <para id="id20449446">Nhận xét : Mặc dù có sự khác nhau trong định nghĩa, ta thấy dạng không đơn định NFA được định nghĩa tổng quát hơn dạng đơn định DFA, nhưng rõ ràng khả năng nhận dạng cùng lớp ngôn ngữ của chúng là tương đương nhau. Trong thực tế, các máy tính số hoàn toàn là đơn định, trạng thái của chúng tại mỗi thời điểm là xác định được duy nhất từ một chuỗi nhập bất kỳ và trạng thái bắt đầu.</para>
+        <para id="id20449472">Câu hỏi :</para>
+        <para id="id20449484">?</para>
+        <para id="id20449597">Tại sao cần định nghĩa dạng không đơn định ?</para>
+        <para id="id20449603">Một số gợi ý câu trả lời: </para>
+        <list id="id20449609" list-type="enumerated">
+          <item>Trong một số các bài toán mang tính chọn lựa, có nhiều hướng giải quyết (nhiều cách đi) như trong các chương trình trò chơi (games) thì thông thường hướng giải quyết tốt nhất (cách đi tốt nhất) là không biết trước được, nhưng có thể tìm thấy được bằng cách sử dụng chiến lược tìm kiếm quay lui (back-tracking). Khi có một vài khả năng chọn lựa có thể, ta chọn một khả năng trong chúng và đi theo hướng đó cho đến khi xác định hướng đó là tốt nhất hay chưa. Nếu chưa phải là hướng tốt nhất, ta phải quay về điểm quyết định cuối cùng trước đó và thử khảo sát theo một hướng khác. Một giải thuật mô phỏng quá trình tìm kiếm quay lui này là một giải thuật không đơn định. </item>
+          <item>Không đơn định đôi khi còn rất hữu hiệu trong việc giúp giải quyết các bài toán dễ dàng. Chẳng hạn, trong một số bài toán thì việc xây dựng một NFA có vẻ tự nhiên và đơn giản hơn việc tìm một DFA cho chúng. Tương tự như vậy, không đơn định còn là một cơ chế hiệu quả dùng mô tả văn phạm sinh ra ngôn ngữ một cách súc tích (sự chọn lựa các luật sinh sinh từ cùng một biến).</item>
+          <item>Trong thực tế, một vài kết quả là dễ dàng được chứng minh đối với NFA hơn là DFA. Vì vậy việc cho phép cơ chế không đơn định thường làm đơn giản hóa các lý luận hình thức mà không ảnh hưởng đến tính tổng quát của kết luận.</item>
+        </list>
+      </section>
+    </section>
+    <section id="id-371306352711">
+      <title>BIỂU THỨC CHÍNH QUY (RE : Regular Expressions)</title>
+      <para id="id20449688">Lớp ngôn ngữ được chấp nhận bởi một ôtômát hữu hạn cũng có thể được mô tả thông qua một dạng biểu thức ngắn gọn và súc tích gọi là biểu thức chính quy. Trong phần này, chúng ta sẽ giới thiệu sự kết hợp của các phép toán hợp, nối kết và bao đóng Kleene trên các tập hợp chuỗi để định nghĩa biểu thức chính quy và chứng tỏ rằng lớp ngôn ngữ được chấp nhận bởi một ôtômát hữu hạn thì thực sự là lớp ngôn ngữ được mô tả bởi biểu thức chính quy.</para>
+      <section id="id-442313882115">
+        <title>Định nghĩa</title>
+        <para id="id20449723">Cho  là một bộ chữ cái. Biểu thức chính quy trên  và các tập hợp mà chúng mô tả được định nghĩa một cách đệ quy như sau:</para>
+        <para id="id20449753">1)  là biểu thức chính quy ký hiệu cho tập rỗng</para>
+        <para id="id20449774">2)  là biểu thức chính quy ký hiệu cho tập {}</para>
+        <para id="id20449803">3) a  , a là biểu thức chính quy ký hiệu cho tập {a}</para>
+        <para id="id20449851">4) Nếu r và s là các biểu thức chính quy ký hiệu cho các tập hợp R và S thì (r + s), (rs) và ( r*) là các biểu thức chính quy ký hiệu cho các tập hợp R  S, RS, R* tương ứng.</para>
+        <para id="id20449922">Trong khi viết biểu thức chính quy ta có thể bỏ bớt các dấu ngoặc đơn với lưu ý rằng thứ tự ưu tiên của các phép toán xếp theo thứ tự giảm dần là: phép bao đóng, phép nối kết, phép hợp.</para>
+        <para id="id20449946">Chẳng hạn : Biểu thức ((0(1*)) + 1) có thể viết là 01*+ 1. </para>
+        <para id="id20449977">Câu hỏi :</para>
+        <para id="id20449989">?</para>
+        <para id="id20450102">Như trên ta nói, biểu thức chính quy dùng ký hiệu cho một lớp ngôn ngữ. Bạn</para>
+        <para id="id20450109">hãy thử liệt kê một vài chuỗi và hình dung lớp ngôn ngữ được ký hiệu bởi biểu</para>
+        <para id="id20450117">thức chính quy r = 01*+ 1 trên ?</para>
+        <para id="id20450138">Phép toán bao đóng dương cũng có thể được sử dụng khi viết biểu thức chính quy. Ta có thể viết rút gọn rr* hay r*r thành r+. </para>
+        <para id="id20450187">Nếu cần thiết phân biệt thì ta sẽ dùng ký hiệu r cho biểu thức chính quy r và L(r) cho ngôn ngữ được ký hiệu bởi biểu thức chính quy r; ngược lại một cách tổng quát, ta có thể dùng r cho cả hai.</para>
+        <para id="id20450203"/>
+        <para id="id20450207">Thí dụ 3.11 : Một số biểu thức chính quy ký hiệu cho các ngôn ngữ :</para>
+        <para id="id20450221">. 00 là biểu thức chính quy biểu diễn tập {00}. </para>
+        <para id="id20450239">. (0+1)* ký hiệu cho tập hợp tất cả các chuỗi số 0 và số 1, kể cả chuỗi rỗng </para>
+        <para id="id20450262">= {e, 0, 1, 00, 01, 10, 11, 010, 011, 0010 ... } </para>
+        <para id="id20450278">. (0+1)*00(0+1)* ký hiệu cho tập hợp tất cả các chuỗi 0,1 có ít nhất hai số 0 liên tiếp. </para>
+        <para id="id20450310">= {00, 000, 100, 0000, 0001, 1000, 1001, 011001, ... }</para>
+        <para id="id20450315">. (1+10)* ký hiệu cho tất cả các chuỗi 0, 1 bắt đầu bằng số 1 và không có hai số 0 liên tiếp = {e, 1, 10, 11, 1010, 111, 101010, ... }</para>
+        <para id="id20450354">. (0+)(1+10)* ký hiệu cho tất cả các chuỗi không có hai số 0 liên tiếp.</para>
+        <para id="id20450385">= {e, 0, 01, 010, 1, 10, 01010, 0111, ... } </para>
+        <para id="id20450408">. (0+1)*011 ký hiệu cho tất cả các chuỗi 0, 1 tận cùng bởi 011.</para>
+        <para id="id20450434">= {011, 0011, 1011, 00011, 11011, ... } </para>
+        <para id="id20450449">. 0*1*2* ký hiệu cho tất cả các chuỗi có một số bất kỳ các số 0, theo sau là một số bất kỳ số 1 và sau nữa là một số bất kỳ số 2.</para>
+        <para id="id20450491">= {e, 0, 1, 2, 01, 02, 12, 012, 0012, 0112, ... } </para>
+        <para id="id20450514">. 00*11*22* ký hiệu cho tất cả các chuỗi trong tập 0*1*2* với ít nhất một trong mỗi ký hiệu. 00*11*22* có thể được viết gọn thành 0+1+2+</para>
+        <para id="id20450626">Thí dụ 3.12 : Biểu thức chính quy ký hiệu cho tập hợp các chuỗi tên biến đúng trong ngôn ngữ lập trình Pascal :</para>
+        <para id="id20450642">Một chuỗi tên biến (identifiers) được gọi là hợp lệ trong một chương trình Pascal nếu như nó bắt đầu bằng ít nhất một chữ cái và theo sau đó là các chữ cái, số, ký hiệu underline hoặc một vài ký hiệu cho phép khác trên bàn phím máy tính.</para>
+        <para id="id20450658">Biểu thức chính quy có dạng như sau :</para>
+        <para id="id20450665">r = (A + …+ Z + a + … + z) (A + …+ Z + a + … + z + 0 + … + 9 + _ + … )*</para>
+        <para id="id20450682">Thí dụ 3.13 : Biểu thức chính quy ký hiệu cho tập hợp các số nguyên trong ngôn ngữ lập trình Pascal :</para>
+        <para id="id20450698">Một chuỗi số nguyên trong một chương trình Pascal có thể bắt đầu bằng dấu âm (-) hoặc dấu dương (+) hay không chứa ký hiệu dấu, và theo sau đó là một chuỗi các ký hiệu số với ít nhất là một số.</para>
+        <para id="id20450711">Biểu thức chính quy có dạng như sau :</para>
+        <para id="id20450717">r = ( ‘+’ + ‘-‘ + ) ( 0 + … + 9 (0 + … +9 )*</para>
+        <para id="id20450764">Nhận xét : Thông thường, việc tìm một biểu thức chính quy ký hiệu cho một ngôn ngữ khó hơn việc xác định ngôn ngữ được ký hiệu bởi một biểu thức chính quy vì không có giải thuật cho loại bài toán này.</para>
+      </section>
+      <section id="id-536045470664">
+        <title>Một số tính chất đại số của biểu thức chính quy </title>
+        <para id="id20450798">Dễ dàng chứng minh rằng, nếu cho r, s, t là các biểu thức chính quy thì ta có các đẳng thức sau :</para>
+        <para id="id20450810">1.r + s = s + r2. r + r = r</para>
+        <para id="id20450824">3.r + (s+t) = (r+s) + t4. r (st) = (rs) t</para>
+        <para id="id20450838">5. r (s+t) = rs + rt6. (r+s) t = rt + st</para>
+        <para id="id20450852">7. r =  r = r8. r = r = </para>
+        <para id="id20450906">9. r +  = r10.* = </para>
+        <para id="id20450949">11. ( + r)* = r*12.r + r* = r*</para>
+        <para id="id20451004">13. ( r* )* = r*14. ( r* s* )* = (r+s)*</para>
+        <para id="id20451074">Trong đó, ta có r = s có nghĩa là L(r) = L(s). </para>
+      </section>
+    </section>
+    <section id="id-112700962404">
+      <title>SỰ TƯƠNG ĐƯƠNG GIỮA ÔTÔMÁT HỮU HẠN VÀ BIỂU THỨC CHÍNH QUY </title>
+      <para id="id20451095">Như trên đã nói, các ngôn ngữ được chấp nhận bởi ôtômát hữu hạn cũng là các ngôn ngữ được mô tả bởi biểu thức chính quy. Chính vì sự tương đương này, mà người ta gọi ngôn ngữ chấp nhận bởi ôtômát hữu hạn là các tập chính quy. Trong phần này, thông qua hai định lý, ta sẽ chỉ ra bằng quy nạp theo kích thước của (số phép toán trong) biểu thức chính quy rằng có tồn tại một NFA với e-dịch chuyển chấp nhận cùng ngôn ngữ; đồng thời với mỗi DFA cũng có một biểu thức chính quy xác định chính ngôn ngữ của nó. </para>
+      <para id="id20451129">ĐỊNH LÝ 3.3: Nếu r là biểu thức chính quy thì tồn tại một NFA với e-dịch chuyển chấp nhận L(r).</para>
+      <para id="id20451153">Chứng minh</para>
+      <para id="id20451158">Ta sẽ chứng minh quy nạp theo số phép toán của biểu thức chính quy r rằng có tồn tại một NFA M với e-dịch chuyển có một trạng thái kết thúc và không có các phép chuyển khỏi trạng thái này chấp nhận biểu thức chính quy r: L(M) = L(r).</para>
+      <para id="id20451183">. r không có phép toán:</para>
+      <para id="id20451198">Vậy r phải là , e hoặc a (với a  ). </para>
+      <para id="id20451240">Các NFA dưới đây thoả mãn điều kiện:</para>
+      <figure id="id20451254">
+        <media id="id3707391" alt=""><image src="../../media/graphics9.png" mime-type="image/png" height="88" width="551"/></media>
+      </figure>
+      <para id="id20451278">Hình 3.7 - Các NFAe cho các kết hợp đơn</para>
+      <para id="id20451305">. r có chứa các phép toán:</para>
+      <para id="id20451320">Giả sử định lý đúng với r có ít hơn i phép toán, i  1. </para>
+      <para id="id20451338">Xét r có i phép toán. Có 3 trường hợp :</para>
+      <para id="id20451347">1) r = r1+ r2. </para>
+      <para id="id20451375">Cả hai biểu thức chính quy r1, r2 có ít hơn i phép toán, vậy ta có 2 ôtômát hữu hạn NFA M1 (Q1, 1, 1, q1, {f1}) và M2 (Q2, 2, 2, q2, {f2}) sao cho L(M1) = L(r1) và L(M2) = L(r2). Vì các trạng thái có thể thay đổi tên nên ta giả sử hai tập trạng thái Q1 và Q2 là rời nhau. Đặt q0 là trạng thái bắt đầu mới và {f0} là tập trạng thái kết thúc mới, ta xây dựng NFA M (Q1  Q2  {q0, f0}, 1  2, , q0, {f0}), trong đó  được xác định như sau:</para>
+      <para id="id19286419">. d(q0, e) = {q1, q2}</para>
+      <para id="id19286468">. d(q, a) = d1(q, a) với q  Q1 - {f1} và a  1  {}</para>
+      <para id="id19286556">. d(q, a) = d2(q, a) với q  Q2 - {f2} và a  2  {}</para>
+      <para id="id19286645">. d(f1, e) = d(f2, e) = {f0}</para>
+      <para id="id19286711">­­Chú ý do giả thiết quy nạp là không có phép chuyển nào ra khỏi f1, f2 trong M1, M2. Vì vậy tất cả các phép chuyển của M1 và M2 đều có trong M. Cách xây dựng M chỉ ra trong hình a. Bất kỳ đường đi nào trong sơ đồ chuyển của M từ q0 tới f0 phải bắt đầu bằng cách đi tới q1 hoặc q2 bằng nhãn . Nếu đường đi qua q1 thì nó theo một đường đi nào đó trong M1 tới f1 rồi sau đó tới f0 bằng nhãn . </para>
+      <para id="id19286873">Tương tự trong trường hợp đường đi qua q2. Có một đưòng đi từ q0 đến f0 nhãn x khi và chỉ khi có đường đi nhãn x trong M1 từ q1 đến f1 hoặc có đường đi nhãn x trong M2 từ q2 đến f2. </para>
+      <para id="id19286964">Vậy L(M) = L(M1)  L(M2)</para>
+      <figure id="id19287001">
+        <media id="id1171166955840" alt=""><image src="../../media/graphics10.png" mime-type="image/png" height="125" width="446"/></media>
+      </figure>
+      <para id="id19287024">Hình a - Phép hợp</para>
+      <figure id="id19287044">
+        <media id="id1171178896839" alt=""><image src="../../media/graphics11.png" mime-type="image/png" height="58" width="445"/></media>
+      </figure>
+      <para id="id19287068">Hình b - Phép nối kết</para>
+      <figure id="id19287094">
+        <media id="id1171176784628" alt=""><image src="../../media/graphics12.png" mime-type="image/png" height="134" width="440"/></media>
+      </figure>
+      <para id="id19287118">Hình c - Phép bao đóng</para>
+      <para id="id19287134"> Hình 3.8 - Các NFAe cho kết hợp phức</para>
+      <para id="id19287171">2) r = r1 r2 </para>
+      <para id="id19287200">Đặt M1 và M2 là các ôtômát NFA như trong trường hợp trên và ta xây dựng ôtômát M (Q,  , , {q1}, {f2}), trong đó  được xác định như sau:</para>
+      <para id="id19287272">. (q, a) = 1(q, a) với q  Q1 - {f1} và a  1  {}</para>
+      <para id="id19287361">. d(f1, e) = {q2}</para>
+      <para id="id19287401">. (q, a) = 2(q, a) với q  Q2 và a  2  {}</para>
+      <para id="id19287482">Cách xây dựng M chỉ ra trong hình b. Mỗi đường đi trong M từ q1 tới f2 là đường đi có nhãn x từ q1 tới f1 sau đó là một cung từ f1 tới q2 nhãn  và tiếp đến là đường đi từ q2 tới f2. </para>
+      <para id="id19287575">Vậy L(M) = {xy  x  L(M1) và y  L(M2)} hay L(M) = L(M1) L(M2).</para>
+      <para id="id19287643">3) r = r*</para>
+      <para id="id19287659">Đặt M1 (Q1, 1, 1, q1, {f1}) và L(M1) = r1. </para>
+      <para id="id19287743">Xây dựng M (Q1 {q0, f0} 1, , q0, {f0}), trong đó  được cho:</para>
+      <para id="id19287828">. d(q0, e) = d(f1, e) = {q1, f0}</para>
+      <para id="id19287902">. d(q, a) = d1(q, a) với q  Q1 - {f1} và a  1  {}</para>
+      <para id="id19287990">Cách xây dựng M được chỉ ra trong hình c. Mỗi đường đi từ q0 tới f0 gồm: hoặc đường đi từ q0 tới f0 bằng nhãn ; hoặc đường đi từ q0 tới q1 bằng nhãn  và sau đó là đường đi từ q1 tới f1 trên chuỗi thuộc L(M), rồi đến f0 bằng nhãn . Như vậy có đường đi từ q0 tới f0 nhãn là x nếu và chỉ nếu ta có thể viết x = x1 x2 ... xj với j  0 (trường hợp j = 0 khi x = ) xi  L(M1). Vậy L(M) = L(M1)*.</para>
+      <para id="id19288225">Thí dụ 3.14 : Xây dựng NFA chấp nhận lớp ngôn ngữ được ký hiệu bởi biểu thức chính quy r = 01* + 1.</para>
+      <para id="id19288259">Ta thấy L(r) = { 1, 0, 01, 011, 0111, 01111, 011111, … } là tập ngôn ngữ chứa các bit đơn 0, 1 và các chuỗi bit nhị phân bắt đầu bằng bit 0, theo sau là một chuỗi bit 1 với độ dài tuỳ ý.</para>
+      <para id="id19288271">Theo quy luật thứ tự ưu tiên, biểu thức 01* + 1 thực chất là (0(1*)) + 1, vì vậy nó có dạng r1 + r2 với r1 = 01* và r2 = 1.</para>
+      <para id="id19288360">Ta sẽ lần lượt xây dựng các NFA cho các biểu thức chính quy con, sau đó dựa vào các quy tắc kết hợp để xây dựng NFA cho toàn bộ biểu thức chính quy đã cho.</para>
+      <para id="id19288374">. NFA cho r2 = 1 dễ dàng để xây dựng :</para>
+      <figure id="id19288395">
+        <media id="id1171176049151" alt=""><image src="../../media/graphics13.png" mime-type="image/png" height="51" width="241"/></media>
+      </figure>
+      <para id="id19288419">. NFA cho r1 = 01*: </para>
+      <para id="id19288449">Ta tách r1 = r3 r4 , trong đó r3 = 0 và r4 = 1*</para>
+      <para id="id19288500">+ NFA cho r3 = 0 :</para>
+      <figure id="id19288529">
+        <media id="id1171170903814" alt=""><image src="../../media/graphics14.png" mime-type="image/png" height="51" width="245"/></media>
+      </figure>
+      <para id="id19288553">+ NFA r4 = 1* :</para>
+      <para id="id19288580">Ta viết r4 = r5*, trong đó r5 = 1. </para>
+      <para id="id19288618">NFA cho r5 = 1 :</para>
+      <figure id="id19288645">
+        <media id="id1171175255502" alt=""><image src="../../media/graphics15.png" mime-type="image/png" height="51" width="241"/></media>
+      </figure>
+      <para id="id19288669">Theo quy tắc 3) ta xây dựng được NFA cho r4 = r5* = 1* như sau :</para>
+      <figure id="id19288711">
+        <media id="id1171170573439" alt=""><image src="../../media/graphics16.png" mime-type="image/png" height="140" width="472"/></media>
+      </figure>
+      <para id="id19288735">Theo quy tắc 2) ta xây dựng được NFA cho r1 = r3 r4 = 01* như sau :</para>
+      <figure id="id19288782">
+        <media id="id1171175374623" alt=""><image src="../../media/graphics17.png" mime-type="image/png" height="130" width="540"/></media>
+      </figure>
+      <para id="id19288806">Cuối cùng, theo quy tắc 1) ta xây dựng NFA cho r = r1 + r2 = 01*+ 1 như sau :</para>
+      <para id="id19288843"><media id="id1171169988139" alt=""><image src="../../media/graphics18.png" mime-type="image/png" height="180" width="623"/></media>Hình 3.9 - NFAe cho ví dụ 3.13</para>
+      <para id="id19288896"/>
+      <para id="id19288901">Phần chứng minh của Định lý 3.3 trên cũng chính là cơ sở của giải thuật chuyển đổi một biểu thức chính quy thành ôtômát hữu hạn. Một điểm cần lưu ý là thứ tự ưu tiên của các phép toán được sử dụng trong biểu thức chính quy, điều này rất quan trọng cho quá trình tách biểu thức chính quy thành các biểu thức con trong những trường hợp viết biểu thức chính quy ở dạng tắt (không có dấu ngoặc).</para>
+      <para id="id19288918">Bây giờ, ta cần chứng tỏ rằng mọi tập hợp được chấp nhận bởi một ôtômát hữu hạn thì cũng được ký hiệu bởi một số biểu thức chính quy.</para>
+      <para id="id19288932">ĐỊNH LÝ 3.4 : Nếu L được chấp nhận bởi một DFA, thì L được ký hiệu bởi một biểu thức chính quy.</para>
+      <para id="id19288947">Chứng minh</para>
+      <para id="id19288952">Đặt L là tập hợp được chấp nhận bởi DFA M ({q1, q2,..., qn}, , , q1, F). </para>
+      <para id="id19481806">Đặt Rkij là tập hợp tất cả các chuỗi x sao cho (qi, x) = qj và nếu (qi, y) = ql, với y là tiền tố bất kỳ của x, khác x hoặc , thì l  k. Tức là Rkij là tập hợp tất cả các chuỗi làm cho ôtômát đi từ trạng thái qi tới qj không đi ngang qua trạng thái nào (được đánh số) lớn hơn k. (Chú ý, khái niệm "đi ngang qua một trạng thái" có nghĩa là có phép chuyển vào và ra khỏi trạng thái đó, nên i hoặc j đều có thể lớn hơn k). Vì chỉ có n trạng thái nên Rnij sẽ là tập hợp tất cả các chuỗi làm ôtômát đi từ qi tới qj. </para>
+      <para id="id19481955">Ta định nghĩa Rkij một cách đệ quy như sau:</para>
+      <para id="id19481976"/>
+      <para id="id19481999">Rkij = Rk-1ik (Rk-1kk )* Rk-1kj È Rk-1ij (1)</para>
+      <para id="id19482097"> { a  (qi, a) = qj } nếu i  j</para>
+      <para id="id19482207">R0ij = </para>
+      <para id="id19482227">{ a  (qi, a) = qj }  {} nếu i = j</para>
+      <para id="id19482291">Một cách hình thức, Rkij định nghĩa như trên là các chuỗi nhập hay nguyên nhân đưa M từ qi tới qj không đi ngang qua trạng thái cao hơn qk, nghĩa là xảy ra hoặc một trong hai trường hợp sau :</para>
+      <list id="id19482344" list-type="enumerated">
+        <item>Nằm trong Rk-1ij (để không bao giờ đi ngang qua một trạng thái nào cao như qk).</item>
+        <item>Bao gồm một chuỗi trong Rk-1ik (chuỗi làm M chuyển đến qk), theo sau bởi không hoặc nhiều chuỗi trong Rk-1kk (chuỗi làm M chuyển từ qk trở về qk mà không ngang qua qk hoặc một trạng thái nào cao hơn) và cuối cùng là một chuỗi trong Rk-1kj (chuỗi làm M chuyển từ qk đến qj ).</item>
+      </list>
+      <para id="id19482757">Ta sẽ chỉ ra rằng với mỗi i, j và k tồn tại biểu thức chính quy rkij ký hiệu cho ngôn ngữ Rkij. Ta quy nạp theo k như sau:</para>
+      <para id="id19482798">. k = 0 : khi đó R0ij là tập hợp hữu hạn các chuỗi có một ký hiệu hoặc . Vậy r0ij có thể viết dưới dạng a1 + a2 + ... + ap (hoặc a1 + a2 + ... + ap+  nếu i = j). Trong đó {a1, a2,..., ap} là tập hợp tất cả các ký hiệu a sao cho (qi, a) = qj. Nếu không có ký hiệu a nào như thế thì  (hoặc  khi i = j) ký hiệu cho r0ij.</para>
+      <para id="id19483002">. Công thức (1) cho Rkij chỉ liên quan đến các phép toán trên biểu thức chính quy: hợp, nối kết, và bao đóng. Hơn nữa theo giả thiết quy nạp, với mỗi l, k và m tồn tại biểu thức chính quy rk-1lm sao cho L(rk-1lm) = Rk-1lm. Vậy đối với rkij ta có thể chọn biểu thức chính quy :</para>
+      <para id="id19483098">(rk-1ik) (rk-1kk)* (rk-1kj) + rk-1ij </para>
+      <para id="id19483163">Cuối cùng ta có nhận xét rằng L(M) = Èqj  F Rn1j vì Rn1j ký hiệu cho tất cả các nhãn của tất cả các đường đi từ q1 tới qj. </para>
+      <para id="id19483243">Vậy L(M) được ký hiệu bởi biểu thức chính quy r = rn1j1 + rn1j2+ ... + rn1jp, trong đó tập F = {qj1, qj2,..., qjp}</para>
+      <para id="id19483321">Thí dụ 3.15 : Viết biểu thức chính quy ký hiệu cho ngôn ngữ được chấp nhận bởi DFA sau :</para>
+      <figure id="id19483339">
+        <media id="id1171175351225" alt=""><image src="../../media/graphics19.png" mime-type="image/png" height="122" width="329"/></media>
+      </figure>
+      <para id="id19483363">Hình 3.10 – DFA cho ví dụ 3.13</para>
+      <para id="id19483380">Gọi DFA được chỉ ra trong hình 3.10 là M ({q1, q2, q3}, {0, 1}, , q1, {q2, q3}). Ta thấy, tập hợp tất cả các chuỗi được chấp nhận bởi DFA trên là các chuỗi làm cho ôtômát chuyển từ trạng thái bắt đầu q1 đến một trong hai trạng thái kết thúc q2 và q3 và không chuyển qua số tối đa là 3 (k = 3) trạng thái của ôtômát. Vậy ta cần viết biểu thức chính quy ký hiệu cho tập hợp này như sau :</para>
+      <para id="id19483487">r = r312 + r313</para>
+      <para id="id19483516">Theo công thức đã được chứng minh trong Định lý, ta có thể tính được các giá trị rkij với i, j là chỉ số các trạng thái từ 1 đến 3 và với k = 0, 1 và 2, như chỉ ra trong bảng sau:</para>
+      <table id="id19483543" summary="">
+        <tgroup cols="4">
+          <colspec colnum="1" colname="c1"/>
+          <colspec colnum="2" colname="c2"/>
+          <colspec colnum="3" colname="c3"/>
+          <colspec colnum="4" colname="c4"/>
+          <tbody>
+            <row>
+              <entry/>
+              <entry>k = 0</entry>
+              <entry>k = 1</entry>
+              <entry>k = 2</entry>
+            </row>
+            <row>
+              <entry>rk11</entry>
+              <entry></entry>
+              <entry></entry>
+              <entry>(00)*</entry>
+            </row>
+            <row>
+              <entry>rk12</entry>
+              <entry>0</entry>
+              <entry>0</entry>
+              <entry>0(00)*</entry>
+            </row>
+            <row>
+              <entry>rk13</entry>
+              <entry>1</entry>
+              <entry>1</entry>
+              <entry>0*1</entry>
+            </row>
+            <row>
+              <entry>rk21</entry>
+              <entry>0</entry>
+              <entry>0</entry>
+              <entry>0(00)*</entry>
+            </row>
+            <row>
+              <entry>rk22</entry>
+              <entry></entry>
+              <entry> + 00</entry>
+              <entry>(00)*</entry>
+            </row>
+            <row>
+              <entry>rk23</entry>
+              <entry>1</entry>
+              <entry>1 + 01</entry>
+              <entry>0*1</entry>
+            </row>
+            <row>
+              <entry>rk31</entry>
+              <entry></entry>
+              <entry></entry>
+              <entry>(0 + 1)(00)*0</entry>
+            </row>
+            <row>
+              <entry>rk32</entry>
+              <entry>0 + 1</entry>
+              <entry>0 + 1</entry>
+              <entry>(0 + 1)(00)*</entry>
+            </row>
+            <row>
+              <entry>rk33</entry>
+              <entry></entry>
+              <entry></entry>
+              <entry> + (0 + 1)0*1</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <para id="id19484187">Bằng cách dùng các công thức tương đương như (r + s) t = rt + st và ( + r)* = r* để đơn giản các biểu thức, chẳng hạn khi tính biểu thức : </para>
+      <para id="id19484225">r122 = r021 (r011 )* r012 + r022 = 0()*0 +  = 00 + </para>
+      <para id="id19484350">Tương tự, khi đơn giản biểu thức </para>
+      <para id="id19484357">r213 = r112 (r122 )* r123 + r113 = 0(00 + )*(1 + 01) + 1 </para>
+      <para id="id19484464">ta nhận thấy (00 + )* tương đương với (00)* và (1 + 01) thì tương đương với ( + 0)1 nên ta rút gọn :</para>
+      <para id="id19484532">r213 = 0(00)*( + 0)1 + 1</para>
+      <para id="id19879655">Mặt khác, chú ý rằng (00)*( + 0) thì tương đương với 0*, vì thế 0(00)*( + 0)1 + 1 cũng bằng 00*1 + 1 hay cuối cùng là 0*1.</para>
+      <para id="id19879768">Để hoàn thành việc xây dựng biểu thức chính quy cho M, ta cần tính r312 và r313. Ta viết:</para>
+      <para id="id19879802">r312 = r213 (r233 )* r232 + r212 </para>
+      <para id="id19879884">= 0*1( + (0 + 1)0*1)*(0 ­+ 1)(00)* + 0(00)* </para>
+      <para id="id19879949">= 0*1((0 + 1)0*1)*(0 ­+ 1)(00)* + 0(00)* </para>
+      <para id="id19880005">và</para>
+      <para id="id19880010">r313 = r213 (r233 )* r233 + r213 </para>
+      <para id="id19880092">= 0*1( + (0 + 1)0*1)*( + (0 ­+ 1))0*1) + 0*1 </para>
+      <para id="id19880169">= 0*1((0 + 1)0*1)* </para>
+      <para id="id19880208">Vậy biểu thức chính quy có dạng :</para>
+      <para id="id19880214"> r = r312 + r313 = 0*1((0 + 1)0*1)*( + (0 ­+ 1)(00)*) + 0(00)* </para>
+      <para id="id19880314"/>
+    </section>
+    <section id="id-195319218266">
+      <title>MỘT VÀI ỨNG DỤNG CỦA ÔTÔMÁT HỮU HẠN </title>
+      <para id="id19880328">Có nhiều kiểu phần mềm thiết kế nhằm đặc tả sự chuyển đổi tự động từ dạng biểu thức chính quy sang việc cài đặt máy tính một cách hiệu quả tương ứng với ôtômát hữu hạn. Trong phần này, ta sẽ đề cập đến hai ứng dụng trong số chúng.</para>
+      <section id="id-366675741521">
+        <title>Bộ phân tích từ vựng </title>
+        <para id="id19880353"/>
+        <para id="id19880357">Các ký hiệu từ vựng (token) trong một ngôn ngữ lập trình thì hầu hết không có sự ngọai lệ, được biểu diễn như các tập hợp chính quy. Chẳng hạn, các định danh của ALGOL: các chữ cái viết hoa hoặc thường, theo sau bởi một dãy bất kỳ của chữ cái (letter) hoặc chữ số (digit) với độ dài không giới hạn có thể được biểu diễn như sau :</para>
+        <para id="id19880374">(letter) (letter + digit)*</para>
+        <para id="id19880386">trong đó "letter" thay thế cho A + B +...+ Z + a + b +...+ z và "digit" là 0 + 1 +...+ 9.</para>
+        <para id="id19880398">Một ví dụ khác, các định danh của FORTRAN có độ dài giới hạn là 6 và các chữ cái chỉ cho phép dùng chữ viết hoa hoặc ký hiệu $ được biểu diễn như sau :</para>
+        <para id="id19880412">(letter) ( + letter + digit)5</para>
+        <para id="id19880433">với "letter" là $ + A + B + ... + Z .</para>
+        <para id="id19880439">Trong SNOBOL, các hằng số số học có thể được biểu diễn như sau :</para>
+        <para id="id19880449">( + ) (digit + ( digit * + ) +  digit+ )</para>
+        <para id="id19880521">Một số công cụ phát sinh bộ phân tích từ vựng nhận input như một dãy các biểu thức chính quy mô tả các ký hiệu từ vựng và phát sinh một ôtômát hữu hạn đơn giản nhận dạng mọi ký hiệu từ vựng. Thông thường, chúng chuyển đổi biểu thức chính quy thành một NFA với -dịch chuyển và sau đó xây dựng tập hợp con các trạng thái để có thể phát sinh DFA một cách trực tiếp hơn là tìm cách loại bỏ các phép chuyển nhãn . Mỗi trạng thái kết thúc xác định ký hiệu từ vựng cụ thể đã tìm thấy. Hàm chuyển của FA sẽ được mã hóa bằng một trong vài cách nhằm chiếm ít không gian hơn so với bảng hàm chuyển tổ chức dưới dạng mảng hai chiều. Bộ phân tích từ vựng được thiết lập bằng cách phát sinh một chương trình cố định thông dịch các bảng mã, cùng với các bảng minh họa cụ thể sự nhận dạng của FA trên các ký hiệu từ vựng (viết dưới dạng các biểu thức chính quy). Bộ phân tích từ vựng dạng này có thể được dùng như một chương trình con độc lập (module) trong một trình biên dịch ngôn ngữ.</para>
+      </section>
+      <section id="id-78087912891">
+        <title>Trình soạn thảo văn bản </title>
+        <para id="id19880597">Hiển nhiên, các trình soạn thảo văn bản hoặc các chương trình tương tự cho phép thay thế một chuỗi bởi mọi chuỗi kết hợp với một biểu thức chính quy cho trước. </para>
+        <para id="id19880611">Chẳng hạn, trình soạn thảo văn bản ed trong UNIX cho phép một câu lệnh như sau :</para>
+        <para id="id19880630">/aba*c/</para>
+        <para id="id19880635">để tìm sự xuất hiện đầu tiên của chuỗi có dạng như trên. Hay câu lệnh :</para>
+        <para id="id19880641">s/bbb*/b/</para>
+        <para id="id19880646">cho phép thay thế các chuỗi có dạng bbb* thành chuỗi có một ký tự b.</para>
+        <para id="id19880673">Hay trong các câu lệnh của MS-DOS và NC, ví dụ câu lệnh :</para>
+        <para id="id19880680">Del tmp*.???</para>
+        <para id="id19880704">sẽ cho phép xóa đi tất cả các file với tên tập tin bắt đầu bằng tmp, sau đó là một chuỗi bắt kỳ và có phần mở rộng là 3 ký tự tùy ý. Dấu * trong trường hợp này ký hiệu cho một chuỗi bất kỳ, còn dấu ? ký hiệu cho một ký tự tùy ý. Đây cũng là một dạng ký hiệu của biểu thức chính quy thay thế cho chuỗi.</para>
+        <para id="id19880749">Hay chẳng hạn, một ví dụ về xử lý chuỗi khác được áp dụng cho việc tìm kiếm theo mẫu trên các trang Web. </para>
+        <para id="id19880761">Trong tất cả các ví dụ trên, ký hiệu * xác định “mọi” biểu thức a1 + a2 + ... + an trong đó các ai là tất cả các ký tự cho phép trong máy tính trừ ký tự xuống dòng (newline). Ta có thể chuyển một biểu thức chính quy r sang DFA chấp nhận mọi r. Chú ý rằng sự hiện diện của ký hiệu * sẽ cho phép ta nhận dạng một thành phần của L(r) bắt đầu từ bất kỳ vị trí nào trong dòng. Để làm được điều này, các ứng dụng phải thực hiện quá trình chuyển đổi từ một biểu thức chính quy sang NFA. Và vì cơ chế hoạt động của NFA khá phức tạp nên thông thường ngay sau đó, NFA lại phải được biến đổi tiếp thành dạng DFA tương đương. Tuy nhiên, sự chuyển đổi từ một biểu thức chính quy sang DFA tốn nhiều thời gian hơn việc sử dụng DFA để kiểm tra các mẫu bằng cách duyệt qua chúng một lần, tuy DFA có thể có số trạng thái là hàm mũ của độ dài biểu thức chính quy. </para>
+        <para id="id19880856">Thực tế, trong trình soạn thảo văn bản UNIX, biểu thức chính quy với mọi r được chuyển thành một NFA có -dịch chuyển và sau đó NFA này được mô phỏng một cách trực tiếp. </para>
+        <para id="id19880880">Câu hỏi :</para>
+        <para id="id19880892">?</para>
+        <para id="id19881005">Hãy tự liên hệ một số các ứng dụng thực tế khác dùng cơ chế ôtômát hữu hạn ?</para>
+        <para id="id19881015">Tổng kết chương III: Phần nội dung chương III tập trung nghiên cứu cơ chế hoạt động của các dạng ôtômát hữu hạn, mối tương quan giữa chúng, cũng như sự tương đương của chúng với biểu thức chính quy. Tùy theo các yêu cầu thực tế của ứng dụng, ta có thể chuyển từ dạng phức tạp nhất sang các dạng đơn giản hơn. Có thể tóm tắt sự tương quan giữa các Định lý trong chương này theo sơ đồ sau :</para>
+        <figure id="id19881041">
+          <media id="id1171169721893" alt=""><image src="../../media/graphics20.png" mime-type="image/png" height="201" width="366"/></media>
+        </figure>
+        <para id="id19881065">BÀI TẬP CHƯƠNG III</para>
+        <para id="id19881073">3.1. Mô tả ngôn ngữ được chấp nhận bởi các ôtômát hữu hạn với sơ đồ chuyển được cho như sau :</para>
+        <para id="id19881094">a) </para>
+        <figure id="id19881105">
+          <media id="id1171169763227" alt=""><image src="../../media/graphics21.png" mime-type="image/png" height="82" width="316"/></media>
+        </figure>
+        <para id="id19881129">b)</para>
+        <figure id="id19881136">
+          <media id="id4001250" alt=""><image src="../../media/graphics22.png" mime-type="image/png" height="123" width="427"/></media>
+        </figure>
+        <para id="id19881160">3.2. Xây dựng các sơ đồ chuyển ôtômát hữu hạn chấp nhận các ngôn ngữ sau trên bộ chữ cái  = {0, 1}</para>
+        <list id="id19881185" list-type="enumerated">
+          <item>Tập các chuỗi kết thúc là 00.</item>
+          <item>Tập các chuỗi có 3 ký hiệu 0 liên tiếp.</item>
+        </list>
+        <para id="id19881204">c) Tập các chuỗi mà ký hiệu thứ 3 kể từ cận phải của chuỗi là 1.</para>
+        <para id="id19881216">d) Tập mọi chuỗi mà bất cứ chuỗi con nào có độ dài bằng 5 đều có chứa ít nhất 2 con số 0.</para>
+        <para id="id19881230">3.3. Tìm các sơ đồ chuyển ôtômát hữu hạn đoán nhận các ngôn ngữ sau :</para>
+        <para id="id19881244">a) Tập các chuỗi trên {0, 1} có chứa một số chẵn các số 0 và một số lẻ các số 1</para>
+        <para id="id19881253">b) Tập các chuỗi trên {0, 1} có độ dài chia hết cho 3.</para>
+        <para id="id19881264">c) Tập các chuỗi trên {0, 1} không chứa 101 như một chuỗi con.</para>
+        <para id="id19881275">3.4. Xây dựng DFA tương đương với mỗi NFA sau :</para>
+        <para id="id19881288">a) N1({0,1,2,3},{a,b},1,0,{3}) với 1 b) N2 ({0,1,2,3}, {a,b}, 2,0, {1,3}) với 2</para>
+        <para id="id19881366"/>
+        <para id="id19881406">1 a b2 a b</para>
+        <para id="id19881455"/>
+        <para id="id19881499">0 {0, 1}{1}0 {1, 3}{1}</para>
+        <para id="id19881527">1 {2}{2}1 {2}{1, 2}</para>
+        <para id="id19881556">2 {3}2 {3}{0}</para>
+        <para id="id19881595">3 {3}{3}3 {0}</para>
+        <para id="id19881634">c)</para>
+        <figure id="id19881642">
+          <media id="id2955716" alt=""><image src="../../media/graphics23.png" mime-type="image/png" height="80" width="427"/></media>
+        </figure>
+        <para id="id19881666">d) </para>
+        <figure id="id19881673">
+          <media id="id1171176806197" alt=""><image src="../../media/graphics24.png" mime-type="image/png" height="134" width="424"/></media>
+        </figure>
+        <para id="id19881697">3.5. Tìm NFA không có -dịch chuyển nhận dạng cùng ngôn ngữ với các NFA sau :</para>
+        <para id="id19881720">a) </para>
+        <figure id="id19881729">
+          <media id="id1171175948959" alt=""><image src="../../media/graphics25.png" mime-type="image/png" height="70" width="427"/></media>
+        </figure>
+        <para id="id19881753"/>
+        <para id="id19881757">b) </para>
+        <figure id="id19881765">
+          <media id="id1171170155383" alt=""><image src="../../media/graphics26.png" mime-type="image/png" height="219" width="276"/></media>
+        </figure>
+        <para id="id19881789">3.6. Viết biểu thức chính quy và vẽ NFA đoán nhận các ngôn ngữ sau :</para>
+        <list id="id19881803" list-type="enumerated">
+          <item>Tập hợp các chuỗi trên  = {1, 2, 3} sao cho ký hiệu cuối cùng đã có xuất hiện trước đó .</item>
+          <item>Tập hợp các chuỗi trên  = {0, 1} trong đó có một cặp ký tự 0 cách nhau bởi một chuỗi con có độ dài 4i, với i  0 nào đó.</item>
+        </list>
+        <para id="id19881859">3.7. Viết biểu thức chính quy cho mỗi ngôn ngữ sau trên  = { 0, 1} :</para>
+        <para id="id19881882">a) Tập hợp các chuỗi trong đó mọi cặp 0 liên tiếp đều xuất hiện trước mọi cặp 1 liên tiếp.</para>
+        <para id="id19881893">b) Tập hợp các chuỗi chứa nhiều nhất một cặp 0 liên tiếp và nhiều nhất một cặp 1 liên tiếp.</para>
+        <para id="id19881902">3.8. Mô tả (bằng lời) ngôn ngữ được các biểu thức chính quy sau đặc tả :</para>
+        <list id="id19881918" list-type="enumerated">
+          <item>0(0 + 1)* 0</item>
+          <item>(0+ 1)*0(0 + 1) (0 + 1)</item>
+          <item>(11+ 0)*(00+ 1)</item>
+          <item>(1+ 01+ 001)*( + 0 + 00)</item>
+          <item>[ 00 + 11 + (01+ 10) (00+ 11)*(01+ 10)]*</item>
+        </list>
+        <para id="id19882020">3.9. Chứng tỏ các biểu thức chính quy sau ký hiệu cho cùng một ngôn ngữ :</para>
+        <para id="id19882036">(aa)*,(aa)* + (a),(aa + aaaa)*,(aa)* (aa)*</para>
+        <para id="id19882102">3.10. Vẽ NFA với -dịch chuyển được cho bởi các biểu thức chính qui sau. Sau đó, hãy chuyển sang DFA tương đương :</para>
+        <list id="id19882134" list-type="enumerated">
+          <item>( a* + b*)*</item>
+          <item>(( + a) b*)*</item>
+          <item>(a + b)* abb (a + b)*</item>
+          <item>ab + (a + bb) a*b</item>
+          <item>(a + ab + aab)*(+ a+ aa)</item>
+          <item>10 + (0 + 11)0*1</item>
+          <item>01 [ (( 10)*+ 111)* + 0]*1</item>
+        </list>
+        <para id="id19882336">3.11. Hãy tìm các biểu thức chính qui tương ứng với các sơ đồ chuyển trạng thái sau:</para>
+        <para id="id19882351">a)b)</para>
+        <para id="id19882374">
+          <figure id="id19882378">
+            <media id="id1171170567518" alt=""><image src="../../media/graphics27.png" mime-type="image/png" height="170" width="203"/></media>
+          </figure>
+          <figure id="id19882406">
+            <media id="id5004928" alt=""><image src="../../media/graphics28.png" mime-type="image/png" height="156" width="204"/></media>
+          </figure>
+        </para>
+        <para id="id19882430">BÀI TẬP LẬP TRÌNH</para>
+        <para id="id19882435">3.12. Viết chương trình trong Pascal / C mô phỏng một FA chấp nhận ngôn ngữ được biểu diễn bởi biểu thức chính quy sau :</para>
+        <para id="id19882469">[ A ... Z, a ... Z ]+ [ A ... Z, a ... Z, 0 ... 9, _ ]* + [ 0 ... 9]+ + op</para>
+        <para id="id19882507">3.13. Viết chương trình cho ra một FA tương ứng khi đầu vào là một biểu thức chính quy.</para>
+        <para id="id19882527">3.14. Viết chương trình cho ra DFA khi đầu vào là một NFA.</para>
+      </section>
+    </section>
+  </content>
+</document>

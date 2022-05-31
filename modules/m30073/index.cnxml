@@ -1,0 +1,237 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Văn phạm chính quy và các tính chất</title>
+  <metadata>
+  <md:content-id>m30073</md:content-id><md:title>Văn phạm chính quy và các tính chất</md:title>
+  <md:abstract>Nội dung chính : Trong chương này, ta sẽ đề cập đến lớp văn phạm chính quy (dạng văn phạm tuyến tính trái hoặc phải) - một phương tiện khác để xác định ngôn ngữ và ta lại thấy rằng lớp ngôn ngữ do chúng sinh ra vẫn là lớp ngôn ngữ chính quy. Điều này được thể hiện bởi mối tương quan giữa văn phạm chính quy và ôtômát hữu hạn. Tiếp sau đó, ta sẽ nghiên cứu một số tính chất của lớp ngôn ngữ chính quy, cũng như các giải thuật xác định tập chính quy.
+Mục tiêu cần đạt: Cuối chương, sinh viên cần phải nắm vững :
+ Định nghĩa một biểu thức chính quy ký hiệu cho tập ngôn ngữ.
+ Mối liên quan giữa ôtômát hữu hạn và biểu thức chính quy. 
+ Các tính chất của tập chính quy.
+ Xây dựng ôtômát từ biểu thức chính quy
+ Viết văn phạm chính quy sinh ra cùng tập ngôn ngữ được cho bởi ôtômát.
+Kiến thức cơ bản: Để tiếp thu tốt nội dung của chương này, sinh viên cần nắm vững các thành phần tổng quát của một văn phạm cấu trúc, các dạng luật sinh; hiểu biết về ngôn ngữ tự nhiên; cơ chế đoán nhận ngôn ngữ từ ôtômát hữu hạn và cách phát sinh một lớp ngôn ngữ thông qua biểu thức chính quy; …
+Tài liệu tham khảo : 
+[1] V.J. Rayward-Smith – A First course in Formal Language Theory (Second Editor) –  McGraw-Hill Book Company Europe – 1995 (Chapter 3 : Regular Language I )
+[2] Hồ Văn Quân – Giáo trình lý thuyết ôtômát và ngôn ngữ hình thức – Nhà xuất bản Đại học quốc gia Tp. Hồ Chí Minh – 2002 (Chương 4 : Văn phạm chính quy)
+[3] From Wikipedia, the free encyclopedia - Regular Grammar:                                                                 
+http://en.wikipedia.org/wiki/Regular_grammar</md:abstract>
+  <md:uuid>f20fc5a1-b1aa-440f-b1aa-fa0d49bf074d</md:uuid>
+</metadata>
+
+<content>
+    <section id="id-155249830515">
+      <title>VĂN PHẠM CHÍNH QUY (rg : REGULAR GRAMMAR)</title>
+      <para id="id19501336">Như trong chương 3 ta đã biết, lớp ngôn ngữ được chấp nhận bởi ôtômát hữu hạn được gọi là ngôn ngữ chính quy và chúng có thể được ký hiệu một cách đơn giản bằng việc dùng một biểu thức chính quy. Chương này giới thiệu một cách khác để mô tả ngôn ngữ chính quy thông qua cơ chế sản sinh ngôn ngữ - đó là văn phạm chính quy. </para>
+      <para id="id19501350">Xét một định nghĩa cho văn phạm sinh ra các số nguyên không dấu (unsigned interger) bắt đầu bằng một chữ số, theo sau bởi một chuỗi các số (digit sequence) thường dùng trong các ngôn ngữ lập trình như sau:</para>
+      <para id="id19501363">&lt;digit sequence&gt; ::= 0  1  2  3  4  5  6  7  8  9</para>
+      <para id="id19501419"> 0 &lt;digit sequence&gt;  1 &lt;digit sequence&gt;</para>
+      <para id="id19501437"> 2 &lt;digit sequence&gt;  3 &lt;digit sequence&gt;</para>
+      <para id="id19501454"> 4 &lt;digit sequence&gt;  5 &lt;digit sequence&gt;</para>
+      <para id="id19501471"> 6 &lt;digit sequence&gt;  7 &lt;digit sequence&gt;</para>
+      <para id="id19501488"> 8 &lt;digit sequence&gt;  9 &lt;digit sequence&gt;</para>
+      <para id="id19501504">&lt;unsighed integer&gt; ::= 0  1  2  3  4  5  6  7  8  9</para>
+      <para id="id19501560"> 1 &lt;digit sequence&gt;  2 &lt;digit sequence&gt;</para>
+      <para id="id19501576"> 3 &lt;digit sequence&gt;  4 &lt;digit sequence&gt;</para>
+      <para id="id19501593"> 5 &lt;digit sequence&gt;  6 &lt;digit sequence&gt;</para>
+      <para id="id19501610"> 7 &lt;digit sequence&gt;  8 &lt;digit sequence&gt;</para>
+      <para id="id19501627"> 9 &lt;digit sequence&gt; </para>
+      <para id="id19501637">Câu hỏi :</para>
+      <para id="id19501649">?</para>
+      <para id="id19501763">Bạn có nhận xét gì về dạng chuỗi trong vế phải của các luật sinh văn phạm ?</para>
+      <para id="id19501773">Trong ví dụ trên, ta thấy mỗi vế phải hoặc là một ký hiệu kết thúc hoặc có dạng của một ký hiệu kết thúc theo sau là một biến. Trong hầu hết mọi ngôn ngữ lập trình, tất cả các ký hiệu cơ bản (số nguyên, tên biến, toán hạng, từ khóa, các ký hiệu hết câu,…) đều có thể định nghĩa bởi những quy luật ngắn dạng này. Vì phần lớn thời gian tiêu tốn trong một trình biên dịch là dùng để nhận dạng các ký hiệu cơ bản, cho nên việc khảo sát lớp văn phạm với các luật sinh dạng như trên là rất cần thiết.</para>
+      <section id="id-341060994581">
+        <title>Văn phạm tuyến tính</title>
+        <para id="id19501808">Một văn phạm G(V, T, P, S) được gọi là tuyến tính trái (left - linear) nếu tất cả các luật sinh của nó có dạng :</para>
+        <para id="id19501822">A  Bw</para>
+        <para id="id19501837">A  w </para>
+        <para id="id19501852">trong đó A, B là các biến  V; w là một chuỗi các ký hiệu kết thúc  T* (có thể rỗng).</para>
+        <para id="id19501877">Một văn phạm G(V, T, P, S) được gọi là tuyến tính phải (right - linear) nếu tất cả các luật sinh của nó có dạng :</para>
+        <para id="id19501892">A  wB</para>
+        <para id="id19501907">A  w</para>
+        <para id="id19501922">Một văn phạm được gọi là văn phạm chính quy nếu nó thuộc dạng văn phạm tuyến tính trái hoặc tuyến tính phải.</para>
+        <para id="id19501931"/>
+        <para id="id19501939">Thí dụ 4.1 : Văn phạm sinh ra các số nguyên không dấu như đã nêu ở trên là văn phạm chính quy vì các luật sinh của nó có dạng tuyến tính phải.</para>
+        <para id="id19501954">Thí dụ 4.2 : Các văn phạm sau đây là văn phạm chính quy :</para>
+        <para id="id19501966">Văn phạm G1 ({S}, {a, b}, P1, S) với các luật sinh được cho như sau :</para>
+        <para id="id19501984">S  abS a</para>
+        <para id="id19502005">là văn phạm tuyến tính phải.</para>
+        <para id="id19502011">Văn phạm G2 ({S, A, B}, {a, b}, P2, S) với các luật sinh được cho như sau :S  Aab</para>
+        <para id="id19502039">A  Aab B</para>
+        <para id="id19502054">B  a</para>
+        <para id="id19502064">là văn phạm tuyến tính trái.</para>
+        <para id="id19502071">Thí dụ 4.3 : Ngôn ngữ được ký hiệu bởi biểu thức chính quy 0(10)* được sinh bởi văn phạm tuyến tính phải có các luật sinh sau :</para>
+        <para id="id19502096">S  0A(1)</para>
+        <para id="id19502116">A  10A</para>
+        <para id="id19502130">Và bởi văn phạm tuyến tính trái :</para>
+        <para id="id19502138">S  S10 0(2)</para>
+      </section>
+      <section id="id-483327781115">
+        <title>Sự tương đương giữa văn phạm chính quy và ôtômát hữu hạn</title>
+        <para id="id19502173">Văn phạm chính quy mô tả tập hợp chính quy trong ngữ cảnh một ngôn ngữ là chính quy khi và chỉ khi nó được sinh ra từ văn phạm tuyến tính trái hoặc văn phạm tuyến tính phải. Kết quả này được xác định bởi hai định lý sau :</para>
+        <para id="id19502187">ĐỊNH LÝ 4.1 : Nếu L được sinh ra từ một văn phạm chính quy thì L là tập hợp chính quy.</para>
+        <para id="id19502202">Chứng minh</para>
+        <para id="id19502207">Trước hết, ta giả sử L = L(G) với một văn phạm tuyến tính phải G(V, T, P, S). Ta xây dựng một NFA có chứa -dịch chuyển M (Q, T, , [S], []) mô phỏng các dẫn xuất trong G.</para>
+        <para id="id19502247">Q bao gồm các trạng thái có dạng [] với  là S hoặc chuỗi hậu tố của vế phải một luật sinh nào đó trong P.</para>
+        <para id="id19502267">Ta định nghĩa  như sau :</para>
+        <list id="id19502278" list-type="enumerated">
+          <item>Nếu A là một biến, thì ([A], ) = {[]  A   là một luật sinh}</item>
+          <item>Nếu a thuộc T và  thuộc T*  T*V, thì ([a], a) = {[]}</item>
+        </list>
+        <para id="id19502379">Sau đó, ta có thể dễ dàng chứng minh quy nạp theo độ dài của dẫn xuất rằng ([S], w) chứa [] khi và chỉ khi có chuỗi dẫn xuất S * xA  xy với A  y là một luật sinh trong P và xy = w, hay nếu  = S thì w = . Khi [] là trạng thái kết thúc duy nhất, M chấp nhận w khi và chỉ khi S * xA  w. Nhưng vì mọi chuỗi dẫn xuất cho một chuỗi ký hiệu kết thúc qua ít nhất 1 bước, nên ta thấy rằng M chấp nhận w khi và chỉ khi G sinh ra w. Vì vậy, mọi văn phạm tuyến tính phải đều sinh ra một tập hợp chính quy.</para>
+        <para id="id19502531">Bây giờ, giả sử G(V, T, P, S) là một văn phạm tuyến tính trái. Đặt văn phạm G’(V, T, P’, S) với P’ chứa các luật sinh của P có vế phải đảo ngược, nghĩa là :</para>
+        <para id="id19502543">P’ = { A    A  R  P }</para>
+        <para id="id19502589">Nếu ta đảo ngược chuỗi vế phải các luật sinh trong một văn phạm tuyến tính trái, ta có văn phạm tuyến tính phải, và ngược lại. Do đó, hiển nhiên chúng ta có G’ là một văn phạm tuyến tính phải, và cũng dễ dàng để chỉ ra rằng L(G’) = L(G)R. Theo chứng minh trên, ta có L(G’) là một tập chính quy. Mà thông thường một tập chính quy cũng vẫn còn giữ nguyên tính chất khi áp dụng phép đảo ngược nên L(G’)R = L(G) cũng là một tập chính quy.</para>
+        <para id="id19502623">Vậy, mọi văn phạm tuyến tính trái hay phải đều sinh ra một tập hợp chính quy.</para>
+        <para id="id19502631">Thí dụ 4.3 : NFA được xây dựng từ Định lý 4.1 cho văn phạm tuyến tính phải (1) ở thí dụ 4.2 có dạng như hình 4.1 sau :</para>
+        <para id="id19502646">Xét văn phạm tuyến tính trái (2) ở thí dụ 4.2, nếu đảo ngược các vế phải luật sinh, ta có:</para>
+        <para id="id19502654">S  01S 0</para>
+        <figure id="id19502674">
+          <media id="id7065619" alt=""><image src="../../media/graphics1-c81f.png" mime-type="image/png" height="116" width="463"/></media>
+        </figure>
+        <para id="id19502698">Hình 4.1 - NFA chấp nhận ngôn ngữ 0(10)*</para>
+        <para id="id19502721">Áp dụng các bước xây dựng NFA cho văn phạm này theo Định lý 4.1, ta có sơ đồ chuyển như Hình 4.2 (a). Nếu chúng ta đảo ngược các cạnh của NFA này và chuyển đổi vị trí các trạng thái bắt đầu và kết thúc, chúng ta sẽ có một NFA khác chấp nhận ngôn ngữ 0(10)*</para>
+        <figure id="id19502748">
+          <media id="id1171530606110" alt=""><image src="../../media/graphics2-b531.png" mime-type="image/png" height="170" width="370"/></media>
+        </figure>
+        <para id="id19502772">Hình (a)</para>
+        <figure id="id19502780">
+          <media id="id6813376" alt=""><image src="../../media/graphics3-e42b.png" mime-type="image/png" height="114" width="458"/></media>
+        </figure>
+        <para id="id19502804">Hình (b)</para>
+        <para id="id19502808">Hình 4.2 - Xây dựng NFA cho 0(10)* từ văn phạm tuyến tính trái</para>
+        <para id="id19502837">ĐỊNH LÝ 4.2 : Nếu L là một tập hợp chính quy, thì L được sinh từ một văn phạm tuyến tính trái hoặc một văn phạm tuyến tính phải nào đó.</para>
+        <para id="id19502854">Chứng minh</para>
+        <para id="id19502859">Đặt L = L(M) với DFA M(Q, , , q0, F). </para>
+        <para id="id19502893">Trước hết, ta giả sử rằng trạng thái q0 không phải là trạng thái kết thúc. Kế tiếp, ta đặt L = L(G) với văn phạm tuyến tính phải G(V, , P, q0), trong đó P chứa các luật sinh dạng p  aq nếu (p, a) = q và luật sinh dạng p  a nếu (p, a) là một trạng thái kết thúc. Rõ ràng (p, w) = q khi và chỉ khi có chuỗi dẫn xuất p * wq. Nếu wa được chấp nhận bởi M, ta đặt (q0, w) = p, suy ra dẫn xuất q0 * wq. Tương tự, nếu (p, a) là trạng thái kết thúc, vì p  a là một luật sinh, nên q0 * wa. Ngược lại, đặt q0 * x. Ta có x = wa và q0 * wq  wa với mọi p. Và vì (q0, w) = p và (p, a) là trạng thái kết thúc nên do đó x  L(M). Hay nói cách khác : L(M) = L(G) = L.</para>
+        <para id="id19503200">Bây giờ, xét q0  F, vì thế chuỗi rỗng  thuộc L. Lưu ý rằng văn phạm G vừa định nghĩa ở trên chỉ sinh ra ngôn ngữ L – {}. Chúng ta có thể sửa đổi G bằng cách thêm vào một ký hiệu bắt đầu S mới với luật sinh S  q0  . Văn phạm thu được vẫn có dạng tuyến tính phải và phát sinh ngôn ngữ L.</para>
+        <para id="id19503291">Để phát sinh một văn phạm tuyến tính trái cho L, ta bắt đầu với một NFA cho LR và sau đó đảo ngược chuỗi vế phải cho tất cả mọi luật sinh của văn phạm tuyến tính phải vừa thu được.</para>
+        <para id="id19503313">Thí dụ 4.4 : Trong Hình 4.3 ta thấy sơ đồ chuyển DFA cho 0(10)* </para>
+        <para id="id19503337">Văn phạm tuyến tính phải sinh từ DFA này có dạng :</para>
+        <para id="id19503345">A  0B1D0</para>
+        <para id="id19503366">B  0D1C</para>
+        <para id="id19503381">C  0B1D0</para>
+        <para id="id19503402">D  0D1D</para>
+        <para id="id19503417">Trong văn phạm trên, biến D không có ích nên ta có thể loại bỏ D và tất cả các luật sinh liên quan tới D, rút gọn văn phạm thành :</para>
+        <para id="id19503428">A  0B0</para>
+        <para id="id19503443">B  1C</para>
+        <para id="id19503453">C  0B0</para>
+        <figure id="id19503471">
+          <media id="id1171533795944" alt=""><image src="../../media/graphics4-56d5.png" mime-type="image/png" height="185" width="359"/></media>
+        </figure>
+        <para id="id19503495">Hình 4.3 - DFA cho 0(10)*</para>
+      </section>
+    </section>
+    <section id="id-881958000595">
+      <title>MỘT SỐ TÍNH CHẤT CỦA TẬP HỢP CHÍNH QUY</title>
+      <para id="id19503528">Một câu hỏi khá quan trọng được đặt ra là: Cho ngôn ngữ L với một số tính chất đặc tả nào đó, liệu L có phải là tập chính quy không ? Phần này cung cấp một số lý thuyết giúp trả lời câu hỏi này. </para>
+      <section id="id-40932620243">
+        <title>Bổ đề bơm cho tập hợp chính quy </title>
+        <para id="id19503551">Một trong những nguyên lý hiệu quả là "Bổ đề bơm", đây là một công cụ mạnh giúp chứng minh các ngôn ngữ không là chính quy. Đồng thời, nó cũng thực sự hữu ích trong việc phát triển các giải thuật liên quan đến các ôtômát, chẳng hạn như một ngôn ngữ được chấp nhận bởi một FA cho trước là hữu hạn hay vô hạn ?</para>
+        <para id="id19503565">BỔ ĐỀ 4.1: (BỔ ĐỀ BƠM)</para>
+        <para id="id19503574">Nếu L là tập hợp chính quy thì có tồn tại hằng số n sao cho nếu z là một từ bất kỳ thuộc L và | z |  n, ta có thể viết z = uvw với | uv |  n, | v |  1 và i  0, ta có uviw  L. </para>
+        <para id="id19503649">Hơn nữa n không lớn hơn số trạng thái của FA nhỏ nhất chấp nhận L.</para>
+        <para id="id19503659">Chứng minh</para>
+        <para id="id19503664">Nếu một ngôn ngữ L là ngôn ngữ chính quy thì nó sẽ được chấp nhận bởi một DFA M (Q, , , q0, F) với n trạng thái. </para>
+        <para id="id19503689">Xét chuỗi nhập z có m ký hiệu được cho như trong bổ đề, vậy z = a1a2 ... am, m  n, và với mỗi i = 1, 2, ..., m , ta đặt (q0, a1a2...ai) = qi. Do m  n nên cần phải có ít nhất n+1 trạng thái trên đường đi của ôtômát chấp nhận chuỗi z. Trong n+1 trạng thái này phải có hai trạng thái trùng nhau vì ôtômát M chỉ có n trạng thái phân biệt, tức là có hai số nguyên j và k sao cho 0  j &lt; k  n thỏa mãn qj = qk. Đường đi nhãn a1a2 ... am trong sơ đồ chuyển của M có dạng như sau: </para>
+        <figure id="id19503813">
+          <media id="id1171529796740" alt=""><image src="../../media/graphics5-321e.png" mime-type="image/png" height="119" width="480"/></media>
+        </figure>
+        <para id="id19503837">Hình 4.4 - Đường đi trong sơ đồ chuyển của DFA M</para>
+        <para id="id19503850">Vì j &lt; k nên chuỗi aj+1...ak có độ dài ít nhất bằng 1 và vì k  n nên độ dài đó không thể lớn hơn n. </para>
+        <para id="id19503875">Nếu qm là một trạng thái trong F, nghĩa là chuỗi a1a2...am thuộc L(M), thì chuỗi a1a2...aj ak+1ak+2...am cũng thuộc L(M) vì có một đường dẫn từ q0 đến qm ngang qua qj nhưng không qua vòng lặp nhãn aj+1... ak. Một cách hình thức, ta có :</para>
+        <para id="id19503968">d(q0, a1a2...aj ak+1ak+2...am) = d (d(q0, a1a2...aj), ak+1ak+2...am)</para>
+        <para id="id19504067">= d (qj, ak+1ak+2...am)</para>
+        <para id="id19504098">= d (qk, ak+1ak+2...am)</para>
+        <para id="id19504128">= qm </para>
+        <para id="id19504140">Vòng lặp trong hình trên có thể được lặp lại nhiều lần - thực tế, số lần muốn lặp là tùy ý, do đó chuỗi a1...aj (aj+1...ak)i ak+1...am  L(M), i  0. Điều ta muốn chứng tỏ ở đây là với một chuỗi có độ dài bất kỳ được chấp nhận bởi một FA, ta có thể tìm được một chuỗi con gần với chuỗi ban đầu mà có thể "bơm" - lặp một số lần tùy ý - sao cho chuỗi mới thu được cũng được chấp nhận bởi FA.</para>
+        <para id="id19504214">Đặt u = a1...aj, v = aj+1...ak và w = ak+1...am. </para>
+        <para id="id19295668">Ta có điều phải chứng minh.</para>
+        <para id="id19295674">Ứng dụng của bổ đề bơm </para>
+        <para id="id19295682"/>
+        <para id="id19295686">Bổ đề bơm rất có hiệu quả trong việc chứng tỏ một tập hợp không là tập hợp chính quy. Phương pháp chung để ứng dụng nó dùng phương pháp chứng minh “phản chứng” theo dạng sau :</para>
+        <list id="id19295698" list-type="enumerated">
+          <item>Chọn ngôn ngữ mà bạn cần chứng tỏ đó không là ngôn ngữ chính quy.</item>
+          <item>Chọn hằng số n, hằng số được đề cập đến trong bổ đề bơm. </item>
+          <item>Chọn chuỗi z thuộc L. Chuỗi z phải phụ thuộc nghiêm ngặt vào hằng số n đã chọn ở bước 2.</item>
+          <item>Giả thiết phân chuỗi z thành các chuỗi con u, v, w theo ràng buộc | uv |  n và | v |  1</item>
+          <item>Mâu thuẫn sẽ phát sinh theo bổ đề bơm bằng cách chỉ ra với u, v và w xác định theo giả thiết, có tồn tại một số i mà ở đó uviw  L. Từ đó có thể kết luận rằng L không là ngôn ngữ chính quy. Chọn lựa giá trị cho i có thể phụ thuộc vào n, u, v và w.</item>
+        </list>
+        <para id="id19295795">Ta có thể phát biểu một cách hình thức nội dung của bổ đề bơm như sau :</para>
+        <para id="id19295803">(L)(n)(z)[ z thuộc L và | z |  n ta có </para>
+        <para id="id19295848">(u, v, w)(z = uvw, | uv |  n, | v |  1 và (i)(uviw thuộc L))]</para>
+        <para id="id19295903">Thí dụ 4.5 : Chứng minh tập hợp L = { 0i2  i là số nguyên, i  1} (L chứa tất cả các chuỗi số 0 có độ dài là một số chính phương) là tập không chính quy.</para>
+        <para id="id20479888">Chứng minh </para>
+        <para id="id20479893">Giả sử L là tập chính quy và tồn tại một số n như trong bổ đề bơm. </para>
+        <para id="id20479900">Xét từ z =0n2. Theo bổ đề bơm, từ z có thể viết là z = uvw với 1  | v |  n và uviw  L, i  0. Trường hợp cụ thể, xét i = 2 : ta phải có uv2w  L. </para>
+        <para id="id20479967">Mặt khác : n2 &lt; | uv2w |  n2 + n &lt; (n+1)2. </para>
+        <para id="id20480000">Do n2 và (n+1)2 là 2 số chính phương liên tiếp nên | uv2w | không thể bằng một số chính phương, vậy uv2w  L.</para>
+        <para id="id20480035">Điều này dẫn đến sự mâu thuẫn, vậy giả thiết ban đầu là sai. Suy ra L không là tập chính quy.</para>
+        <para id="id20480041">Câu hỏi :</para>
+        <para id="id20480053">?</para>
+        <para id="id20480164">Hãy tự liên hệ một số tập ngôn ngữ khác mà bạn nghĩ chúng không thuộc lớp</para>
+        <para id="id20480175">ngôn ngữ chính quy vì không thể thỏa mãn các tính chất của Bổ đề bơm ?</para>
+      </section>
+      <section id="id-173975450165">
+        <title>Tính chất đóng của tập hợp chính quy </title>
+        <para id="id20480195">Có nhiều phép toán trên ngôn ngữ chuyên sử dụng cho tập hợp chính quy, mà cho phép khi áp dụng chúng vào tập hợp chính quy thì vẫn giữ được các tính chất của tập chính quy. Nếu một lớp ngôn ngữ nào đó "đóng" với một phép toán cụ thể, ta gọi đó là tính chất đóng của lớp ngôn ngữ này.</para>
+        <para id="id20480217">ĐỊNH LÝ 4.3 : Tập hợp chính quy đóng với các phép toán: hợp, nối kết và bao đóng Kleen.</para>
+        <para id="id20480232">Chứng minh</para>
+        <para id="id20480236">Hiển nhiên từ định nghĩa của biểu thức chính quy.</para>
+        <para id="id20480243">ĐỊNH LÝ 4.4 : Tập hợp chính quy đóng với phép lấy phần bù. Tức là, nếu L là tập chính quy và L  * thì * - L là tập chính quy. </para>
+        <para id="id20480295">Chứng minh</para>
+        <para id="id20480300">Gọi L là L(M) cho DFA M (Q, 1, , q0, F) và L  *.</para>
+        <para id="id20480359">Trước hết, ta giả sử 1 =  vì nếu có ký hiệu thuộc 1 mà không thuộc  thì ta có thể bỏ các phép chuyển trong M liên quan tới các ký hiệu đó. Do L  * nên việc xóa như vậy không ảnh hưởng tới M. Nếu có ký hiệu thuộc  nhưng không thuộc 1 thì các ký hiệu này không xuất hiện trong L. Ta thiết kế thêm một trạng thái "chết" d trong M sao cho (d, a) = d, a  và (q, a) = d, q  Q và a   - 1.</para>
+        <para id="id20480554">Bây giờ, để chấp nhận * - L, ta hoàn thiện các trạng thái kết thúc của M. Nghĩa là, đặt M’ = (Q, , , q0, Q - F). Ta có M’ chấp nhận từ w nếu (q0,w)  Q - F, suy ra w Î * - L. </para>
+        <para id="id20480654">ĐỊNH LÝ 4.5: Tập hợp chính quy đóng với phép giao</para>
+        <para id="id20480667">Chứng minh</para>
+        <para id="id20480672">Do ta có công thức biến đổi :</para>
+        <para id="id20480680"><m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>1</m:mn></m:mrow></m:mstyle></m:msub></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{L rSub { size 8{1} } } {}</m:annotation></m:semantics></m:math>  
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>2</m:mn></m:mrow></m:mstyle></m:msub></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{L rSub { size 8{2} } } {}</m:annotation></m:semantics></m:math> = 
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:mover accent="true"><m:mtable><m:mtr><m:mtd><m:mrow><m:mover accent="true"><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>1</m:mn></m:mrow></m:mstyle></m:msub><m:mo>¯</m:mo></m:mover><m:mrow/></m:mrow></m:mtd><m:mtd><m:mrow><m:mrow/><m:mover accent="true"><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>2</m:mn></m:mrow></m:mstyle></m:msub><m:mo>¯</m:mo></m:mover><m:mrow/></m:mrow></m:mtd></m:mtr></m:mtable><m:mo>¯</m:mo></m:mover></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{ {overline  { matrix {
+ {overline  {L rSub { size 8{1} } }}  {} #  union  {overline  {L rSub { size 8{2} } }} {}
+} }} } {}</m:annotation></m:semantics></m:math></para>
+        <para id="id20480901">Nên theo các định lý trên, suy ra được tập L1  L2 là tập chính quy.</para>
+      </section>
+    </section>
+    <section id="id-241477697975">
+      <title>các GIẢI THUẬT xác đỊnh TẬP hỢp CHÍNH QUY</title>
+      <para id="id20480947">Một vấn đề khác, cũng rất cần thiết là xác định các giải thuật giúp giải đáp nhiều câu hỏi liên quan đến tập hợp chính quy, chẳng hạn như : Một ngôn ngữ cho trước là rỗng, hữu hạn hay vô hạn ? Ngôn ngữ chính quy có tương đương với ngôn ngữ nào khác không ? ... Để xác định các giải thuật này, trước hết cần giả sử mỗi tập chính quy thì được biểu diễn bởi một ôtômát hữu hạn. Như đã biết, biểu thức chính quy dùng đặc tả cho tập hợp chính quy, do đó chỉ cần cung cấp thêm một cơ chế dịch từ dạng biểu thức này sang dạng ôtômát hữu hạn. Một số định lý sau có thể xem là nền tảng cho việc chuyển đổi này. </para>
+      <para id="id20480978">ĐỊNH LÝ 4.6: Tập hợp các chuỗi được chấp nhận bởi ôtômát M có n trạng thái là:</para>
+      <para id="id20480993">1) Không rỗng nếu và chỉ nếu ôtômát chấp nhận một chuỗi có độ dài &lt; n.</para>
+      <para id="id20481003">2) Vô hạn nếu và chỉ nếu ôtômát chấp nhận một chuỗi có độ dài l với n  l &lt; 2n.</para>
+      <para id="id20481023">Chứng minh</para>
+      <para id="id20481028">1) Phần "nếu " là hiển nhiên. </para>
+      <para id="id20481033">Ta chứng minh "chỉ nếu": Giả sử M chấp nhận một tập không rỗng. Gọi w là chuỗi ngắn nhất được chấp nhận bởi M. Theo bổ đề bơm, ta có | w | &lt; n vì nếu w là chuỗi ngắn nhất và | w |  n thì ta có thể viết w = uvy, và uy là chuỗi ngắn hơn trong L hay | uy | &lt; | w |  Mâu thuẫn.</para>
+      <para id="id20481064">2) Nếu w  L và n  | w | &lt; 2n thì theo bổ đề bơm ta có w = w1w2w3 và w1w2 i w3  L với mọi i  0, suy ra L(M) vô hạn . </para>
+      <para id="id20481132">Ngược lại, nếu L(M) vô hạn thì tồn tại w  L(M) sao cho | w |  n. Nếu | w |&lt; 2n thì xem như đã chứng minh xong. Nếu không có chuỗi nào có độ dài nằm giữa n và 2n-1 thì gọi w là chuỗi có độ dài ít nhất là 2n nhưng ngắn hơn mọi chuỗi trong L(M), nghĩa là | w |  2n. Một lần nữa, cũng theo bổ đề bơm, ta có thể biểu diễn w = w1w2w3, trong đó 1  | w2 |  n và w1w3  L(M). Ta có hoặc w không phải là chuỗi ngắn nhất có độ dài  2n, hoặc là n  | w1w3 |  2n-1  Mâu thuẫn. Vậy có tồn tại chuỗi có độ dài l sao cho n  l &lt; 2n.</para>
+      <para id="id20481262">ĐỊNH LÝ 4.7 : Có giải thuật để xác định hai ôtômát tương đương (chấp nhận cùng một ngôn ngữ).</para>
+      <para id="id20481277">Chứng minh</para>
+      <para id="id20481282">Đặt M1, M2 là hai ôtômát chấp nhận L1, L2. </para>
+      <para id="id20481308">Theo các định lý 4.3, 4.4, 4.5, ta có (
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>1</m:mn></m:mrow></m:mstyle></m:msub></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{L rSub { size 8{1} } } {}</m:annotation></m:semantics></m:math>  
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:mover accent="true"><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>2</m:mn></m:mrow></m:mstyle></m:msub><m:mo>¯</m:mo></m:mover></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{ {overline  {L rSub { size 8{2} } }} } {}</m:annotation></m:semantics></m:math>)  (
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:mover accent="true"><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>1</m:mn></m:mrow></m:mstyle></m:msub><m:mo>¯</m:mo></m:mover></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{ {overline  {L rSub { size 8{1} } }} } {}</m:annotation></m:semantics></m:math>  
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:msub><m:mi>L</m:mi><m:mstyle fontsize="8pt"><m:mrow><m:mn>2</m:mn></m:mrow></m:mstyle></m:msub></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{L rSub { size 8{2} } } {}</m:annotation></m:semantics></m:math>) được chấp nhận bởi ôtômát M3 nào đó. Dễ thấy M3 chấp nhận một chuỗi nếu và chỉ nếu L1  L2. Theo định lý 4.6, ta thấy có giải thuật để xác định xem liệu L1 = L2 hay không.</para>
+      <para id="id19400014">Tổng kết chương IV: Qua chương này, chúng ta có thể thấy rõ hơn các tính chất của lớp ngôn ngữ chính quy và cách xác định chúng bằng một số giải thuật. Mối liên quan giữ hai cơ chế đoán nhận ngôn ngữ (ôtômát hữu hạn) và phát sinh ngôn ngữ (văn phạm) cũng đã được thiết lập và chứng minh rõ ràng. Đây là lớp ngôn ngữ nhỏ nhất theo sự phân cấp của Noam Chomsky. Trong những chương tiếp theo, chúng ta sẽ khảo sát những lớp ngôn ngữ rộng lớn hơn chứa cả ngôn ngữ chính quy trong nó. </para>
+      <para id="id19400037">BÀI TẬP CHƯƠNG IV</para>
+      <para id="id19400045">4.1. Xây dựng văn phạm tuyến tính trái và tuyến tính phải cho các ngôn ngữ sau : </para>
+      <para id="id19400061">a) (0 + 1)*00(0 + 1)*</para>
+      <para id="id19400079">b) 0*(1(0 + 1))*</para>
+      <para id="id19400097">c) (((01 + 10)*11)*00)*</para>
+      <para id="id19400120">4.2. Xây dựng văn phạm chính quy sinh ra các ngôn ngữ trên bộ chữ cái  = {0,1} như sau :</para>
+      <para id="id19400138">a) Tập các chuỗi có chứa 3 con số 0 liên tiếp.</para>
+      <para id="id19400148">b) Tập các chuỗi kết thúc bằng 2 con số 0.</para>
+      <para id="id19400159">4.3. Xây dựng văn phạm chính quy sinh ra các ngôn ngữ sau : </para>
+      <para id="id19400174">a) { w  w  (0 + 1)* }</para>
+      <para id="id19400198">b) { am bn  m, n &gt; 0 }</para>
+      <para id="id19400223"/>
+      <para id="id19400227">4.4. Chứng tỏ rằng ngôn ngữ L = {0n1n  n là số nguyên dương} không chính qui.</para>
+      <para id="id19400267">4.5. Ngôn ngữ nào trong các ngôn ngữ sau không là ngôn ngữ chính qui? Chứng minh câu trả lời:</para>
+      <list id="id19400284" list-type="enumerated">
+        <item>L = {02n  n là số nguyên dương }</item>
+        <item>L = {0n1m0 n+m  m, n là số nguyên dương}</item>
+        <item>L = {0n  n là số nguyên tố }</item>
+      </list>
+    </section>
+  </content>
+</document>

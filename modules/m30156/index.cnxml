@@ -1,0 +1,715 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Máy Turing</title>
+  <metadata>
+  <md:content-id>m30156</md:content-id><md:title>Máy Turing</md:title>
+  <md:abstract>Nội dung chính : Trong chương này, ta sẽ xét thêm một loại máy trừu tượng khác - máy Turing (TM - Turing Machines). Chúng có khả năng đoán nhận được lớp ngôn ngữ lớn hơn lớp ngôn ngữ phi ngữ cảnh. Đây còn là một mô hình của sự tính toán, mô hình của các thủ tục hiệu quả, là nền tảng cho quá trình xử lý của máy tính hiện đại, được giới thiệu bởi Alan Turing vào năm 1936. Nhờ đó, các khái niệm về "sự tính được", "sự giải được" được xác định một cách rõ ràng trên cơ sở sự xuất hiện của một số hàm không tính được, các bài toán không giải được. 
+Mục tiêu cần đạt: Cuối chương, sinh viên cần phải nắm vững:
+ Khái niệm TM, định nghĩa và các thành phần.
+ Các kỹ thuật thiết kế TM.
+ Một số biến dạng TM từ mô hình chuẩn.
+ Xây dựng TM dùng nhận dạng ngôn ngữ hoặc tính toán các hàm số nguyên đơn giản được biểu diễn trong hệ nhất phân.
+ Các tính chất của lớp ngôn ngữ được chấp nhận bởi TM.
+Kiến thức cơ bản: Để tiếp thu tốt nội dung của chương này, sinh viên cần hiểu rõ cách thiết kế các hàm chuyển trạng thái trên mô hình máy tính toán; ý tưởng thiết kế một số thuật toán đơn giản trên tập hợp số, …
+Tài liệu tham khảo : 
+[1] John E. Hopcroft, Jeffrey D.Ullman – Introduction to Automata Theory, Languages and Computation – Addison – Wesley Publishing Company, Inc – 1979 (Chapter 7 : Turing Machines )
+[2] Peter Linz – An Introduction to Formal Languages and Automata – D.C. Heath and Company – 1990.
+[3] David Barker-Plummer - Stanford Encyclopedia of Philosophy – Turing Machines:                                                                 
+http://plato.stanford.edu/entries/turing-machine/
+[4] Turing Machinesimplemented in JavaScript:                                                                 
+http://www.turing.org.uk/turing/scrapbook/tmjava.html
+[5] By Jon Barwise and John Etchemendy -Turing Machines:      
+http://www-csli.stanford.edu/hp/Turing1.html</md:abstract>
+  <md:uuid>fe335a38-e3ab-4111-9784-33e0231c624d</md:uuid>
+</metadata>
+
+<content>
+    <section id="id-45856062694">
+      <title>MÔ HÌNH MÁY TURING (TM)</title>
+      <para id="id20554745">Một mô hình hình thức cho một thủ tục hiệu quả sẽ có những đặc tính cụ thể. Đầu tiên, mỗi thủ tục sẽ được mô tả một cách hữu hạn. Tiếp đó, thủ tục sẽ được phân thành một số bước độc lập, mà mỗi bước thực thi một vấn đề. Nguyên tắc này cũng được hình thức trong mô hình máy Turing.</para>
+      <para id="id20554759">Máy Turing có một băng nhớ, dùng để ghi mọi loại dữ liệu (dữ liệu nhập, dữ liệu dùng cho việc điều khiển tương tự như một chương trình máy tính và các kết quả trung gian khi làm việc). Với một bộ điều khiển chứa một số hữu hạn trạng thái, TM cũng như các ôtômát khác, làm việc theo lối "ngắt quãng" theo từng bước chuyển. </para>
+      <section id="id-369927408198">
+        <title>Mô tả TM</title>
+        <para id="id20554784">Máy Turing có rất nhiều dạng đồng khả năng, nghĩa là có nhiều mô hình và định nghĩa khác nhau cho máy Turing nhưng tất cả chúng đều tương đương nhau. Song, nói chung mô hình cơ bản của một máy Turing gồm :</para>
+        <para id="id20554800">- Một bộ điều khiển hữu hạn. </para>
+        <para id="id20554808">- Một băng được chia thành các ô.</para>
+        <para id="id20554817">- Một đầu đọc-viết, mỗi lần đọc có thể duyệt qua một ô trên băng để đọc hay viết ký hiệu. </para>
+        <para id="id20554842">Mỗi ô có thể giữ được một ký hiệu trong số hữu hạn các ký hiệu băng (các ký hiệu được phép viết trên băng). Khởi đầu xem như n ô bên trái của băng (n  0) giữ chuỗi nhập (input), chuỗi nhập là một chuỗi các ký tự được chọn từ một tập hợp con của tập hợp các ký hiệu băng, tập hợp con này gọi là tập các ký hiệu nhập. Phần còn lại của băng coi như có vô hạn khoảng trống, ký hiệu B (Blank), B là một ký hiệu đặc biệt của băng nhưng không phải là ký hiệu nhập.</para>
+        <figure id="id20554878">
+          <media id="id1954264" alt=""><image src="../../media/graphics1-ed34.png" mime-type="image/png" height="148" width="309"/></media>
+        </figure>
+        <para id="id20554902">Hình 7.1 - Mô tả một TM</para>
+        <para id="id20554919">Mỗi bước chuyển của máy Turing, phụ thuộc vào ký hiệu do đầu đọc đọc được trên băng và trạng thái của bộ điều khiển, máy sẽ thực hiện các bước sau :</para>
+        <para id="id20554933">1) Chuyển trạng thái</para>
+        <para id="id20554938">2) In một ký hiệu trên băng tại ô đang duyệt (nghĩa là thay ký hiệu đọc được trên băng bằng ký hiệu nào đó)</para>
+        <para id="id20554951">3) Dịch chuyển đầu đọc-viết (sang trái (L), sang phải (R) hoặc đứng yên())</para>
+        <para id="id20554970">Câu hỏi :</para>
+        <para id="id20554981">?So sánh cơ chế máy Turing với hai dạng ôtômát đã khảo sát trong các chương trước (ôtômát hữu hạn FA và ôtômát đẩy xuống PDA) ? Nêu những điểm khác biệt quan trọng trong nguyên tắc nhận dạng ngôn ngữ ?</para>
+      </section>
+      <section id="id-85600668073">
+        <title>Định nghĩa</title>
+        <para id="id20555112">Một cách hình thức, ta định nghĩa một máy Turing (TM) như sau :</para>
+        <para id="id20555122">Định nghĩa: TM là một hệ thống M (Q, ∑, , , q0, B, F), trong đó:</para>
+        <para id="id20555170">. Q : tập hữu hạn các trạng thái.</para>
+        <para id="id20555176">. ∑: bộ ký hiệu nhập.</para>
+        <para id="id20555193">.  : tập hữu hạn các ký tự được phép viết trên băng.</para>
+        <para id="id20555211">. B : ký hiệu thuộc  dùng chỉ khoảng trống trên băng (Blank).</para>
+        <para id="id20555229">.  : hàm chuyển ánh xạ : Q    Q    {L, R, } </para>
+        <para id="id20555306">( có thể không xác định với một vài đối số)</para>
+        <para id="id20555324">. q0  Q là trạng thái bắt đầu</para>
+        <para id="id20555349">. F  Q là tập các trạng thái kết thúc</para>
+        <para id="id20555367">Hình thái TM (Instantaneous description - ID)</para>
+        <para id="id20555376"><m:math><m:semantics><m:mrow/><m:annotation encoding="StarMath 5.0">{}</m:annotation></m:semantics></m:math>Một hình thái của máy Turing M được cho bởi 1 q 2, trong đó q là trạng thái hiện hành của M; 12  * là nội dung của băng tính từ đầu băng cho tới ký hiệu khác Blank bên phải nhất của băng. Giả sử Q và  rời nhau: đầu đọc đang đọc ký hiệu bên trái nhất của 2 hoặc nếu 2 =  thì đầu đọc đọc Blank.</para>
+        <para id="id20555549">Hàm chuyển </para>
+        <para id="id20555554">Ta định nghĩa một phép chuyển trạng thái của TM như sau : </para>
+        <para id="id20555564">Đặt X1X2 ... Xi-1 q Xi ... Xn là một ID. </para>
+        <para id="id20555622">+ Giả sử (q, Xi) = (p, Y, L), trong đó: </para>
+        <para id="id20555660">- Nếu i - 1 = n thì Xi là B. </para>
+        <para id="id20555677">- Nếu i =1 thì không có ID kế tiếp, nghĩa là đầu đọc không được phép vượt qua cận trái của băng.</para>
+        <para id="id20555688">- Nếu i &gt; 1 ta viết :</para>
+        <para id="id20555694">X1X2 ... Xi-1 q Xi ... Xn ⊢M X1X2 ... Xi-2 p Xi-1Y Xi+1 ... Xn </para>
+        <para id="id20555839">+ Tương tự (q, Xi) = (p, Y, R) thì ta viết :</para>
+        <para id="id20555869">X1X2 ... Xi-1 q Xi ... Xn ⊢M X1X2 ... Xi-1 Yp Xi+1 ... Xn </para>
+        <para id="id20555995">+ Tương tự (q, Xi) = (p, Y, ) thì ta viết :</para>
+        <para id="id20556034">X1X2 ... Xi-1 q Xi ... Xn ⊢M X1X2 ... Xi-1 pY Xi+1 ... Xn </para>
+        <para id="id20556160">Chú ý rằng nếu i - 1 = n thì chuỗi Xi ... Xn là rỗng và vế phải dài hơn vế trái, nghĩa là TM M mở rộng chuỗi ký hiệu trên băng.</para>
+        <para id="id20556189">Nếu hai ID được quan hệ nhau bởi ⊢M thì ta nói ID thứ hai là kết quả của ID thứ nhất bằng một lần chuyển, một bước áp dụng hàm chuyển (hoặc nói cái thứ hai thu được từ cái thứ nhất bằng một lần chuyển). Nếu một ID thu được từ ID khác bằng một số lần chuyển (có thể bằng 0) thì ta ký hiệu quan hệ là ⊢M* . Ta cũng có thể bỏ đi ký hiệu M trong cách viết các quan hệ trên nếu không có nhầm lẫn.</para>
+        <para id="id20556242">Ngôn ngữ được chấp nhận bởi TM </para>
+        <para id="id20556251">Ký hiệu L(M): tập hợp các chuỗi trong * là nguyên nhân đưa TM M đi vào trạng thái kết thúc khi đã thực hiện việc thay thế từ bên trái các ký hiệu trên băng của M với trạng thái bắt đầu q0. Một cách hình thức, ta định nghĩa tập hợp ngôn ngữ được chấp nhận bởi TM M (Q, ∑, , , q0, B, F) là tập</para>
+        <para id="id20556328">L(M) = { w  w  * và q0 w ⊢M* 1 p 2 với p  F còn 12  *}</para>
+        <para id="id20556473">Cho TM nhận diện một ngôn ngữ L là cho lần lượt các từ của L vào TM xem TM có chấp nhận từ đó không. TM sẽ dừng và đi vào một trong những trạng thái kết thúc  F (không có phép chuyển kế tiếp) khi từ được chấp nhận, nhưng nếu TM không chấp nhận một từ nào đó thì TM có thể ngừng ở một trạng thái  F hoặc cũng có thể nó chạy mãi mà không dừng lại.</para>
+        <para id="id20556513">Thí dụ 7.1 : Thiết kế TM chấp nhận ngôn ngữ L = { 0n1n  n  1}</para>
+        <para id="id20556562">Khởi đầu TM chứa 0n1n bên trái nhất trên băng sau đó là vô hạn khoảng trống Blank. TM lặp lại quá trình sau: </para>
+        <para id="id20556590">- M thay 0 bên trái nhất bằng X rồi chuyển sang phải tới 1 trái nhất, TM thay 1 này bằng Y rồi dịch chuyển về bên trái cho tới khi gặp X phải nhất nó chuyển sang phải một ô (tới 0 trái nhất) rồi tiếp tục lặp một chu trình mới. </para>
+        <para id="id20556604">- Nếu trong khi dịch chuyển sang phải để tìm 1 mà TM gặp Blank thì TM dừng và không chấp nhận input. Tương tự, khi TM đã thay hết 0 bằng X và kiểm tra còn 1 trên băng thì TM cũng dừng và không chấp nhận input.</para>
+        <para id="id20556620">- TM chấp nhận input nếu như cũng không còn ký hiệu 1 nào nữa trên băng. </para>
+        <para id="id20556631">Đặt TM M (Q, ∑, , , q0, B, F) với các thành phần :</para>
+        <para id="id20556673">Q = {q0, q1, q2, q3, q4}; ∑= {0, 1};  = {0, 1, X, Y, B} và F = {q4}.</para>
+        <para id="id20556750">Ta có thể hình dung mỗi trạng thái là một câu lệnh hoặc một nhóm các câu lệnh trong chương trình. Trạng thái q0 là trạng thái khởi đầu và nó làm cho ký hiệu 0 bên trái nhất thay bằng X. Trạng thái q1 được dùng để tiến sang phải bỏ qua các số 0 và Y để tìm 1 bên trái nhất. Nếu M tìm thấy 1 nó thay 1 bằng Y rồi đi vào trạng thái q2. Trạng thái q2 đưa M tiến sang trái cho tới X đầu tiên và đi vào trạng thái q0, dịch chuyển sang phải để tới 0 bên trái nhất và tiếp tục một chu trình mới. Khi M tiến sang phải trong trạng thái q1, nếu B hoặc X được tìm thấy trước 1 thì input bị loại bỏ (không chấp nhận) vì có chứa nhiều ký hiệu 0 hơn 1 hoặc input không có dạng 0*1* .</para>
+        <para id="id20556853">Trạng thái q0 còn có vai trò khác. Nếu trạng thái q2 tìm thấy X bên phải nhất và ngay sau đó là Y thì các số 0 đã được xét hết, do đó ở trạng thái bắt đầu một chu trình mới q0 không tìm thấy ký hiệu 0 nào để thay thành X mà chỉ gặp Y thì TM đi vào trạng thái q3 duyệt qua các Y để kiểm tra có hay không có ký hiệu 1 còn lại. Nếu theo ngay sau các Y là B, nghĩa là trên băng nhập không còn ký hiệu 1 nào nữa thì TM sẽ đi vào q4 (trạng thái kết thúc) để chấp nhận input. Ngược lại input bị loại bỏ. </para>
+        <para id="id20556923">Hàm chuyển  được cho trong bảng sau :</para>
+        <table id="id20556941" summary="">
+          <tgroup cols="6">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <colspec colnum="4" colname="c4"/>
+            <colspec colnum="5" colname="c5"/>
+            <colspec colnum="6" colname="c6"/>
+            <tbody>
+              <row>
+                <entry></entry>
+                <entry/>
+                <entry/>
+                <entry>Ký hiệu</entry>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry>Trạng thái</entry>
+                <entry>0</entry>
+                <entry>1</entry>
+                <entry>X</entry>
+                <entry>Y</entry>
+                <entry>B</entry>
+              </row>
+              <row>
+                <entry>q0</entry>
+                <entry>(q1, X, R)</entry>
+                <entry>-</entry>
+                <entry>-</entry>
+                <entry>(q3, Y, R)</entry>
+                <entry>-</entry>
+              </row>
+              <row>
+                <entry>q1</entry>
+                <entry>(q1, 0, R)</entry>
+                <entry>(q2, Y, L)</entry>
+                <entry>-</entry>
+                <entry>(q1, Y, R)</entry>
+                <entry>-</entry>
+              </row>
+              <row>
+                <entry>q2</entry>
+                <entry>(q2, 0, L)</entry>
+                <entry>-</entry>
+                <entry>(q0, X, R)</entry>
+                <entry>(q2, Y, L)</entry>
+                <entry>-</entry>
+              </row>
+              <row>
+                <entry>q3</entry>
+                <entry>-</entry>
+                <entry>-</entry>
+                <entry>-</entry>
+                <entry>(q3, Y, R)</entry>
+                <entry>(q4, B, )</entry>
+              </row>
+              <row>
+                <entry>q4</entry>
+                <entry>-</entry>
+                <entry>-</entry>
+                <entry>-</entry>
+                <entry>-</entry>
+                <entry>-</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id20557540">Các phép chuyển hình thái của TM M trên input 0011 :</para>
+        <para id="id20557546">q00011 ⊢ Xq1011 ⊢ X0q111 ⊢ X q20Y1 ⊢ q2X0Y1 ⊢ X q00Y1 ⊢ XXq1Y1 ⊢ XXY q11 ⊢ XX q2YY ⊢ X q2XYY ⊢ XX q0YY ⊢ XXYq3Y ⊢ XXYYq3 ⊢ XXYYq4</para>
+        <para id="id20557791"/>
+        <para id="id20557795">Nhận xét: Như vậy, ta có thể dễ dàng thấy, TM khác với một ôtômát hữu hạn ở chỗ đầu đọc-viết có thể dịch chuyển tự do trên băng, không những đọc mà còn có khả năng viết trên băng và vùng làm việc còn có thể mở rộng theo yêu cầu phát sinh. TM khác với ôtômát đẩy xuống ở chỗ nó không dùng thêm Stack như một bộ giữ nhớ mà viết các ký hiệu cần ghi nhớ ngay trên băng.</para>
+      </section>
+    </section>
+    <section id="id-475098914009">
+      <title>NGÔN NGỮ VÀ "HÀM TÍNH ĐƯỢC"</title>
+      <para id="id20557827">Ngôn ngữ được chấp nhận bởi một máy Turing được gọi là ngôn ngữ đệ qui liệt kê - recursively enumerable (r.e). Đó là một lớp ngôn ngữ rất rộng, nó thực sự chứa ngôn ngữ phi ngữ cảnh CFL và một số ngôn ngữ mà không thể xác định các thành phần một cách máy móc. Nếu L(M) là một ngôn ngữ như vậy thì bất kỳ một máy Turing nào nhận diện L(M) cũng sẽ không dừng trên một số input không thuộc L(M). Nhưng nếu một chuỗi w  L(M) thì chắc chắn TM dừng, tuy nhiên TM sẽ chạy bao lâu trên input thì chúng ta không thể biết được và ta cũng không biết chắc chắn liệu TM có dừng lại hay không. Một cách thuận lợi và có ý nghĩa hơn là xét một lớp con của lớp ngôn ngữ đệ qui liệt kê, trong đó mọi ngôn ngữ đều được chấp nhận bởi ít nhất một máy Turing dừng trên mọi input. Lớp ngôn ngữ này gọi là lớp ngôn ngữ đệ qui - recursive sets.</para>
+      <para id="id20557901">Máy Turing như là một máy tính hàm số nguyên </para>
+      <para id="id20557910">Máy Turing cũng có thể được xem như là một máy tính của các hàm số nguyên (đi từ tập số nguyên đến tập số nguyên). Mỗi số nguyên ta viết dưới dạng số trong hệ nhất phân (unary), tức là với một số i  0 ta viết thành chuỗi 0i (gồm i chữ số 0). Nếu hàm f có k đối số i1, i2, ..., ik thì ta viết lần lượt các số nguyên này trên băng của TM ngăn cách nhau bởi 1, nghĩa là input có dạng 0i110i21 ... 10ik. Nếu TM dừng (chấp nhận hoặc không chấp nhận input) với băng 0m thì ta nói f (i1, i2, ..., ik ) = m. </para>
+      <para id="id20558065">Chú ý rằng ta cũng có thể tính được hàm chỉ có một đối số. Nếu f xác định với mọi bộ đối số i1, i2, ..., ik thì ta gọi f là hàm đệ qui toàn bộ. Một hàm f tính được bởi máy Turing ta gọi là hàm đệ qui bộ phận. Hàm đệ qui bộ phận tương tự như ngôn ngữ đệ qui liệt kê bởi vì nó tính được bởi máy Turing nhưng có thể không dừng với một số đối số nào đó. Hàm đệ qui toàn bộ tương tự như ngôn ngữ đệ qui vì TM sẽ dừng trên mọi input.</para>
+      <para id="id20558133">Thí dụ 7.2 :Thiết kế máy Turing tính toán phép trừ riêng</para>
+      <para id="id20558148">Ta định nghĩa phép trừ riêng (proper subtraction) như sau :</para>
+      <para id="id20558158">f(m, n) = m\ n =m - n nếu m  n</para>
+      <list id="id20558259" list-type="enumerated">
+        <item>nếu m &lt; n </item>
+      </list>
+      <para id="id20558268">. Input : 0m10n</para>
+      <para id="id20558292">. Output : 0 m\ n</para>
+      <para id="id20558304">M lặp lại việc thay thế lần lượt từng số 0 ở đầu băng bằng B rồi tiến sang phải, ra sau 1 tìm 0 và thay 0 này bằng 1. M lại chuyển sang trái cho đến khi gặp B đầu tiên thì dừng lại, trở về trạng thái bắt đầu và tiếp tục vòng lặp như trên. M dừng nếu :</para>
+      <para id="id20558321">i) Khi sang phải tìm 0 bên phải, M gặp B. Lúc này M đã thay n số 0 bên phải chuỗi input 0m10n thành 1 và n + 1 số 0 bên trái thành B, trường hợp này xảy ra khi trong chuỗi input có m &gt; n. Do vậy M phải thay lại tất cả n + 1 số 1 sau thành B, và sau đó dịch trái thay trả lại một B về thành 0, cuối cùng trên băng còn lại kết quả phép trừ là m - n số 0.</para>
+      <para id="id20558367">ii) Khi bắt đầu một vòng lặp mới, M không tìm thấy 0 để đổi thành B, lúc này m số 0 đầu đã bị đổi thành B, trường hợp này xảy ra khi n  m. Khi đó, M thay tất cả các số 1 và 0 trên băng thành B để cho kết quả phép trừ là 0 (biểu diễn gồm toàn ký hiệu B trong hệ nhất phân).</para>
+      <para id="id20558395">Ta xây dựng TM như sau: M ({q0, q1, ..., q6}, {0, 1}, {0, 1, B}, , q0, B, {q6})</para>
+      <para id="id20558454">M sẽ bắt đầu bằng 0m10n trên băng và kết thúc với 0m\ n trên băng. Các phép chuyển trạng thái được định nghĩa như sau :</para>
+      <para id="id20558496">1) d(q0, 0) = (q1, B, R)</para>
+      <para id="id20558531">M thay 0 đầu băng bởi B.</para>
+      <para id="id20558539">2) d(q1, 0) = (q1, 0, R)</para>
+      <para id="id20558573">d(q1, 1) = (q2, 1, R)</para>
+      <para id="id20558607">M di chuyển sang phải qua 0 tìm 1.</para>
+      <para id="id20558612">3) d(q2, 1) = (q2, 1, R)</para>
+      <para id="id20558646"> d(q2, 0) = (q3, 1, L)</para>
+      <para id="id20558686">M di chuyển sang phải vượt qua 1 đến khi gặp 0, đổi 0 thành 1.</para>
+      <para id="id20558696">4) d(q3, 0) = (q3, 0, L)</para>
+      <para id="id20558729">d(q3, 1) = (q3, 1, L)</para>
+      <para id="id20558758">d(q3, B) = (q0, B, R)</para>
+      <para id="id20558791">M dịch trái tới khi gặp B, trở về trạng thái q0 và bắt đầu một vòng lặp mới.</para>
+      <para id="id20558811">5) d(q2, B) = (q4, B, L)</para>
+      <para id="id20558844">d(q4, 1) = (q4, B, L) </para>
+      <para id="id20558873">d(q4, 0) = (q4, 0, L)</para>
+      <para id="id20558901">d(q4, B) = (q6, 0, )</para>
+      <para id="id20558938">Nếu ở trạng thái q2 sang phải tìm 0 để thay thành 1 nhưng chỉ gặp B thì ta xét trường hợp kết thúc i) ở trên: TM đi vào trạng thái q4 và chuyển sang trái đổi tất cả 1 thành B cho tới khi gặp một B bên trái đầu tiên. B này sẽ được thay lại thành 0 rồi M đi vào trạng thái kết thúc q6 và dừng.</para>
+      <para id="id20558983">6) d(q0, 1) = (q5, B, R)</para>
+      <para id="id20559016">d(q5, 0) = (q5, B, R)</para>
+      <para id="id20559045">d(q5, 1) = (q5, B, R)</para>
+      <para id="id20559073">d(q5, B) = (q6, B, )</para>
+      <para id="id20559110">Nếu ở trạng thái bắt đầu vòng lặp mới q0 gặp 1 thay vì gặp 0, thì khối các số 0 bên trái đã xét hết, đây là trường hợp kết thúc ii) nêu trên: TM sẽ đi vào trạng thái q5, xoá phần còn lại của băng rồi đi vào trạng thái kết thúc q6 và dừng.</para>
+      <para id="id20559153">Chẳng hạn TM tính toán phép trừ 2\1 (tức input 0010 ) như sau :</para>
+      <para id="id20559163">q00010 ⊢ B q1010 ⊢ B0q110 ⊢ B01q20 ⊢ B0q311 ⊢ Bq3011 ⊢ q3B011 ⊢ Bq0011 ⊢ BBq111 ⊢ BB1q21 ⊢ BB11q2 ⊢ BB1q41 ⊢ BBq41 ⊢ Bq4 ⊢ Bq60</para>
+      <para id="id20559421">Nếu cho TM tính toán 1\2 (tức input 0100) :</para>
+      <para id="id20559427">q00100 ⊢ Bq1100 ⊢ B1q200 ⊢ Bq3110 ⊢ q3B110 ⊢ Bq0110 ⊢ BBq510 ⊢ BBBq50 ⊢ BBBBq5 ⊢ BBBBq6</para>
+    </section>
+    <section id="id-4809864887">
+      <title>CÁC KỸ THUẬT XÂY DỰNG MÁY TURING</title>
+      <para id="id20559611">Việc xây dựng máy Turing bằng cách viết (liệt kê) tất cả các hàm chuyển của nó trên băng nhập có thể là một công việc đơn điệu. Để mô tả đầy đủ cách xây dựng máy Turing, ta cần một vài công cụ "cấp cao" hơn. Phần này sẽ trình bày một số công cụ tổng quát :</para>
+      <section id="id-351266366408">
+        <title>Lưu trữ trong bộ điều khiển (Storage in the finite control) </title>
+        <para id="id20559638">Bộ điều khiển có thể dùng để lưu trữ một lượng hữu hạn thông tin. Để làm như thế, ta viết mỗi trạng thái như là một cặp các phần tử: một thành phần để điều khiển, thành phần kia lưu giữ 1 ký hiệu. Chú ý rằng, đây chỉ là một cách mở rộng trên khái niệm chứ không thay đổi định nghĩa máy Turing.</para>
+        <para id="id20559655">Thí dụ 7.3 :Xét máy Turing M nhận vào ký hiệu đầu tiên trên chuỗi nhập (viết trên bộ chữ cái {0, 1}), lưu trữ vào bộ điều khiển và kiểm tra rằng ký hiệu này không có xuất hiện ở vị trí nào khác trên chuỗi nữa hay không ?.</para>
+        <para id="id20559678">Ta xây dựng TM M (Q, {0, 1}, {0, 1, B}, , [q0, B], B, F}), trong đó tập trạng thái Q bao gồm các trạng thái dạng một cặp thành phần {q0, q1}  {0, 1, B}, tức là Q gồm chứa các trạng thái [q0, 0], [q0, 1], [q0, B], [q1, 0], [q1, 1] và [q1, B]. Trong mỗi cặp này thành phần thứ nhất ghi trạng thái điều khiển, thành phần thứ hai ghi nhớ ký hiệu. Ta định nghĩa hàm chuyển  như sau:</para>
+        <para id="id20559800">1)d([q0, B], 0) = ([q1, 0], 0, R)</para>
+        <para id="id20559834">d([q0, B], 1) = ([q1, 1], 1, R)</para>
+        <para id="id20559863">Bắt đầu từ trạng thái [q0, B], TM đọc và lưu trữ ký hiệu đầu tiên trên băng vào thành phần thứ hai trong bộ điều khiển.</para>
+        <para id="id20559884">2)d([q1, 0], 1) = ([q1, 0], 1, R)</para>
+        <para id="id20559918">d([q1, 1], 0) = ([q1, 1], 0, R)</para>
+        <para id="id20559946">Nếu các ký hiệu được đọc tiếp theo không giống với ký hiệu đang lưu trữ thì tiếp tục di chuyển sang phải.</para>
+        <para id="id20559960">3)d([q1, 0], B) = ([q1, B], 0, )</para>
+        <para id="id20560002">d([q1, 1], B) = ([q1, B], 0, ) </para>
+        <para id="id20560040">M đi vào trạng thái kết thúc [q1, B] khi gặp Blank. </para>
+        <para id="id20560059">M sẽ đi vào trạng thái kết thúc nếu nó tiến đến gặp ký hiệu B mà không có ký hiệu nào giống với ký hiệu đầu tiên đang được lưu trữ trong bộ điều khiển. Vậy nếu M tiến đến B ở trạng thái [q1, 0] hoặc [q1, 1] thì input được chấp nhận. Ngược lại, ở trạng thái [q1, 0] và gặp 0 hoặc ở trạng thái [q1, 1] và gặp 1 thì M dừng và không chấp nhận chuỗi input vì không có hàm chuyển trạng thái để xác định các bước chuyển này.</para>
+        <para id="id20560118">Một cách tổng quát, ta có thể xem bộ điều khiển gồm k thành phần trong đó một thành phần giữ trạng thái điều khiển và các thành phần kia (k-1 thành phần) dùng lưu giữ thông tin.</para>
+      </section>
+      <section id="id-798757624694">
+        <title>Nhiều rãnh trên băng (Multiple tracks)</title>
+        <para id="id20560142">Một cách mở rộng khác, ta cũng có thể xem băng của TM được chia thành k thành phần, với k &gt; 1 và hữu hạn. Một ký hiệu trên băng được xét là một bộ gồm k ký hiệu, mỗi ký hiệu nằm trên một rãnh.</para>
+        <para id="id20560162">Thí dụ 7.4 : Thiết kế TM nhận vào một số nguyên n (viết ở dạng nhị phân) và kiểm tra xem đó có phải là số nguyên tố hay không ?</para>
+        <para id="id20560180">Ta dùng băng 3 rãnh như hình 7.2 với nguyên tắc sau :</para>
+        <para id="id20560190">Số n ở dạng nhị phân được đưa vào trên rãnh 1 và được bao bởi cặp dấu Ë và $. Như vậy các ký hiệu được phép ghi trên băng là [Ë, B, B], [0, B, B], [1, B, B] và [$, B, B]. Các ký hiệu này tương ứng với Ë, 0, 1, $ khi xem chúng là ký hiệu nhập. Ký hiệu Blank là [B, B, B]. </para>
+        <para id="id20560234">Viết số 2 dạng nhị phân trên rãnh 2 (tức 10)</para>
+        <para id="id20560240">Chép rãnh 1 vào rãnh 3 sau đó lấy rãnh 3 trừ rãnh 2 nhiều lần nhất có thể được (thực hiện việc chia số cần kiểm tra cho số trên rãnh 2, lấy phần dư) </para>
+        <para id="id20560254">Xét số còn lại (số dư) :</para>
+        <para id="id20560263">- Nếu số còn lại là 0 thì input không là số nguyên tố (vì nó chia hết cho số trên rãnh 2)</para>
+        <para id="id20560271">- Nếu số còn lại khác 0 thì tăng số trên rãnh 2 thêm một đơn vị: nếu số trên rãnh 2 bằng số trên rãnh 1 (số n) thì input n là số nguyên tố vì n đã không chia hết cho bất kỳ số nào từ 2 đến n -1. Nếu số trên rãnh 2 nhỏ hơn số trên rãnh 1 thì ta lặp lại quá trình trên với số mới trên rãnh 2.</para>
+        <figure id="id20560291">
+          <media id="id1167576174667" alt=""><image src="../../media/graphics2-811c.png" mime-type="image/png" height="159" width="507"/></media>
+        </figure>
+        <para id="id20560315">Hình 7.2 - TM với băng 3 rãnh</para>
+        <para id="id20560338">Hình 7.2 trên mô tả một TM với k = 3, kiểm tra số n = 47 viết trên rãnh 1 dưới dạng nhị phân, TM đang thực hiện phép chia 47 cho 5. Nó đã trừ 2 lần số 5 vào số 47, vậy ở rãnh 3 hiện đang có số 37.</para>
+      </section>
+      <section id="id-625034341886">
+        <title>Đánh dấu ký hiệu (Checking off symbols) </title>
+        <para id="id20560364">Kỹ thuật đánh dấu thường dùng để nhận diện các ngôn ngữ được định nghĩa bằng cách lặp lại chuỗi chẳng hạn như {ww  w  å*}; {wcy  w, y  å*, w  y} hoặc {wwR  w  å*} hoặc các ngôn ngữ có độ dài các chuỗi con cần được so sánh, như {aibi  i  1} hoặc {aibjck  i = j hoặc j = k}. </para>
+        <para id="id20560555">Ta dùng một rãnh mở rộng trên băng để giữ ký hiệu đánh dấu . Ký hiệu  xuất hiện khi ký hiệu trên rãnh ngay bên dưới nó đã hoặc đang được xét bởi TM.</para>
+        <para id="id20560586">Thí dụ 7.5 :Xét máy Turing M (Q, å, , , q0, B, F) nhận diện ngôn ngữ L có dạng {wcw  w  (a+b)+} với các thành phần như sau :</para>
+        <para id="id20560663">Q = {[q, d]  q = q1, ..., q9 và d = a, b hoặc B} = {q1, ..., q9}  {a, b, B} (thành phần thứ hai của các trạng thái dùng để lưu trữ ký hiệu nhập)</para>
+        <para id="id20560726">å = {[B, d]  d = a, b, c} (ký hiệu nhập [B, d] được xác định bởi d)</para>
+        <para id="id20560751"> = {[X, d]  X = B hoặc  ; d = a, b, c hoặc B}.</para>
+        <para id="id20560782">q0 = [q1, B] </para>
+        <para id="id20560810">B = [B, B] được định nghĩa là B, ký hiệu Blank. </para>
+        <para id="id20560820">F = {[q9, B]}. </para>
+        <para id="id20560836">Với d = a hoặc b; e = a hoặc b, ta định nghĩa hàm chuyển  như sau:</para>
+        <para id="id20560854">1) d([q1, B], [B, d]) = ([q2, d], [Ö, d], R)</para>
+        <para id="id20560899">M đánh dấu ký hiệu được duyệt trên băng, lưu trữ vào bộ điều khiển và dịch chuyển sang phải.</para>
+        <para id="id20560910">2) d([q2, d], [B, e]) = ([q2, d], [B, e], R)</para>
+        <para id="id20560946">M tiếp tục dịch phải trên các ký hiệu chưa đánh dấu và tìm c.</para>
+        <para id="id20560956">3) d([q2, d], [B, c]) = ([q3, d], [B, c], R)</para>
+        <para id="id20560992">Khi tìm thấy c, M đi vào trạng thái mà thành phần đầu tiên là q3.</para>
+        <para id="id20561011">4) d([q3, d], [Ö, e]) = ([q3, d], [Ö, e], R)</para>
+        <para id="id20561064">M dịch phải qua các ký hiệu đã đánh dấu.</para>
+        <para id="id20561073">5) d([q3, d], [B, d]) = ([q4, B], [Ö, d], L)</para>
+        <para id="id20561118">M gặp ký hiệu chưa đánh dấu. Nếu ký hiệu chưa đánh dấu giống với ký hiệu đang lưu trong bộ điều khiển thì M đánh dấu rồi dịch trái. Nếu ký hiệu không giống ký hiệu lưu trong bộ điều khiển thì M không dịch chuyển nữa và không chấp nhận input. M cũng dừng nếu ở trạng thái q3 và gặp ký hiệu [B, B] trước khi gặp ký hiệu chưa đánh dấu.</para>
+        <para id="id20561146">6) d([q4, B], [Ö, d]) = ([q4, B], [Ö, d], L)</para>
+        <para id="id20561200">M dịch trái trên các ký hiệu đã đánh dấu.</para>
+        <para id="id20561209">7) d([q4, B], [B, c]) = ([q5, B], [B, c], L)</para>
+        <para id="id20561245">M gặp ký hiệu c.</para>
+        <para id="id20561250">8) d([q5, B], [B, d]) = ([q6, B], [B, d], L)</para>
+        <para id="id20561286">Nếu ký hiệu ngay bên trái c chưa được đánh dấu thì M tiến sang trái để tìm ký hiệu bên phải nhất đã được đánh dấu.</para>
+        <para id="id20561298">9) d([q6, B], [B, d]) = ([q6, B], [B, d], L)</para>
+        <para id="id20561334">M tiếp tục dịch chuyển sang trái.</para>
+        <para id="id20561340">10) d([ q6, B], [Ö, d]) = ([q1, B], [Ö, d], R)</para>
+        <para id="id20561393">M gặp ký hiệu đã đánh dấu, nó dịch phải để lấy ký hiệu chưa đánh dấu bên cạnh và tiếp tục vòng lặp so sánh. Khi đó, thành phần thứ 1 lại trở thành q1.</para>
+        <para id="id20561415">11) d([q5, B], [Ö, d]) = ([q7, B], [Ö, d], R)</para>
+        <para id="id20561468">M ở trạng thái [q5, B] ngay sau khi vượt sang trái c. Nếu ký hiệu xuất hiện ngay trước c đã được đánh dấu thì tất cả các ký hiệu trước c đều đã được đánh dấu. M phải kiểm tra xem bên phải c còn có ký hiệu nào chưa được đánh dấu hay không. Nếu không còn ký hiệu nào thì M chấp nhận input.</para>
+        <para id="id20561495">12) d([q7, B], [B, c]) = ([q8, B], [B, c], R)</para>
+        <para id="id20561531">M dịch sang phải c.</para>
+        <para id="id20561536">13) d([q8, B], [Ö, d]) = ([q8, B], [Ö, d], R)</para>
+        <para id="id20561589">M tiếp tục dịch sang phải trên các ký hiệu đã được đánh dấu.</para>
+        <para id="id20561599">14) d([q8, B], [B, B]) = ([q9, B], [Ö, B], )</para>
+        <para id="id20561651">M tìm gặp Blank, nó dừng và chấp nhận chuỗi. Nếu M gặp ký hiệu chưa được đánh dấu khi thành phần thứ 1 là q8 thì nó dừng và không chấp nhận.</para>
+      </section>
+      <section id="id-201265772544">
+        <title>Dịch qua (Shifting over)</title>
+        <para id="id20561682">Máy Turing có thể tạo ra một không gian trống trên băng bằng cách dời các ký hiệu không trống trên băng đi sang phải hữu hạn ô. Để làm điều đó đầu đọc phải thực hiện dịch phải, lặp lại việc lưu ký hiệu đọc được vào bộ điều khiển và thay thế chúng bằng ký hiệu đọc được ở ô bên trái. Nếu có đủ ô trống, TM cũng có thể chuyển dịch một khối ký hiệu sang trái một cách tương tự.</para>
+        <para id="id20561700">Thí dụ 7.6 :Xây dựng TM M(Q, å, , , q0, B, F) dịch toàn bộ các ký hiệu không trống trên băng sang phải 2 ô. </para>
+        <para id="id20561750">Ta giả sử không có Blank giữa các ký hiệu không trống, vì vậy khi đầu đọc gặp Blank thì nó đã dịch xong các ký hiệu khác trống trên băng. Tập các trạng thái Q chứa các phần tử dạng [q, A1, A2] với q = q1 hoặc q2 và A1, A2  . Gọi X là một ký hiệu đặc biệt được chấp nhận trên băng của M, nó không được sử dụng với mục đích nào khác ngoài quá trình dịch chuyển trên băng. M bắt đầu với trạng thái [q1, B, B] và hàm chuyển thực hiện như sau:</para>
+        <para id="id20561852">Với Ai   - {B, X}</para>
+        <para id="id20561885">1) d([q1, B, B], A1) = ([q1, B, A1], X, R) </para>
+        <para id="id20561936">M lưu ký hiệu đọc đầu tiên vào thành phần thứ 3 trong bộ điều khiển, ghi X vào ô đang đọc rồi dịch sang phải.</para>
+        <para id="id20561948">2) d([q1, B, A1], A2) = ([q1, A1, A2], X, R) </para>
+        <para id="id20562015">M chuyển ký hiệu ở thành phần thứ 3 sang thành phần thứ 2, lưu trữ ký hiệu đọc được vào thành phần thứ 3, viết X vào ô đang đọc rồi dịch sang phải.</para>
+        <para id="id20562029">3) d([q1, A1, A2], A3) = ([q1, A2, A3], A1, R) </para>
+        <para id="id20562113">Bắt đầu từ bước chuyển này, M lần lượt đọc vào một ký hiệu, ghi nó vào thành phần thứ 3, chuyển ký hiệu được ghi trước đó ở thành phần thứ 3 sang thành phần thứ 2, chép lại ký hiệu ở thành phần thứ 2 vào ô đang đọc rồi dịch sang phải.</para>
+        <para id="id20562130">4) d([q1, Ai - 2, Ai – 1], Ai) = ([q1, Ai - 1, Ai], Ai - 2, R) </para>
+        <para id="id20562215">5) d([q1, An - 1, An], B) = ([q2, An, B], An - 1, R)</para>
+        <para id="id20562282">Cho đến khi M gặp B, nó dốc nốt 2 ký hiệu cuối đang giữ trong bộ nhớ để bắt đầu đi vào trạng thái kết thúc. </para>
+        <para id="id20562295">6) d([q2, An, B], B) = ([q2, B, B], An, L)</para>
+        <para id="id20562345">Cuối cùng, tất cả các ký hiệu không trống trên băng đã được chuyển dịch sang phải 2 ô. Lúc đó nó sẽ được chuyển sang một trạng thái nào đó (có thể quay về trái, trở về đầu băng) để thực hiện một chức năng khác.</para>
+      </section>
+      <section id="id-492123735048">
+        <title>Chương trình con (Subroutines) </title>
+        <para id="id20562371">Cũng giống như một chương trình máy tính hiện đại, máy Turing có thể đóng vai trò tương tự như bất kỳ một kiểu chương trình con nào trong ngôn ngữ lập trình bao gồm thủ tục đệ qui hoặc có tham số. Ý tưởng chung là ta viết một phần chương trình của TM như là một chương trình con. Nó sẽ được thiết kế có chứa một trạng thái khởi đầu và một trạng thái trở về, trạng thái trở về là trạng thái không có phép chuyển kế tiếp và nó sẽ đóng vai trò là trạng thái khởi đầu của một TM khác hoặc là một trạng thái nào đó trong một TM khác. Nghĩa là từ trạng thái trở về của TM này ta tiếp tục các phép chuyển của một TM khác, sự kiện này có ý nghĩa như là gọi một chương trình con khác hoặc tiếp tục thực hiện chương trình cấp trên. Lưu ý, các trạng thái của chương trình con phải phân biệt với chương trình cấp trên của nó.</para>
+        <para id="id20562409">Thí dụ 7.7 :Thiết kế TM thực hiện phép nhân 2 số nguyên m, n.</para>
+        <para id="id20562424">. Input : 0m10n</para>
+        <para id="id20562448">. Output : 0m  n </para>
+        <para id="id20562469">M bắt đầu với 0m10n trên băng và kết thúc với 0m  n trên băng được bao quanh bởi các Blank. </para>
+        <para id="id20562517">Ý tưởng chung là đặt thêm số 1 sau 0m10n rồi chép khối n số 0 sang phải m lần mỗi lần xoá một con 0 bên trái của 0m. Ta được kết quả cuối cùng là 10n10m  n . Bây giờ ta chỉ việc xoá 10n1 ta sẽ được kết quả 0m  n .</para>
+        <para id="id20562612">Phần chính của giải thuật trên là thủ tục COPY để chép n số 0 sang phải. Thủ tục này được xác định bằng các hàm chuyển sau:</para>
+        <table id="id20562625" summary="">
+          <tgroup cols="5">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <colspec colnum="4" colname="c4"/>
+            <colspec colnum="5" colname="c5"/>
+            <tbody>
+              <row>
+                <entry/>
+                <entry>0</entry>
+                <entry>1</entry>
+                <entry>2</entry>
+                <entry>B</entry>
+              </row>
+              <row>
+                <entry>q1</entry>
+                <entry>(q2, 2, R)</entry>
+                <entry>(q4, 1, L)</entry>
+                <entry/>
+                <entry/>
+              </row>
+              <row>
+                <entry>q2</entry>
+                <entry>(q2, 0, R)</entry>
+                <entry>(q2, 1, R)</entry>
+                <entry/>
+                <entry>(q3, 0, L)</entry>
+              </row>
+              <row>
+                <entry>q3</entry>
+                <entry>(q3, 0, L)</entry>
+                <entry>(q3, 1, L)</entry>
+                <entry>(q1, 2, R)</entry>
+                <entry/>
+              </row>
+              <row>
+                <entry>q4</entry>
+                <entry/>
+                <entry>(q5, 1, R)</entry>
+                <entry>(q4, 0, L)</entry>
+                <entry/>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id20563023"/>
+        <para id="id20563036">Ở trạng thái q1 nhìn thấy 0, M đổi 0 thành 2 và đi vào trạng thái q2. Ở trạng thái q2, M dịch phải tới Blank viết 0 rồi dịch trái trong trạng thái q3. Khi ở trạng thái q3 mà gặp 2, M đi vào trạng thái q1 để tiếp tục lặp lại quá trình trên cho tới khi gặp 1. Trạng thái q4 được dùng để biến đổi 2 thành 0 và thủ tục dừng tại q5. </para>
+        <para id="id20563124">Để làm đầy đủ chương trình ta phải thêm các trạng thái để biến đổi hình thái khởi đầu q00m10n thành B0m-11q10n1. Tức là ta cần ba qui tắc:</para>
+        <para id="id20563184">d(q0, 0) = (q6, B, R)</para>
+        <para id="id20563213">d(q6, 0) = (q6, 0, R)</para>
+        <para id="id20563241">d(q6, 1) = (q1, 1, R)</para>
+        <para id="id20563270">Sau đó, ta lại thêm các phép chuyển và trạng thái cần thiết để biến đổi từ hình thái Bi0m-i1q50n10n  i thành Bi+10m-i-11q10n10n  i là trạng thái bắt đầu lại việc COPY, đồng thời kiểm tra i = m hay không (khi tất cả các 0 của 0m đã bị xoá). Nếu i = m thì 10n1 bị xoá và quá trình tính toán sẽ dừng ở trạng thái q12. Các hàm chuyển bổ sung như sau :</para>
+        <para id="id20563416">
+          <table id="id20563437" summary="">
+            <tgroup cols="5">
+              <colspec colnum="1" colname="c1"/>
+              <colspec colnum="2" colname="c2"/>
+              <colspec colnum="3" colname="c3"/>
+              <colspec colnum="4" colname="c4"/>
+              <colspec colnum="5" colname="c5"/>
+              <tbody>
+                <row>
+                  <entry/>
+                  <entry>0</entry>
+                  <entry>1</entry>
+                  <entry>2</entry>
+                  <entry>B</entry>
+                </row>
+                <row>
+                  <entry>q5</entry>
+                  <entry>(q7, 0, L)</entry>
+                  <entry/>
+                  <entry/>
+                  <entry/>
+                </row>
+                <row>
+                  <entry>q7</entry>
+                  <entry/>
+                  <entry>(q8, 1, L)</entry>
+                  <entry/>
+                  <entry/>
+                </row>
+                <row>
+                  <entry>q8</entry>
+                  <entry>(q9, 0, L)</entry>
+                  <entry/>
+                  <entry/>
+                  <entry>(q10, B, R)</entry>
+                </row>
+                <row>
+                  <entry>q9</entry>
+                  <entry>(q9, 0, L)</entry>
+                  <entry/>
+                  <entry/>
+                  <entry>(q0, B, R)</entry>
+                </row>
+                <row>
+                  <entry>q10</entry>
+                  <entry/>
+                  <entry>(q11, B, R)</entry>
+                  <entry/>
+                  <entry/>
+                </row>
+                <row>
+                  <entry>q11</entry>
+                  <entry>(q11, B, R)</entry>
+                  <entry>(q12, B,)</entry>
+                  <entry/>
+                  <entry/>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+        </para>
+        <para id="id20563917"/>
+        <para id="id20563921"/>
+      </section>
+    </section>
+    <section id="id-0828066090055">
+      <title>CÁC BIẾN DẠNG CỦA MÁY TURING</title>
+      <para id="id20563935">Sau đây, ta sẽ xét thêm một số dạng khác của máy Turing, chúng có vẻ phức tạp và tinh vi hơn, song thực tế chúng cũng đều tương đương với mô hình TM cơ bản đã định nghĩa ở trên.</para>
+      <section id="id-23060370136">
+        <title>Máy Turing với băng vô hạn 2 chiều </title>
+        <para id="id20563959">Máy Turing với băng vô hạn hai chiều cũng tương tự như mô hình gốc (TM vô hạn một chiều băng), chỉ khác là băng của nó không có cận trái như mô hình gốc, nghĩa là ta xem như TM có vô hạn Blank ở cả hai đầu băng. Vì thế hàm  được mở rộng thêm bằng cách xét thêm các trường hợp đặc biệt tại cận trái như sau :</para>
+        <para id="id20563988">Nếu (q, X) = (p, Y, L) thì qX ⊢ pBY</para>
+        <para id="id20564028">Nếu (q, X) = (p, B, R) thì qX ⊢ p</para>
+        <para id="id20564067">ĐỊNH LÝ 7.1 : Nếu L được nhận diện bởi TM với băng vô hạn hai chiều thì L cũng được nhận diện bằng TM vô hạn một chiều băng</para>
+        <para id="id20564086">Chứng minh</para>
+        <para id="id20564091">Gọi M2 là TM với băng vô hạn hai chiều M2 (Q2, 2, 2, 2, q2, B, F2) nhận diện L. Ta xây dựng M1 là TM vô hạn một chiều băng nhận diện L. Băng của M1 có 2 rãnh: </para>
+        <para id="id20564200">- Rãnh trên biểu diễn cho băng của M2 phía phải đầu đọc lúc khởi đầu.</para>
+        <para id="id20564221">- Rãnh dưới biểu diễn cho băng phía trái đầu đọc lúc khởi đầu theo thứ tự ngược lại.</para>
+        <table id="id20564235" summary="">
+          <tgroup cols="13">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <colspec colnum="4" colname="c4"/>
+            <colspec colnum="5" colname="c5"/>
+            <colspec colnum="6" colname="c6"/>
+            <colspec colnum="7" colname="c7"/>
+            <colspec colnum="8" colname="c8"/>
+            <colspec colnum="9" colname="c9"/>
+            <colspec colnum="10" colname="c10"/>
+            <colspec colnum="11" colname="c11"/>
+            <colspec colnum="12" colname="c12"/>
+            <colspec colnum="13" colname="c13"/>
+            <tbody>
+              <row>
+                <entry>...</entry>
+                <entry>A-5</entry>
+                <entry>A-4</entry>
+                <entry>A-3</entry>
+                <entry>A-2</entry>
+                <entry>A-1</entry>
+                <entry>A0</entry>
+                <entry>A1</entry>
+                <entry>A2</entry>
+                <entry>A3</entry>
+                <entry>A4</entry>
+                <entry>A5</entry>
+                <entry>...</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id20564455"/>
+        <para id="id20564459">(a) - Băng của M2</para>
+        <table id="id20564481" summary="">
+          <tgroup cols="7">
+            <colspec colnum="1" colname="c1"/>
+            <colspec colnum="2" colname="c2"/>
+            <colspec colnum="3" colname="c3"/>
+            <colspec colnum="4" colname="c4"/>
+            <colspec colnum="5" colname="c5"/>
+            <colspec colnum="6" colname="c6"/>
+            <colspec colnum="7" colname="c7"/>
+            <tbody>
+              <row>
+                <entry>A0</entry>
+                <entry>A1</entry>
+                <entry>A2</entry>
+                <entry>A3</entry>
+                <entry>A4</entry>
+                <entry>A5</entry>
+                <entry>...</entry>
+              </row>
+              <row>
+                <entry>Ë</entry>
+                <entry>A-1</entry>
+                <entry>A-2</entry>
+                <entry>A-3</entry>
+                <entry>A-4</entry>
+                <entry>A-5</entry>
+                <entry>...</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para id="id20564714"/>
+        <para id="id20564723">(b) - Băng của M1</para>
+        <para id="id20564744">Hình 7.3 - Băng nhập của TM M2 và M1</para>
+        <para id="id20564780">M1 thực hiện các phép chuyển tương tự như M2 nhưng khi M2 thực hiện các phép chuyển phía phải đầu đọc thì M1 làm việc với rãnh trên, khi M2 thực hiện các phép chuyển bên trái đầu đọc thì M1 làm việc ở rãnh dưới</para>
+        <para id="id20564849">Một cách hình thức M1 (Q1, 1, 1, 1, q1, B, F1), trong đó :</para>
+        <para id="id20564929">Q1 là tập hợp các đối tượng dạng [q, U] hoặc [q, D], trong đó q là trạng thái trong Q2, còn U, D dùng chỉ rằng M1 đang làm việc với rãnh trên (Up) hay rãnh dưới (Down). Các ký hiệu băng của M1 (các ký hiệu thuộc 1) có dạng [X, Y] trong đó X, Y thuộc 2, hơn nữa Y có thể là  là ký hiệu không có trong 2 dùng để đánh dấu ô trái nhất trên băng của M1 .</para>
+        <para id="id20565058">1 là tập hợp các đối tượng dạng [a, B] trong đó a  2.</para>
+        <para id="id20565099">F1 = {[q, U], [q, D] q Î F2}.</para>
+        <para id="id20565145">Hàm chuyển 1 có dạng như sau:</para>
+        <para id="id20565166">1)1(q1, [a, B]) = ([q, U], [X, ], R) nếu 2(q2, a) = (q, X, R)</para>
+        <para id="id20565230">Nếu M2 chuyển sang phải trong lần chuyển đầu tiên thì M in  trên rãnh dưới, ghi nhớ U vào thành phần thứ hai của trạng thái và dịch phải. Thành phần thứ nhất của trạng thái lưu trạng thái của M2. M1 in X (ký hiệu mà M2 in ra) ở rãnh trên. </para>
+        <list id="id20565289" list-type="enumerated">
+          <item>a Î 2 U {B} : </item>
+        </list>
+        <para id="id20565327">1(q1, [a, B]) = ([q, D], [X, ], R) nếu 2(q2, a) = (q, X, L)</para>
+        <para id="id20565384">Nếu M2 chuyển sang trái trong lần chuyển đầu tiên thì M1 in  trên rãnh dưới, ghi nhớ D vào thành phần thứ hai của trạng thái và dịch phải. Thành phần thứ nhất của trạng thái lưu trạng thái của M2. M1 in X (ký hiệu mà M2 in ra) ở rãnh trên.</para>
+        <para id="id20565452">3) [X, Y] 1, với Y   và A = L hoặc R :</para>
+        <para id="id20565500">1([q, U], [X, Y]) = ([p, U], [Z, Y], A) nếu 2(q, X) = (p, Z, A)</para>
+        <para id="id20565531">M1 ở rãnh trên thực hiện tương tự như M2.</para>
+        <para id="id20565557">4) 1([q, D], [X, Y]) = ([p, D], [X, Z], A) nếu 2(q, Y) = (p,Z,
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:mover accent="true"><m:mi>A</m:mi><m:mo>¯</m:mo></m:mover></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{ {overline  {A}} } {}</m:annotation></m:semantics></m:math>)</para>
+        <para id="id20565648">(Trong đó nếu A = L thì 
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:mover accent="true"><m:mi>A</m:mi><m:mo>¯</m:mo></m:mover></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{ {overline  {A}} } {}</m:annotation></m:semantics></m:math> = R và nếu A = R thì 
+<m:math><m:semantics><m:mrow><m:mstyle fontsize="12pt"><m:mrow><m:mover accent="true"><m:mi>A</m:mi><m:mo>¯</m:mo></m:mover></m:mrow></m:mstyle><m:mrow/></m:mrow><m:annotation encoding="StarMath 5.0"> size 12{ {overline  {A}} } {}</m:annotation></m:semantics></m:math> = L)</para>
+        <para id="id20565768">Ở rãnh dưới, M1 làm tương tự M2 nhưng dịch chuyển đầu đọc theo hướng ngược lại.</para>
+        <para id="id20565798">5) 1([q, U], [X, ]) = 1([q, D], [X, ]) = ([p, C], [Y,], R] </para>
+        <para id="id20565860">nếu 2(q, X) = (p, Y, A)</para>
+        <para id="id20565881">(Trong đó C = U nếu A = R, C = D nếu A = L) </para>
+        <para id="id20565890">M1 làm tương tự M2 ở ô khởi đầu, công việc tiếp theo của M1 thực hiện ở rãnh trên hay dưới phụ thuộc vào hướng chuyển đầu đọc của M2.</para>
+      </section>
+      <section id="id-619434966456">
+        <title>Máy Turing với nhiều băng vô hạn hai chiều</title>
+        <para id="id20565946">Xét máy Turing có một bộ điều khiển có k đầu đọc và k băng vô hạn hai chiều. Mỗi phép chuyển của máy Turing, phụ thuộc vào trạng thái của bộ điều khiển và ký tự đọc được tại mỗi đầu đọc, nó có thể thực hiện các bước sau :</para>
+        <para id="id20565963">1) Chuyển trạng thái.</para>
+        <para id="id20565968">2) In ký hiệu mới tại mỗi đầu đọc để thay thế ký hiệu vừa đọc.</para>
+        <para id="id20565979">3) Đầu đọc có thể giữ nguyên vị trí hoặc dịch trái hoặc dịch phải 1 ô một cách độc lập nhau.</para>
+        <para id="id20565990">Khởi đầu input xuất hiện trên băng thứ nhất, các băng khác chỉ toàn Blank. </para>
+        <para id="id20566001">Một máy Turing như vậy gọi là máy Turing với nhiều băng vô hạn hai chiều.</para>
+        <para id="id20566011">ĐỊNH LÝ 7.2 : Nếu L được nhận dạng bởi máy Turing nhiều băng vô hạn hai chiều thì nó cũng được nhận dạng bởi máy Turing một băng vô hạn hai chiều. </para>
+        <para id="id20566030">Chứng minh</para>
+        <para id="id20566035">Giả sử L được nhận diện bởi máy Turing k băng vô hạn hai chiều M1, ta xây dựng máy Turing M2 một băng với 2k rãnh, 2 rãnh sẽ mô phỏng một băng của M1 bằng cách: một rãnh giữ ký hiệu trên băng của M1 một rãnh kia giữ ký hiệu đánh dấu vị trí đầu đọc.</para>
+        <para id="id20566087">Mỗi phép chuyển của M1 được mô phỏng bằng M2 như sau:</para>
+        <para id="id20566115">M2 xuất phát tại vị trí trái nhất chứa ký hiệu đánh dấu đầu đọc, M2 quét sang phải, khi qua mỗi ô có đánh dấu vị trí đầu đọc nó ghi nhớ ký hiệu tại vị trí này và đếm số vị trí đầu đọc đã gặp. Khi M2 đi sang phải và đã đếm đủ k đầu đọc thì nó đã có đủ thông tin để xác định phép chuyển tương tự như M1, M2 lại quét từ phải sang trái, khi đi ngang qua mỗi ô có đánh dấu đầu đọc nó in ký hiệu thay thế ký hiệu tại đầu đọc (như M1) chuyển vị trí đánh dấu đầu đọc (như M1 chuyển đầu đọc của nó). Cuối cùng M2 đổi trạng thái trong bộ điều khiển của nó thành trạng thái mà M1 chuyển tới.</para>
+        <figure id="id20566227">
+          <media id="id1167572143451" alt=""><image src="../../media/graphics3-39d1.png" mime-type="image/png" height="377" width="332"/></media>
+        </figure>
+        <para id="id20566251">Hình 7.4 - Máy Turing 1 băng mô phỏng máy Turing 3 băng</para>
+        <para id="id20566273">Thí dụ 7..8 :Ngôn ngữ {ww w  (0+1)*} có thể được chấp nhận bởi một máy Turing có 2 băng bằng cách như sau: Đầu tiên, nó chép lại chuỗi nhập ở băng thứ nhất lên băng thứ hai. Sau đó, trên băng thứ nhất đầu đọc chuyển dần từ cận trái sang cận phải của chuỗi, trong khi trên băng thứ hai đầu đọc lại chuyển ngược lại từ cận phải sang cận trái của chuỗi đó. Chuỗi được chấp nhận nếu suốt quá trình đó, các ký hiệu đọc được trên 2 băng luôn luôn đồng nhất.</para>
+        <para id="id20566331">Như ta đã biết, để đoán nhận ngôn ngữ này bằng TM một băng thì đầu đọc phải dịch chuyển tới lui rất nhiều lần để so sánh hai nửa của chuỗi nhập từ cả hai đầu băng. Như vậy, số bước dịch chuyển của nó xấp xỉ bằng bình phương độ dài chuỗi nhập, trong khi TM với 2 băng nhập chỉ cần thực hiện số bước chuyển tỷ lệ với độ dài của chuỗi nhập.</para>
+      </section>
+      <section id="id-0921974003009">
+        <title>Máy Turing không đơn định</title>
+        <para id="id20566358">Máy Turing không đơn định có mô hình tương tự như mô hình gốc nhưng điểm khác biệt ở chỗ là trong mỗi lần chuyển, máy Turing có thể lựa chọn một trong một số hữu hạn các trạng thái kế tiếp, lựa chọn hướng chuyển đầu đọc, và lựa chọn ký hiệu in ra trên băng để thay thế ký hiệu vừa đọc được. Máy Turing trong mô hình gốc còn gọi là máy Turing đơn định.</para>
+        <para id="id20566380">ĐỊNH LÝ 7.3 : Nếu L được chấp nhận bởi máy Turing không đơn định M1 thì L cũng được chấp nhận bởi một máy Turing đơn định M2 nào đó.</para>
+        <para id="id20566417">Chứng minh</para>
+        <para id="id20566422">Với một trạng thái và một ký hiệu băng bất kỳ của M1, có một số hữu hạn các phép chuyển đến trạng thái kế tiếp, ta có thể đấnh số các trạng thái này là 1, 2, ... Gọi r là số lớn nhất của số các cách lựa chọn với một cặp trạng thái và ký kiệu bất kỳ. Ta có, mọi dãy các phép chuyển trạng thái đều được chỉ ra bằng một dãy chứa các số từ 1 đến r. Ngược lại một dãy hữu hạn bất kỳ gồm các số từ 1 đến r có thể biểu diễn cho một dãy các phép chuyển nào đó cũng có thể không. M2 được thiết kế có ba băng: </para>
+        <para id="id20566462">Băng 1 chứa input</para>
+        <para id="id20566470">Băng 2 sinh ra dãy chứa các số từ 1 đến r một cách tự động theo tính chất dãy ngắn sinh ra trước, nếu các dãy cùng độ dài thì nó sinh ra theo thứ tự liệt kê số (numerical order).</para>
+        <para id="id20566488">Băng 3 dùng chép input trên băng 1 vào để xử lý: với mỗi số sinh ra trên băng 2, M2 chép input trên băng 1 vào băng 3 và thực hiện các phép chuyển theo dãy số trên băng 2. </para>
+        <para id="id20566513">Nếu có một chuỗi nào đó trên băng 2 làm cho M2 đi vào trạng thái kết thúc thì M2 dừng và chấp nhận input. Nếu không có chuỗi nào như vậy thì M2 không chấp nhận input. Tất nhiên M2 chấp nhận input khi và chỉ khi M1 chấp nhận input.</para>
+      </section>
+      <section id="id-274043058403">
+        <title>Máy Turing nhiều chiều</title>
+        <para id="id20566584">Máy Turing nhiều chiều gồm một bộ điều khiển hữu hạn, nhưng băng của nó là một mảng k chiều vô hạn về cả 2k phía. Với một số k nào đó, phụ thuộc vào trạng thái và một ký hiệu được đọc, máy thay đổi trạng thái, in một ký hiệu mới tại ô đang đọc và dịch chuyển đầu đọc theo một trong 2k phía. </para>
+        <para id="id20566605">ĐỊNH LÝ 7.4: Nếu L được chấp nhận bởi máy Turing k chiều M1 thì L cũng được chấp nhận bởi một máy Turing một chiều M2 nào đó.</para>
+        <para id="id20566639">(Phần chứng minh, xem như bài tập)</para>
+      </section>
+      <section id="id-823738126158">
+        <title>Máy Turing nhiều đầu đọc</title>
+        <para id="id20566661"/>
+        <para id="id20566665">Máy Turing nhiều đầu đọc có k đầu đọc được đánh số từ 1 đến k với k là một số hữu hạn nào đó, nhưng chỉ có một băng input. Một phép chuyển của máy Turing phụ thuộc vào trạng thái và các ký tự được đọc bởi mỗi đầu băng. Mỗi đầu dịch chuyển một cách độc lập sang trái, sang phải hoặc đứng yên.</para>
+        <para id="id20566788">ĐỊNH LÝ 7.5 : Nếu L được chấp nhận bởi máy Turing k đầu đọc M1 thì L cũng được chấp nhận bởi một máy Turing một đầu đọc M2 nào đó.</para>
+        <para id="id20566826">(Phần chứng minh, xem như bài tập)</para>
+      </section>
+    </section>
+    <section id="id-771619949713">
+      <title>GIẢ THUYẾT CHURCH</title>
+      <para id="id20566846">Giả thuyết rằng khái niệm trực giác “Hàm tính được” (computable function) có thể được định nghĩa bằng lớp các hàm đệ quy bộ phận là giả thuyết Church hay còn được gọi là luận đề Church - Turing. Trong khi chúng ta không thể hy vọng để chứng minh giả thuyết Church cũng như những định nghĩa không hình thức về “sự tính được”, chúng ta có thể cho những dẫn chứng về những khả triển của chúng. Trong một thời gian dài, khái niệm trực giác về “sự tính được” đặt không giới hạn trên số bước hoặc tổng số các lưu trữ, có vẻ như các hàm đệ quy bộ phận thì có thể tính được một cách trực giác mặc dù cũng có một số hàm không thể tính được trừ khi ta đặt giới hạn cho việc tính toán sau đó hoặc ít nhất thiết lập được liệu có hay không có phép tính cuối cùng.</para>
+      <para id="id20566936">Điều còn không rõ là liệu lớp các hàm đệ quy bộ phận có thể bao hàm tất cả mọi “hàm tính được”. Những nhà logic học đã đưa ra nhiều công thức khác, chẳng hạn như phép tính-, hệ thống Post và các hàm đệ quy tổng quát. Tất cả chúng được định nghĩa cùng một lớp hàm, cụ thể là hàm đệ quy bộ phận. Hơn nữa, các mô hình máy tính trừu tượng, chẳng hạn như mô hình RAM (Random Access Machine) cũng được xem xét như một hàm đệ quy bộ phận.</para>
+      <para id="id20566966">Mô hình RAM bao gồm một số vô hạn các từ nhớ, đánh số 0, 1, ..., mỗi một từ nhớ có thể lưu giữ một số nguyên bất kỳ và một số hữu hạn các thanh ghi số học cũng có khả năng giữ các số nguyên bất kỳ. Các số nguyên có thể được giải mã thành các dạng thông thường của các chỉ thị máy tính. Chúng ta sẽ không định nghĩa mô hình RAM một cách hình thức hơn, nhưng sẽ rõ ràng hơn nếu chúng ta chọn một tập các chỉ thị phù hợp, RAM sẽ mô phỏng mọi máy tính hiện có. Chứng minh rằng mô hình máy Turing cũng có khả năng tương đương như mô hình RAM được chỉ ra dưới đây hay có thể nói một máy Turing cũng có tác dụng như một kiểu RAM. </para>
+      <para id="id20567007">Mô phỏng mô hình RAM bởi máy Turing</para>
+      <para id="id20567012">ĐỊNH LÝ 7.6: Một máy Turing có thể mô phỏng một RAM, với điều kiện là mỗi chỉ thị RAM cũng có thể được mô phỏng bởi một TM.</para>
+      <para id="id20567029">Chứng minh</para>
+      <para id="id20567034">Ta sử dụng một TM M nhiều băng để thực hiện quá trình mô phỏng. Một băng của M giữ các từ của RAM được cho bởi các giá trị như dưới đây. Băng có dạng sau :</para>
+      <para id="id20567045"># 0*v0 # 1*v1 # 10*v2 # …# i*vi # …</para>
+      <para id="id20567088">trong đó vi là nội dung băng viết dưới dạng nhị phân của từ thứ i. Tại mỗi thời điểm, sẽ có một số hữu hạn các từ của RAM có thể được dùng và M chỉ cần lưu giữ lại các giá trị cho đến khi có một số lượng từ lớn nhất được sử dụng sau đó.</para>
+      <para id="id20567114">RAM có một số hữu hạn các thanh ghi số học. M dùng một băng để giữ nội dung của mỗi thanh ghi này, một băng để giữ số đếm vị trí (location counter), nơi chứa số thứ tự các từ mà chỉ thị kế tiếp sẽ gọi đến. Và một băng nữa dùng như là thanh ghi địa chỉ bộ nhớ (memory address register) trong đó lưu giữ số của từ nhớ. </para>
+      <para id="id20567152">Giả sử rằng 10 bit đầu tiên của một chỉ thị biểu thị một toán tử chuẩn của máy tính, chẳng hạn như LOAD, STORE, ADD, … và những bit sau đó xác định địa chỉ của một toán hạng. Trong khi chúng ta sẽ xem xét một cách chi tiết việc cài đặt tất cả các chỉ thị máy tính chuẩn, một ví dụ minh họa sẽ cho thấy điều này rõ ràng hơn. Giả sử băng số đếm vị trí của M giữ số i trong hệ nhị phân. M duyệt băng này đầu tiên từ bên trái và tìm thấy # i*. Nếu một khoảng trống được đếm trước khi tìm thấy # i*, có nghĩa là không có chỉ thị nào trong từ i, vì thế RAM và M ngừng lại. Nếu # i* được tìm thấy, chuỗi bit theo sau ký hiệu * cho đến ký hiệu # sau đó sẽ được xem xét. Giả sử 10 bit đầu tiên là mã lệnh của “ADD to register 2” và phần chuỗi bit còn lại là một số j trong hệ nhị phân. M thêm 1 vào i trên băng số đếm vị trí và sao chép j vào băng địa chỉ bộ nhớ. Sau đó, M lại tìm kiếm # j* trên băng đầu tiên, một lần nữa lại bắt đầu từ bên trái (chú ý rằng # 0* đánh dấu vị trí cận trái). Nếu # j* không tìm thấy, ta giả sử từ j giữ 0 và đi tiếp đến chỉ thị kế tiếp của RAM. Nếu # j* vj# được tìm thấy, vj sẽ đựoc thêm vào nội dung của thanh ghi 2, nơi chứa chính nó trên băng. Tiếp tục lặp lại vòng lặp này với chỉ thị kế tiếp.</para>
+      <para id="id20567213">Lưu ý rằng trong giải thuật này, mặc dù mô phỏng RAM dùng một máy Turing nhiều băng, nhưng theo Định lý 7.2, nếu ta dùng TM với một băng vô hạn hai chiều cũng sẽ thành công song sẽ phức tạp hơn.</para>
+    </section>
+    <section id="id-465818447599">
+      <title>MÁY TURING NHƯ LÀ MỘT BỘ LIỆT KÊ</title>
+      <para id="id20567235">Ta đã xét máy Turing như là một máy dùng nhận dạng ngôn ngữ và tính toán các hàm. Một quan điểm rất có ích nữa là xem máy Turing như là bộ liệt kê, tức là nó có khả năng sinh ra ngôn ngữ.</para>
+      <para id="id20567250">Xét máy Turing có nhiều băng, một trong các băng đó được xem là băng output, trên băng này một ký hiệu được viết lên sẽ không bị thay đổi và đầu đọc của băng này không bao giờ dịch trái.</para>
+      <para id="id20567266">Giả sử trên băng output, M sẽ viết chuỗi các ký tự thuộc bộ chữ cái , các chuỗi được viết ngăn cách nhau bởi dấu #. Ta định nghĩa G(M) là ngôn ngữ sinh bởi máy Turing M, là tập hợp tất cả các từ w  * được viết giữa hai dấu # trên băng output. Chú ý rằng trừ khi M không dừng, G(M) luôn luôn hữu hạn. Ta cũng không yêu cầu các từ được sinh ra theo một thứ tự nào đó, và cũng không yêu cầu mỗi từ chỉ sinh ra đúng một lần.</para>
+      <section id="id-569809900039">
+        <title>Tính chất đệ qui liệt kê của tập sinh</title>
+        <para id="id20567330">BỔ ĐỀ 7.1: Nếu L là G(M1) với TM M1 nào đó thì L là tập đệ qui liệt kê</para>
+        <para id="id20567363">Chứng minh</para>
+        <para id="id20567368">Ta xây dựng M2 có nhiều hơn M1 một băng, M2 sẽ thực hiện tương tự M1, M2 dùng tất cả các thành phần của M1 chỉ trừ băng input của M1, nhưng khi M1 in # trên băng output của M1 thì M2 lấy input của M2 so sánh với từ vừa được sinh trên băng output của M1. Nếu giống thì M2 chấp nhận, ngược lại M2 tiếp tục làm tương tự M1. Rõ ràng M2 chấp nhận input w nếu và chỉ nếu M1 sinh ra w, vậy G(M1) là tập đệ qui liệt kê.</para>
+        <para id="id20567543">Chứng minh điều ngược lại của bổ đề trên là khó khăn hơn. Giả sử M1 là bộ nhận dạng của một tập hợp đệ qui liệt kê L  * nào đó. Nếu ta cố gắng thiết kế một bộ sinh ra L có thể sinh mọi từ thuộc * theo thứ tự nào đó là w1, w2, ... , ta cho chạy M1 trên w1, nếu M1 chấp nhận thì sinh ra w1. Rồi chạy M1 với w2, ..., cứ lần lượt như thế với mọi từ. Phương pháp này chỉ đúng nếu M1 dừng trên mọi input. Tuy nhiên, do có các tập đệ qui liệt kê nhưng không đệ qui vì vậy M1 có thể không dừng với một input wi nào đó và tất nhiên ta sẽ không bao giờ xét được các từ sau đó wi+1, wi+2, ... ngay cả khi M1 chấp nhận chúng.</para>
+        <para id="id20567736">Từ phân tích trên, ta thấy vấn đề đặt ra là phải thiết kế bộ sinh sao cho nó có thể tránh được trường hợp trên. Để làm như vậy trước hết ta đánh số thứ tự các từ thuộc * rồi ta sinh ra từng cặp số nguyên dương (i, j). Việc sinh ra cặp (i, j) có ý nghĩa như là M1 sinh ra từ thứ i bằng j bước. Cụ thể, ta đánh số các từ trong * theo "thứ tự chuẩn" (canonical order) như sau: liệt kê các từ theo độ dài, với các từ có cùng độ dài được liệt kê theo thứ tự số, tức là nếu  = {a0, a1, ..., ak-1} thì mỗi từ w  * coi như là một số trong hệ k-phân. Ta có thể thiết kế TM sinh ra các từ theo thứ tự chuẩn là không khó khăn gì.</para>
+        <para id="id20567872">Thí dụ 7.9 :Nếu  = {0,1} thì các từ liệt kê theo thứ tự chuẩn là: , 0, 1, 00, 01, 10, 11, 000, 001, ... Xét cách sinh ra cặp sinh (i, j) sau một lượng thời gian hữu hạn. Nếu sinh theo thứ tự (1, 1), (1, 2), ... thì sẽ không bao giờ sinh được cặp (i, j) với i &gt; 1. Thay vào đó ta cho sinh ra cặp (i, j) theo thứ tự i + j, vì số lượng cặp (i, j) thỏa i + j bằng hằng số là hữu hạn nên cặp (i, j) bất kỳ sẽ được sinh ra sau một lượng thời gian hữu hạn, cụ thể ta có thể chứng minh: cặp (i, j) sẽ được sinh ở lần sinh thứ :</para>
+        <para id="id20567930">(i + j - 1)(i + j - 2) / 2+ i.</para>
+        <para id="id20567934">Máy Turing sinh ra các cặp sinh (i, j) viết trong hệ nhị phân là dễ dàng được thiết kế và ta gọi máy Turing này là bộ sinh cặp.</para>
+        <para id="id20567947">ĐỊNH LÝ 7.7 : Một ngôn ngữ là tập đệ qui liệt kê nếu và chỉ nếu nó là G(M2) với TM M2 nào đó.</para>
+        <para id="id20567979">Chứng minh</para>
+        <para id="id20567984">Với bổ đề 1 ta chỉ cần chỉ ra rằng nếu L = L(M1) thì L được sinh ra bởi TM M2. M2 tương tự như bộ sinh cặp. Khi (i, j) được sinh ra, M2 sản xuất từ thứ i theo thứ tự chuẩn và làm tương tự M1 trên từ wi với j bước. Nếu M1 chấp nhận từ thứ i với j bước thì M2 sinh ra wi. Chắc chắn rằng M2 không sinh ra từ không thuộc L, đặt w là từ thứ i trong thứ tự chuẩn trên bộ chữ cái L và M1 chấp nhận w bằng j bước. Vì chỉ cần một lượng thời gian hữu hạn để M2 sinh ra bất kỳ từ nào và làm tương tự như M1 nên M2 chắc chắn sinh ra (i, j). Lúc này w sẽ được sinh ra bởi M2. Vậy L = G(M2)</para>
+        <para id="id20568149">HỆ QUẢ : Nếu L là tập đệ qui liệt kê thì có một bộ sinh sinh ra mỗi từ trong L đúng một lần.</para>
+      </section>
+      <section id="id-204719871336">
+        <title>Tính chất đệ qui của tập sinh</title>
+        <para id="id20568174">BỔ ĐỀ 7.2: Nếu L là tập đệ qui thì có một bộ sinh in ra các từ của L theo thứ tự chuẩn và không in ra các từ khác.</para>
+        <para id="id20568191">Chứng minh</para>
+        <para id="id20568196">Đặt L = L(M1)  * trong đó M1 dừng với mọi input. Ta xây dựng M2 sinh ra L như sau M2 sinh ra các từ thuộc * mỗi lần một từ theo thứ tự chuẩn. Sau khi sinh ra một từ w, M2 làm tương tự M1 trên w. Nếu M1 chấp nhận w thì M2 sinh ra w. Vì M1 chắc chắn dừng nên M2 cũng sẽ dừng sau hữu hạn bước và chắc chắn sẽ xét mỗi từ thuộc *. Vậy M2 sinh ra L theo thứ tự chuẩn.</para>
+        <para id="id20568357">Điều ngược lại của bổ đề trên cũng đúng, tức là, nếu L được sinh ra theo thứ tự chuẩn thì L là tập đệ qui. Nghĩa là có TM nhận diện M tồn tại, tuy nhiên không có một giải thuật cụ thể cho TM này.</para>
+        <para id="id20568368">Giả sử M1 sinh ra L theo thứ tự chuẩn. Một ý nghĩ tự nhiên là ta xây dựng M2 làm tương tự M1 trên input w cho tới khi M1 sinh ra w hoặc sinh ra từ sau w (theo thứ tự chuẩn). Trong trường hợp đầu, M2 chấp nhận w, trong trường hợp sau M2 dừng nhưng không chấp nhận w. Rõ ràng nếu L hữu hạn thì M1 có thể không dừng sau khi sinh ra từ cuối cùng trong L (vì theo định lý trên M1 không sinh từ nào không thuộc L). Trong trường hợp này M2 cũng không dừng. Điều này chỉ gặp khi L hữu hạn, nhưng do không có cách xác định TM có sinh ra tập hữu hạn hay không hoặc nếu biết TM sinh ra tập hữu hạn thì cũng không thể biết tập hợp đó là gì. Vậy ta biết là có TM chấp nhận L, nhưng không thể đưa ra một giải thuật cụ thể cho TM này.</para>
+        <para id="id20510957">ĐỊNH LÝ 7.8 : L là tập đệ qui nếu và chỉ nếu L được sinh ra theo thứ tự chuẩn.</para>
+        <para id="id20510972">Chứng minh</para>
+        <para id="id20510976">Ta chỉ cần chứng minh phần nếu.</para>
+        <para id="id20510982">Khi L hữu hạn thì sẽ có một ôtômát chấp nhận L và vì vậy L được chấp nhận bởi TM luôn luôn dừng trên tất cả các input.</para>
+      </section>
+    </section>
+    <section id="id-459850070431">
+      <title>SỰ TƯƠNG ĐƯƠNG GIỮA VĂN PHẠM kIỂU 0 VÀ MÁY TURING</title>
+      <para id="id20511006">Họ văn phạm rộng lớn nhất theo sự phân cấp của Noam Chomsky đòi hỏi các luật sinh có dạng   , với ,  là các chuỗi tùy ý chứa ký hiệu văn phạm sao cho   . Lớp văn phạm này được biết như là văn phạm kiểu 0, văn phạm ngữ cấu hay văn phạm không hạn chế. </para>
+      <para id="id20511119">Thí dụ 7.10 :Cho một văn phạm không hạn chế sinh ra ngôn ngữ </para>
+      <para id="id20511134">L = { ai  i là lũy thừa dương của 2 } với tập luật sinh như sau :</para>
+      <para id="id20511161">G ({S, A, B, C, D, E}, {a,  }, P, S)</para>
+      <para id="id20511178">Với P = {1. S  ACaB</para>
+      <para id="id20511197">2. Ca  aaC</para>
+      <para id="id20511213">3. CB  DB</para>
+      <para id="id20511229">4. CB  E</para>
+      <para id="id20511245">5. aD  Da</para>
+      <para id="id20511261">6. AD  AC</para>
+      <para id="id20511277">7. aE  Ea </para>
+      <para id="id20511293">8. AE   }</para>
+      <para id="id20511320">Trong văn phạm trên, biến A và B giữ vai trò là ký hiệu đánh dấu cận trái và cận phải của một chuỗi thuộc ngôn ngữ. C di chuyển từ trái sang phải qua chuỗi các ký hiệu a nằm giữa hai biến A và B, và gấp đôi số ký hiệu a đó lên theo luật sinh (2). Khi C chạm đến cận phải B, nó sẽ thay thế thành D hay E theo luật sinh (3) hoặc (4). Nếu D được chọn thay thế thì D lại quay về trái theo luật sinh (5), cho đến khi gặp cận trái A thì thay thế lại thành C theo luật sinh (6) và cho phép lặp lại chu trình. Còn nếu E được chọn để thay thế, thì theo luật sinh (4), B sẽ biến mất, sau đó E quay về trái theo luật sinh (7) cho đến khi gặp cận trái A thì xóa A và mất đi theo luật sinh (8), cho ra chuỗi có dạng 2i ký hiệu a, với i &gt; 0.</para>
+      <para id="id20511366">Có thể chứng minh bằng quy nạp theo số bước dẫn xuất rằng nếu luật sinh (4) chưa được dùng đến thì chuỗi trong dẫn xuất có một trong ba dạng như sau :</para>
+      <list id="id20511378" list-type="enumerated">
+        <item>S</item>
+        <item>AaiCajB, với i + 2j là một lũy thừa dương của 2.</item>
+        <item>AaiDajB, với i + j là một lũy thừa dương của 2.</item>
+      </list>
+      <para id="id20511440">Khi luật sinh (4) được áp dụng thì ta sẽ có chuỗi dạng AaiE, trong đó i là một lũy thừa dương của 2. Sau đó, ta chỉ có thể áp dụng i lần luật sinh (7) để đi tới dạng câu AEai. Cuối cùng, với luật sinh (8), ta thu được chuỗi dạng ai với i là lũy thừa dương của 2.</para>
+      <para id="id20511484">Phần tiếp theo dưới đây, chúng ta sẽ xét mối tương quan giữa văn phạm không hạn chế này và mô hình máy Turing. Chúng ta chứng minh hai Định lý dưới đây thể hiện mối tương quan giữa lớp văn phạm không hạn chế và lớp ngôn ngữ đệ quy liệt kê r.e – lớp ngôn ngữ được chấp nhận bởi một máy Turing. Định lý đầu tiên sẽ chứng tỏ rằng mọi ngôn ngữ kiểu 0 phát sinh một tập r.e. Và sau đó ta sẽ xây dựng một giải thuật để liệt kê tất cả các chuỗi thuộc văn phạm kiểu 0.</para>
+      <para id="id20511509">ĐỊNH LÝ 7.9 : Nếu L là L(G) với một văn phạm không hạn chế G(V, T, P, S) thì L là ngôn ngữ đệ quy liệt kê.</para>
+      <para id="id20511525">Chứng minh</para>
+      <para id="id20511529">Thiết lập một máy Turing M không đơn định, hai băng chấp nhận ngôn ngữ L. Băng thứ nhất (băng 1) của TM chứa chuỗi nhập w, còn băng thứ hai (băng 2), máy phát sinh các dạng chuỗi  của G. Đầu tiên, chuỗi  được phát sinh trên băng 2 là ký hiệu bắt đầu S. Sau đó, TM lặp lại quá trình sau :</para>
+      <para id="id20511566">(i) Chọn một cách ngẫu nhiên một vị trí i trên  với 1  i    , nghĩa là TM xuất phát từ bên trái chuỗi  rồi tùy chọn giữa hai khả năng : hoặc chọn i là vị trí hiện tại, hoặc dịch chuyển sang phải và lặp lại quá trình.</para>
+      <para id="id20511643">(ii) Chọn một luật sinh    trong số các luật sinh thuộc tập luật sinh của G.</para>
+      <para id="id20511679">(iii) Nếu chuỗi con  xuất hiện trong  kể từ vị trí thứ i, TM thay thế chuỗi  bởi  (dĩ nhiên nếu        thì phải dịch chuyển phần cuối của  để đủ chỗ trống cần cho phép thay thế)</para>
+      <para id="id20511797">(iv) So sánh chuỗi phát sinh được với chuỗi nhập w trên băng 1. Nếu giống nhau thì chuỗi mới phát sinh sẽ được chấp nhận. Nếu khác nhau thì TM trở về bước (i). Ta có thể chứng minh được rằng tất cả và chỉ có những chuỗi thuộc G mới xuất hiện trên băng 2 ở bước (iv).</para>
+      <para id="id20511812">Vậy L(M) = L(G) = L.</para>
+      <para id="id20511817">ĐỊNH LÝ 7.10 : Nếu L là ngôn ngữ đệ quy liệt kê thì L = L(G) với một văn phạm không hạn chế G nào đó.</para>
+      <para id="id20511833">Chứng minh</para>
+      <para id="id20511837">Giả sử ngôn ngữ L được chấp nhận bởi máy Turing M (Q, å, , , q0, B, F). Ta sẽ xây dựng một văn phạm không hạn chế G mà mỗi chuỗi dẫn xuất của nó phát sinh theo ba bước như sau :</para>
+      <para id="id20511886">(i) G phát sinh một cách ngẫu nhiên một chuỗi w thuộc . Chuỗi này được viết thành hai bản : một sẽ lưu giữ cho đến khi kết thúc, một sẽ thay đổi trong quá trình làm việc của TM.</para>
+      <para id="id20511910">(ii) G mô phỏng lại quá trình làm việc của của TM trên chuỗi w, bằng cách lặp lại đúng quá trình làm việc của TM.</para>
+      <para id="id20511919">(iii) Khi bước (ii) kết thúc, với sự xuất hiện của một trạng thái kết thúc q  F của TM (nghĩa là chuỗi w đã được TM chấp nhận). Lúc đó G tiếp tục thu giảm để chuyển dạng câu đã có về như chuỗi w. Và như vậy, có nghĩa là chuỗi w đã được G sinh ra. </para>
+      <para id="id20511946">Một cách hình thức, ta thiết lập văn phạm G (V, , P, S1) </para>
+      <para id="id20511972">Với V = ( (  {  })  )  { S1, S2, # })</para>
+      <para id="id20512049">Và tập luật sinh P được xây dựng như sau :</para>
+      <list id="id20512056" list-type="enumerated">
+        <item>a) S1  #q0 S2#</item>
+      </list>
+      <para id="id20512101">b) S2  [a, a] S2#, a  </para>
+      <para id="id20512159">c) S2  </para>
+      <para id="id20512188">- Nếu (q, X) = (p, Y, R) với p, q  ; X, Y   thì thêm các luật sinh dạng (2a) và (2b) sau đây vào tập luật sinh P :</para>
+      <para id="id20512244">2. a) q[a, X][b, Z]  [a, Y]p[b, Z], a, b    {} và Z  </para>
+      <para id="id20512330"> b) q[a, X]#  [a, Y]p[, B], a    {} </para>
+      <para id="id20512404">- Nếu (q, X) = (p, Y, L) với p, q  ; X, Y   thì thêm các luật sinh dạng (2c) sau đây vào tập luật sinh P :</para>
+      <para id="id20512459">c) [b, Z]q[a, X]  q[b, Z]p[a, Y], a, b    {} và Z  </para>
+      <para id="id20512543">- Nếu q  F thì thêm các luật sinh (3a-e) sau đây vào tập luật sinh P:</para>
+      <para id="id20512563">3. a) [a, X]q  qap, a    {} và X  </para>
+      <para id="id20512649">b) q[a, X]  qap, a    {} và X  </para>
+      <para id="id20512729">c) q#  </para>
+      <para id="id20512750">d) #q  </para>
+      <para id="id20512770">e) q  </para>
+      <para id="id20512791">Dùng các luật sinh (1a-c), ta có chuỗi dẫn xuất :</para>
+      <para id="id20512798">S1  G* #q0 [a1, a1][a2, a2] … [an, an]#</para>
+      <para id="id20512893">Chuỗi dẫn xuất này thể hiện hình thái bắt đầu của TM là : #q0a1a2 … an#. Bắt đầu từ bước này các quy tắc (2a-c) được áp dụng. Lưu ý rằng các luật sinh này trong G phản ánh các quy tắc chuyển trạng thái đã được thiết kế cho TM. Cho nên quá trình dẫn xuất lại trong G sẽ mô phỏng lại các bước chuyển hình thái trong quá trình làm việc của TM. Nếu quá trình đó chuyển đến một trong những trạng thái kết thúc q  F, tương ứng với trường hợp TM chấp nhận chuỗi a1a2 … an, thì trong văn phạm G các quy tắc (3a-e) sẽ được áp dụng tiếp theo và cho phép G dẫn xuất ra chính chuỗi nhập a1a2 … an. Hay ta có : S G* a1a2 … an</para>
+      <para id="id20513052">Phần chứng minh L(M)  L(G) và L(G)  L(M) xem như bài tập.</para>
+      <para id="id20513080">Tổng kết chương VII: Với sự giới thiệu mô hình máy Turing như là một mô hình của sự tính toán, người ta còn đi tới khái niệm về độ phức tạp của tính toán hay “độ khó” của các bài toán. Nghiên cứu về độ phức tạp của tính toán là một hướng nghiên cứu hiện đại trong Tin học, nó có ý nghĩa lớn lao về lý thuyết cũng như thực hành. Kết thúc chương này, sự phân lớp ngôn ngữ theo nguyên tắc của Noam Chomsky đã được thể hiện tương đối rõ ràng. </para>
+      <para id="id20513103">BÀI TẬP CHƯƠNG VII</para>
+      <para id="id20513111">7.1. Thiết kế máy Turing nhận diện ngôn ngữ:</para>
+      <para id="id20513124">a) { 0n 1n 0n | n ³ 1} </para>
+      <para id="id20513173">b) {ww R | w Î (0+1)*}</para>
+      <para id="id20513206">c) Tập hợp các chuỗi chứa 0 và 1, có số số 0 và số số 1 bằng nhau.</para>
+      <para id="id20513214">7.2. Thiết kế máy Turing tính các hàm số nguyên:</para>
+      <para id="id20513227">a) f(n) = n2</para>
+      <para id="id20513239">b) f(n) = 2n</para>
+      <para id="id20513250">c) f(n) = n ! </para>
+      <para id="id20513255">7.3. Xây dựng văn phạm không hạn chế (loại 0) sinh ra các ngôn ngữ sau:</para>
+      <para id="id20513269">a) { ww | w Î (0+1)*}</para>
+      <para id="id20513302">b) { 0k | k = i2 và i ³ 1} </para>
+      <para id="id20513343">c) { 0i | i không là số nguyên tố} </para>
+      <para id="id20513367">BÀI TẬP LẬP TRÌNH</para>
+      <para id="id20513372">7.4. Viết chương trình máy tính mô phỏng hoạt động của các TM thiết kế trong bài tập 7.1 và 7.2.</para>
+    </section>
+  </content>
+</document>

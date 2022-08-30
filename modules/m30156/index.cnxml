@@ -58,7 +58,7 @@ http://www-csli.stanford.edu/hp/Turing1.html</md:abstract>
         <para id="id20555324">. q0  Q là trạng thái bắt đầu</para>
         <para id="id20555349">. F  Q là tập các trạng thái kết thúc</para>
         <para id="id20555367">Hình thái TM (Instantaneous description - ID)</para>
-        <para id="id20555376"><m:math><m:semantics><m:mrow/><m:annotation encoding="StarMath 5.0">{}</m:annotation></m:semantics></m:math>Một hình thái của máy Turing M được cho bởi 1 q 2, trong đó q là trạng thái hiện hành của M; 12  * là nội dung của băng tính từ đầu băng cho tới ký hiệu khác Blank bên phải nhất của băng. Giả sử Q và  rời nhau: đầu đọc đang đọc ký hiệu bên trái nhất của 2 hoặc nếu 2 =  thì đầu đọc đọc Blank.</para>
+        <para id="id20555376">Một hình thái của máy Turing M được cho bởi 1 q 2, trong đó q là trạng thái hiện hành của M; 12  * là nội dung của băng tính từ đầu băng cho tới ký hiệu khác Blank bên phải nhất của băng. Giả sử Q và  rời nhau: đầu đọc đang đọc ký hiệu bên trái nhất của 2 hoặc nếu 2 =  thì đầu đọc đọc Blank.</para>
         <para id="id20555549">Hàm chuyển </para>
         <para id="id20555554">Ta định nghĩa một phép chuyển trạng thái của TM như sau : </para>
         <para id="id20555564">Đặt X1X2 ... Xi-1 q Xi ... Xn là một ID. </para>
